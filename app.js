@@ -13,6 +13,7 @@ function show(screen) {
 
 // NAV
 function goAuth() {
+  document.getElementById("lockScreen").classList.add("hidden");
   show("auth");
 }
 
@@ -21,7 +22,6 @@ async function register() {
   const name = nameInput.value;
   const email = emailInput.value;
   const password = passwordInput.value;
-  const code = codeInput.value;
 
   const res = await fetch(API_URL, {
     method: "POST",
@@ -37,17 +37,6 @@ async function register() {
 
   if (data.success) {
     alert("Kodas: " + data.token);
-
-    if (code) {
-      await fetch(API_URL, {
-        method: "POST",
-        body: JSON.stringify({
-          action: "redeemCode",
-          email,
-          code
-        })
-      });
-    }
   } else {
     alert(data.error);
   }
@@ -80,15 +69,15 @@ async function login() {
   }
 }
 
-// VIDEOS
+// LOAD VIDEOS
 async function loadVideos() {
   const res = await fetch("videos.json");
-  const videos = await res.json();
+  const list = await res.json();
 
   const container = document.getElementById("videos");
   container.innerHTML = "";
 
-  videos.forEach(v => {
+  list.forEach(v => {
     const el = document.createElement("div");
 
     el.innerHTML = `
@@ -103,7 +92,10 @@ async function loadVideos() {
 
 // WATCH
 async function watch(url) {
-  if (!loggedIn) return alert("Prisijunkite");
+  if (!loggedIn) {
+    alert("Prisijunkite");
+    return;
+  }
 
   const email = localStorage.getItem("email");
 
@@ -117,7 +109,8 @@ async function watch(url) {
 
   const data = await res.json();
 
-  if (!data.allowed) {
+  // ONLY trigger lock when actually blocked
+  if (data.allowed === false) {
     document.getElementById("lockScreen").classList.remove("hidden");
     return;
   }
@@ -128,12 +121,8 @@ async function watch(url) {
   playerModal.classList.remove("hidden");
 }
 
-// CLOSE
+// CLOSE PLAYER
 function closePlayer() {
   playerModal.classList.add("hidden");
   player.src = "";
-}
-
-function closeLock() {
-  document.getElementById("lockScreen").classList.add("hidden");
 }
