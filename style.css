@@ -5,11 +5,9 @@
 
 body {
   margin: 0;
-  height: 100vh;
-  overflow-x: hidden;
 }
 
-/* Background gradient */
+/* Background */
 .background {
   position: fixed;
   width: 100%;
@@ -50,7 +48,6 @@ button {
   background: rgba(255,255,255,0.3);
   color: white;
   cursor: pointer;
-  transition: 0.2s;
 }
 
 button:hover {
@@ -107,10 +104,10 @@ iframe {
   border: none;
 }
 
-/* Close button */
 .close-btn {
   margin-top: 10px;
   background: #4facfe;
+  color: white;
 }
 
 /* Lock screen */
