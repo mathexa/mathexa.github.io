@@ -3,37 +3,62 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mathexa v0.1.12test</title>
+<title>Mathexa v0.1.12</title>
 <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<div class="center" id="landing">
-  <div class="card">
-    <h1>Mathexa</h1>
-    <button onclick="goAuth()">Pradėti</button>
-  </div>
+<div class="app">
+
+<!-- LANDING -->
+<div id="landing" class="screen active">
+  <h1>Mathexa</h1>
+  <button onclick="showScreen('auth')">i have an account</button>
+  <button onclick="showScreen('auth')">create account</button>
 </div>
 
-<div class="center hidden" id="auth">
-  <div class="card">
-    <input id="name" placeholder="Vardas Pavardė">
-    <input id="email" placeholder="El. paštas">
-    <input id="password" type="password" placeholder="Slaptažodis">
-    <button onclick="register()">Registruotis</button>
-    <button onclick="login()">Prisijungti</button>
-    <div id="status"></div>
+<!-- AUTH -->
+<div id="auth" class="screen">
+  <h2>Prisijungimas / Registracija</h2>
+
+  <input id="name" placeholder="Vardas Pavardė">
+  <div class="error" id="nameError"></div>
+
+  <input id="email" placeholder="El. paštas">
+  <div class="error" id="emailError"></div>
+
+  <input id="password" type="password" placeholder="Slaptažodis">
+  <div class="error" id="passwordError"></div>
+
+  <div class="phone-row">
+    <input id="phone" value="+370">
+    <span class="info" onclick="toggleInfo()">ℹ️</span>
   </div>
+  <div id="phoneInfo" class="info-box">
+    Jei neturite lietuviško telefono numerio, naudosime jūsų el. paštą, todėl įsitikinkite, kad jis teisingas
+  </div>
+  <div class="error" id="phoneError"></div>
+
+  <select id="role">
+    <option value="">Pasirinkite rolę</option>
+    <option value="student">Studentas</option>
+    <option value="teacher">Mokytojas</option>
+  </select>
+  <div class="error" id="roleError"></div>
+
+  <button onclick="register()">Registruotis</button>
+  <button onclick="login()">Prisijungti</button>
+
+  <div id="status"></div>
 </div>
 
-<div id="videos" class="hidden"></div>
+<!-- VIDEOS -->
+<div id="videos" class="screen">
+  <h2>Vaizdo įrašai</h2>
+  <button onclick="activateCode()">Aktyvuoti kodą</button>
+  <div id="videoList"></div>
+</div>
 
-<div id="lock" class="lock hidden">
-  <div>
-    <h2>Limitas pasiektas</h2>
-    <button onclick="goAuth()">Grįžti</button>
-  </div>
 </div>
 
 <script src="app.js"></script>
