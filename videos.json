@@ -1,10 +1,18 @@
 [
   {
     "title": "Matematika 1",
+    "category": "math",
+    "language": "lt",
+    "duration": "10:25",
+    "platform": "youtube",
     "url": "https://www.youtube.com/watch?v=VIDEO1"
   },
   {
-    "title": "Matematika 2",
+    "title": "Fizika 1",
+    "category": "science",
+    "language": "lt",
+    "duration": "08:10",
+    "platform": "youtube",
     "url": "https://www.youtube.com/watch?v=VIDEO2"
   }
 ]
