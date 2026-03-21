@@ -1,18 +1,6 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbxR4KL0Sjl2FtB6uQ4kK11Rsmjl-PMc4_gpYz-bzlcF5t5NcoQHdxPWl6fci_bETaSV/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbyZmT5y3R39CNJDAA8vGsjM7eiuwLjFzs5jNLBl0t1PtJWpL8-g3tvV5vUpRkkIbDFbLQ/exec";
 
 let currentUser = null;
-
-const nameInput = document.getElementById('name');
-const emailInput = document.getElementById('email');
-const passwordInput = document.getElementById('password');
-const phoneInput = document.getElementById('phone');
-const roleInput = document.getElementById('role');
-
-const nameError = document.getElementById('nameError');
-const emailError = document.getElementById('emailError');
-const passwordError = document.getElementById('passwordError');
-const phoneError = document.getElementById('phoneError');
-const roleError = document.getElementById('roleError');
 
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -24,106 +12,76 @@ function toggleInfo() {
   box.style.display = box.style.display === 'block' ? 'none' : 'block';
 }
 
-function validateRegister() {
-  let valid = true;
-
-  nameError.innerText = "";
-  emailError.innerText = "";
-  passwordError.innerText = "";
-  phoneError.innerText = "";
-  roleError.innerText = "";
-
-  if (nameInput.value.trim().split(" ").length < 2) {
-    nameError.innerText = "Įveskite vardą ir pavardę";
-    valid = false;
-  }
-
-  if (!/^\S+@\S+\.\S+$/.test(emailInput.value)) {
-    emailError.innerText = "Neteisingas el. paštas";
-    valid = false;
-  }
-
-  if (passwordInput.value.length < 6) {
-    passwordError.innerText = "Mažiausiai 6 simboliai";
-    valid = false;
-  }
-
-  const phone = phoneInput.value.trim();
-  if (phone !== "" && phone !== "+370") {
-    if (!/^\+?[0-9]{8,15}$/.test(phone)) {
-      phoneError.innerText = "Neteisingas numeris";
-      valid = false;
-    }
-  }
-
-  if (!roleInput.value) {
-    roleError.innerText = "Pasirinkite rolę";
-    valid = false;
-  }
-
-  return valid;
-}
-
-function setStatus(msg) {
-  document.getElementById('status').innerText = msg;
+function setStatus(id, msg) {
+  document.getElementById(id).innerText = msg;
 }
 
 async function register() {
-  if (!validateRegister()) return;
+  const name = document.getElementById('name').value;
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  const phone = document.getElementById('phone').value;
+  const role = document.getElementById('role').value;
 
-  setStatus("Kraunama...");
+  setStatus("registerStatus", "Kraunama...");
 
   try {
     const res = await fetch(API_URL, {
       method: "POST",
       body: JSON.stringify({
         action: "register",
-        name: nameInput.value,
-        email: emailInput.value,
-        password: passwordInput.value,
-        phone: phoneInput.value,
-        role: roleInput.value
+        name,
+        email,
+        password,
+        phone,
+        role
       })
     });
 
     const data = await res.json();
 
     if (data.success) {
-      setStatus("Sėkminga registracija");
+      currentUser = email;
+      loadVideos();
+      showScreen('videos');
     } else {
-      setStatus(data.error);
+      setStatus("registerStatus", data.error);
     }
 
   } catch {
-    setStatus("Serverio klaida");
+    setStatus("registerStatus", "Serverio klaida");
   }
 }
 
 async function login() {
-  setStatus("Kraunama...");
+  const email = document.getElementById('loginEmail').value;
+  const password = document.getElementById('loginPassword').value;
+
+  setStatus("loginStatus", "Kraunama...");
 
   try {
     const res = await fetch(API_URL, {
       method: "POST",
       body: JSON.stringify({
         action: "login",
-        email: emailInput.value,
-        password: passwordInput.value
+        email,
+        password
       })
     });
 
-    const data = await res.json();
+    const text = await res.text();
+    const data = JSON.parse(text);
 
     if (data.success) {
-      currentUser = emailInput.value;
+      currentUser = email;
       loadVideos();
       showScreen('videos');
     } else {
-      setStatus("Neteisingi prisijungimo duomenys");
+      setStatus("loginStatus", "Neteisingi prisijungimo duomenys");
     }
 
   } catch {
-    setStatus("Serverio klaida");
+    setStatus("loginStatus", "Serverio klaida");
   }
 }
 
@@ -184,7 +142,7 @@ async function activateCode() {
     body: JSON.stringify({
       action: "activate",
       email: currentUser,
-      code: code
+      code
     })
   });
 
