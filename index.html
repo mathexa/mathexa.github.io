@@ -13,13 +13,27 @@
 <!-- LANDING -->
 <div id="landing" class="screen active">
   <h1>Mathexa</h1>
-  <button onclick="showScreen('auth')">Turiu paskyrą</button>
-  <button onclick="showScreen('auth')">Sukurti paskyrą</button>
+  <button onclick="showScreen('login')">Turiu paskyrą</button>
+  <button onclick="showScreen('register')">Sukurti paskyrą</button>
 </div>
 
-<!-- AUTH -->
-<div id="auth" class="screen">
-  <h2>Prisijungimas / Registracija</h2>
+<!-- LOGIN -->
+<div id="login" class="screen">
+  <h2>Prisijungimas</h2>
+
+  <input id="loginEmail" placeholder="El. paštas">
+  <div class="error" id="loginEmailError"></div>
+
+  <input id="loginPassword" type="password" placeholder="Slaptažodis">
+  <div class="error" id="loginPasswordError"></div>
+
+  <button onclick="login()">Prisijungti</button>
+  <div id="loginStatus"></div>
+</div>
+
+<!-- REGISTER -->
+<div id="register" class="screen">
+  <h2>Registracija</h2>
 
   <input id="name" placeholder="Vardas Pavardė">
   <div class="error" id="nameError"></div>
@@ -35,7 +49,7 @@
     <span class="info" onclick="toggleInfo()">ℹ️</span>
   </div>
   <div id="phoneInfo" class="info-box">
-    Jei neturite lietuviško telefono numerio, naudosime jūsų el. paštą, todėl įsitikinkite, kad jis teisingas
+    Jei neturite lietuviško telefono numerio, naudosime jūsų el. paštą
   </div>
   <div class="error" id="phoneError"></div>
 
@@ -47,9 +61,7 @@
   <div class="error" id="roleError"></div>
 
   <button onclick="register()">Registruotis</button>
-  <button onclick="login()">Prisijungti</button>
-
-  <div id="status"></div>
+  <div id="registerStatus"></div>
 </div>
 
 <!-- VIDEOS -->
