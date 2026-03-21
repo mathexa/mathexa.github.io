@@ -2,26 +2,46 @@ const API_URL = "https://script.google.com/macros/s/AKfycby4oaibD3PfUGJGO2dCTzXW
 
 let loggedIn = false;
 
-// SCREEN CONTROL
-function show(screen) {
-  document.getElementById("landing").classList.add("hidden");
-  document.getElementById("auth").classList.add("hidden");
-  document.getElementById("videos").classList.add("hidden");
-
-  document.getElementById(screen).classList.remove("hidden");
-}
-
 // NAV
 function goAuth() {
-  document.getElementById("lockScreen").classList.add("hidden");
-  show("auth");
+  landing.classList.add("hidden");
+  auth.classList.remove("hidden");
+}
+
+// VALIDATION
+function validateEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function validatePassword(p) {
+  return p.length >= 6;
 }
 
 // REGISTER
 async function register() {
-  const name = nameInput.value;
-  const email = emailInput.value;
+  const name = nameInput.value.trim();
+  const email = emailInput.value.trim();
   const password = passwordInput.value;
+
+  emailError.innerText = "";
+  passError.innerText = "";
+  status.innerText = "";
+
+  let valid = true;
+
+  if (!validateEmail(email)) {
+    emailError.innerText = "Neteisingas el. paštas";
+    valid = false;
+  }
+
+  if (!validatePassword(password)) {
+    passError.innerText = "Mažiausiai 6 simboliai";
+    valid = false;
+  }
+
+  if (!valid) return;
+
+  status.innerText = "Kuriama...";
 
   const res = await fetch(API_URL, {
     method: "POST",
@@ -36,16 +56,18 @@ async function register() {
   const data = await res.json();
 
   if (data.success) {
-    alert("Kodas: " + data.token);
+    status.innerText = "Sėkminga registracija. Kodas: " + data.token;
   } else {
-    alert(data.error);
+    status.innerText = data.error;
   }
 }
 
 // LOGIN
 async function login() {
-  const email = emailInput.value;
+  const email = emailInput.value.trim();
   const password = passwordInput.value;
+
+  status.innerText = "Jungiama...";
 
   const res = await fetch(API_URL, {
     method: "POST",
@@ -62,20 +84,20 @@ async function login() {
     loggedIn = true;
     localStorage.setItem("email", email);
 
-    show("videos");
+    auth.classList.add("hidden");
     loadVideos();
   } else {
-    alert(data.error);
+    status.innerText = data.error;
   }
 }
 
-// LOAD VIDEOS
+// VIDEOS
 async function loadVideos() {
   const res = await fetch("videos.json");
   const list = await res.json();
 
-  const container = document.getElementById("videos");
-  container.innerHTML = "";
+  videos.classList.remove("hidden");
+  videos.innerHTML = "";
 
   list.forEach(v => {
     const el = document.createElement("div");
@@ -86,17 +108,12 @@ async function loadVideos() {
       <button onclick="watch('${v.url}')">Žiūrėti</button>
     `;
 
-    container.appendChild(el);
+    videos.appendChild(el);
   });
 }
 
 // WATCH
 async function watch(url) {
-  if (!loggedIn) {
-    alert("Prisijunkite");
-    return;
-  }
-
   const email = localStorage.getItem("email");
 
   const res = await fetch(API_URL, {
@@ -109,19 +126,16 @@ async function watch(url) {
 
   const data = await res.json();
 
-  // ONLY trigger lock when actually blocked
   if (data.allowed === false) {
-    document.getElementById("lockScreen").classList.remove("hidden");
+    lockScreen.classList.remove("hidden");
     return;
   }
 
   const id = url.split("v=")[1];
-
   player.src = `https://www.youtube.com/embed/${id}`;
   playerModal.classList.remove("hidden");
 }
 
-// CLOSE PLAYER
 function closePlayer() {
   playerModal.classList.add("hidden");
   player.src = "";
