@@ -50,7 +50,7 @@ button {
   font-size: 12px;
 }
 
-#status {
+#loginStatus, #registerStatus {
   margin-top: 10px;
   color: white;
 }
