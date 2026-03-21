@@ -7,36 +7,43 @@
 </head>
 <body>
 
-<h1>Mathexa</h1>
+<div class="background"></div>
 
-<div id="landing">
-  <button onclick="showRegister()">Esu naujas (5 nemokami)</button>
+<div class="card" id="landing">
+  <h1>Mathexa</h1>
+  <p>Mokykis išmaniau</p>
+
+  <button onclick="showRegister()">Esu naujas</button>
   <button onclick="showLogin()">Turiu paskyrą</button>
 </div>
 
-<div id="auth" style="display:none;">
-  <input id="name" placeholder="Vardas Pavardė"><br>
-  <input id="email" placeholder="El. paštas"><br>
-  <input id="password" type="password" placeholder="Slaptažodis"><br>
-  <input id="code" placeholder="Kodas (nebūtina)"><br>
+<div class="card hidden" id="auth">
+  <h2>Prisijungimas / Registracija</h2>
 
-  <button onclick="register()">Registruotis</button>
-  <button onclick="login()">Prisijungti</button>
-</div>
+  <input id="name" placeholder="Vardas Pavardė">
+  <input id="email" placeholder="El. paštas">
+  <input id="password" type="password" placeholder="Slaptažodis">
+  <input id="code" placeholder="Kodas (nebūtina)">
 
-<div id="videos"></div>
-
-<div id="playerModal" class="modal">
-  <div class="modal-content">
-    <span onclick="closePlayer()">X</span>
-    <iframe id="player" width="100%" height="400"></iframe>
+  <div class="row">
+    <button onclick="register()">Registruotis</button>
+    <button onclick="login()">Prisijungti</button>
   </div>
 </div>
 
-<div id="lockScreen" class="lock">
-  <div>
-    <h2>Pasiekėte limitą</h2>
-    <p>Įsigykite prenumeratą</p>
+<div id="videos" class="videos"></div>
+
+<div id="playerModal" class="modal hidden">
+  <div class="modal-box">
+    <iframe id="player"></iframe>
+    <button class="close-btn" onclick="closePlayer()">Uždaryti</button>
+  </div>
+</div>
+
+<div id="lockScreen" class="lock hidden">
+  <div class="lock-box">
+    <h2>Limitas pasiektas</h2>
+    <p>Įsigykite prenumeratą, kad tęstumėte</p>
   </div>
 </div>
 
