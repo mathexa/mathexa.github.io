@@ -1,8 +1,10 @@
 [
   {
-    "title": "Matematika pagrindai",
-    "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    "language": "LT",
-    "duration": "10:00"
+    "title": "Matematika 1",
+    "url": "https://www.youtube.com/watch?v=VIDEO1"
+  },
+  {
+    "title": "Matematika 2",
+    "url": "https://www.youtube.com/watch?v=VIDEO2"
   }
 ]
