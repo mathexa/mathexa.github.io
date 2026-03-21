@@ -1,23 +1,27 @@
 const API_URL = "https://script.google.com/macros/s/AKfycby4oaibD3PfUGJGO2dCTzXW5cjBIW-0g9V1dMH8GeIy6u08jTqGr1BJ_NOREyUZPLaPhw/exec";
 
-let isLoggedIn = false;
+let loggedIn = false;
 
-// UI
-function showRegister() {
+// SCREEN CONTROL
+function show(screen) {
   document.getElementById("landing").classList.add("hidden");
-  document.getElementById("auth").classList.remove("hidden");
+  document.getElementById("auth").classList.add("hidden");
+  document.getElementById("videos").classList.add("hidden");
+
+  document.getElementById(screen).classList.remove("hidden");
 }
 
-function showLogin() {
-  showRegister();
+// NAV
+function goAuth() {
+  show("auth");
 }
 
 // REGISTER
 async function register() {
-  const name = document.getElementById("name").value;
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-  const code = document.getElementById("code").value;
+  const name = nameInput.value;
+  const email = emailInput.value;
+  const password = passwordInput.value;
+  const code = codeInput.value;
 
   const res = await fetch(API_URL, {
     method: "POST",
@@ -32,10 +36,17 @@ async function register() {
   const data = await res.json();
 
   if (data.success) {
-    alert("Jūsų kodas: " + data.token);
+    alert("Kodas: " + data.token);
 
     if (code) {
-      await redeemCode(email, code);
+      await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({
+          action: "redeemCode",
+          email,
+          code
+        })
+      });
     }
   } else {
     alert(data.error);
@@ -44,8 +55,8 @@ async function register() {
 
 // LOGIN
 async function login() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+  const email = emailInput.value;
+  const password = passwordInput.value;
 
   const res = await fetch(API_URL, {
     method: "POST",
@@ -59,30 +70,17 @@ async function login() {
   const data = await res.json();
 
   if (data.success) {
+    loggedIn = true;
     localStorage.setItem("email", email);
-    isLoggedIn = true;
 
-    document.getElementById("auth").classList.add("hidden");
-
+    show("videos");
     loadVideos();
   } else {
     alert(data.error);
   }
 }
 
-// REDEEM
-async function redeemCode(email, code) {
-  await fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify({
-      action: "redeemCode",
-      email,
-      code
-    })
-  });
-}
-
-// LOAD VIDEOS
+// VIDEOS
 async function loadVideos() {
   const res = await fetch("videos.json");
   const videos = await res.json();
@@ -95,20 +93,17 @@ async function loadVideos() {
 
     el.innerHTML = `
       <h3>${v.title}</h3>
-      <p>${v.language} | ${v.duration} | ${v.category}</p>
-      <button onclick="openVideo('${v.url}')">Žiūrėti</button>
+      <p>${v.language} | ${v.duration}</p>
+      <button onclick="watch('${v.url}')">Žiūrėti</button>
     `;
 
     container.appendChild(el);
   });
 }
 
-// VIDEO ACCESS
-async function openVideo(url) {
-  if (!isLoggedIn) {
-    alert("Pirmiausia prisijunkite");
-    return;
-  }
+// WATCH
+async function watch(url) {
+  if (!loggedIn) return alert("Prisijunkite");
 
   const email = localStorage.getItem("email");
 
@@ -128,14 +123,17 @@ async function openVideo(url) {
   }
 
   const id = url.split("v=")[1];
-  document.getElementById("player").src =
-    `https://www.youtube.com/embed/${id}`;
 
-  document.getElementById("playerModal").classList.remove("hidden");
+  player.src = `https://www.youtube.com/embed/${id}`;
+  playerModal.classList.remove("hidden");
 }
 
-// CLOSE PLAYER
+// CLOSE
 function closePlayer() {
-  document.getElementById("playerModal").classList.add("hidden");
-  document.getElementById("player").src = "";
+  playerModal.classList.add("hidden");
+  player.src = "";
+}
+
+function closeLock() {
+  document.getElementById("lockScreen").classList.add("hidden");
 }
