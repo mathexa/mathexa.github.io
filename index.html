@@ -1,111 +1,45 @@
 <!DOCTYPE html>
 <html lang="lt">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projektas netrukus</title>
-
-    <style>
-        body {
-            margin: 0;
-            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0a3d91, #1e90ff);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-        }
-
-        .container {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(15px);
-            border-radius: 20px;
-            padding: 40px;
-            width: 90%;
-            max-width: 600px;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-        }
-
-        h1 {
-            margin-bottom: 20px;
-            font-size: 28px;
-        }
-
-        p {
-            font-size: 18px;
-            line-height: 1.6;
-        }
-
-        .lang-switch {
-            margin-top: 25px;
-        }
-
-        button {
-            background: white;
-            color: #0a3d91;
-            border: none;
-            padding: 10px 16px;
-            margin: 5px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.2s;
-        }
-
-        button:hover {
-            background: #e0eaff;
-        }
-
-        .footer {
-            margin-top: 25px;
-            font-size: 14px;
-            opacity: 0.8;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Mathexa</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="container">
-    <h1 id="title">Projektas kuriamas</h1>
-    <p id="text">
-        Ši svetainė buvo sukurta rezervuoti šį URL mūsų būsimam projektui. 
-        Ji taip pat bus naudojama prototipų kūrimui.
-    </p>
+<h1>Mathexa</h1>
 
-    <div class="lang-switch">
-        <button onclick="setLang('lt')">Lietuvių</button>
-        <button onclick="setLang('en')">English</button>
-        <button onclick="setLang('de')">Deutsch</button>
-    </div>
-
-    <div class="footer">
-        © 2026
-    </div>
+<div id="landing">
+  <button onclick="showRegister()">Esu naujas (5 nemokami)</button>
+  <button onclick="showLogin()">Turiu paskyrą</button>
 </div>
 
-<script>
-    const translations = {
-        lt: {
-            title: "Projektas kuriamas",
-            text: "Ši svetainė buvo sukurta rezervuoti šį URL mūsų būsimam projektui. Ji taip pat bus naudojama prototipų kūrimui."
-        },
-        en: {
-            title: "Project Coming Soon",
-            text: "This site was created to reserve this URL for our upcoming project. It will also be used to create prototypes."
-        },
-        de: {
-            title: "Projekt kommt bald",
-            text: "Diese Seite wurde erstellt, um diese URL für unser kommendes Projekt zu reservieren. Sie wird auch zur Erstellung von Prototypen verwendet."
-        }
-    };
+<div id="auth" style="display:none;">
+  <input id="name" placeholder="Vardas Pavardė"><br>
+  <input id="email" placeholder="El. paštas"><br>
+  <input id="password" type="password" placeholder="Slaptažodis"><br>
+  <input id="code" placeholder="Kodas (nebūtina)"><br>
 
-    function setLang(lang) {
-        document.getElementById("title").innerText = translations[lang].title;
-        document.getElementById("text").innerText = translations[lang].text;
-    }
-</script>
+  <button onclick="register()">Registruotis</button>
+  <button onclick="login()">Prisijungti</button>
+</div>
 
+<div id="videos"></div>
+
+<div id="playerModal" class="modal">
+  <div class="modal-content">
+    <span onclick="closePlayer()">X</span>
+    <iframe id="player" width="100%" height="400"></iframe>
+  </div>
+</div>
+
+<div id="lockScreen" class="lock">
+  <div>
+    <h2>Pasiekėte limitą</h2>
+    <p>Įsigykite prenumeratą</p>
+  </div>
+</div>
+
+<script src="app.js"></script>
 </body>
 </html>
