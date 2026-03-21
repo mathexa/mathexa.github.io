@@ -1,5 +1,7 @@
 const API_URL = "https://script.google.com/macros/s/AKfycby4oaibD3PfUGJGO2dCTzXW5cjBIW-0g9V1dMH8GeIy6u08jTqGr1BJ_NOREyUZPLaPhw/exec";
 
+let isLoggedIn = false;
+
 // UI
 function showRegister() {
   document.getElementById("landing").classList.add("hidden");
@@ -30,7 +32,7 @@ async function register() {
   const data = await res.json();
 
   if (data.success) {
-    alert("Jūsų unikalus kodas: " + data.token);
+    alert("Jūsų kodas: " + data.token);
 
     if (code) {
       await redeemCode(email, code);
@@ -38,18 +40,6 @@ async function register() {
   } else {
     alert(data.error);
   }
-}
-
-// REDEEM
-async function redeemCode(email, code) {
-  await fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify({
-      action: "redeemCode",
-      email,
-      code
-    })
-  });
 }
 
 // LOGIN
@@ -70,10 +60,26 @@ async function login() {
 
   if (data.success) {
     localStorage.setItem("email", email);
+    isLoggedIn = true;
+
+    document.getElementById("auth").classList.add("hidden");
+
     loadVideos();
   } else {
     alert(data.error);
   }
+}
+
+// REDEEM
+async function redeemCode(email, code) {
+  await fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify({
+      action: "redeemCode",
+      email,
+      code
+    })
+  });
 }
 
 // LOAD VIDEOS
@@ -99,6 +105,11 @@ async function loadVideos() {
 
 // VIDEO ACCESS
 async function openVideo(url) {
+  if (!isLoggedIn) {
+    alert("Pirmiausia prisijunkite");
+    return;
+  }
+
   const email = localStorage.getItem("email");
 
   const res = await fetch(API_URL, {
