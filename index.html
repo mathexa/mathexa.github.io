@@ -3,23 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <title>Mathexa</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
 
 <div class="background"></div>
 
 <!-- LANDING -->
-<div class="card" id="landing">
+<div id="landing" class="card">
   <h1>Mathexa</h1>
   <p>Mokykis išmaniau</p>
 
-  <button onclick="showRegister()">Esu naujas</button>
-  <button onclick="showLogin()">Turiu paskyrą</button>
+  <button onclick="goAuth()">Pradėti</button>
 </div>
 
 <!-- AUTH -->
-<div class="card hidden" id="auth">
+<div id="auth" class="card hidden">
   <h2>Prisijungimas / Registracija</h2>
 
   <input id="name" placeholder="Vardas Pavardė">
@@ -27,20 +28,18 @@
   <input id="password" type="password" placeholder="Slaptažodis">
   <input id="code" placeholder="Kodas (nebūtina)">
 
-  <div class="row">
-    <button onclick="register()">Registruotis</button>
-    <button onclick="login()">Prisijungti</button>
-  </div>
+  <button onclick="register()">Registruotis</button>
+  <button onclick="login()">Prisijungti</button>
 </div>
 
 <!-- VIDEOS -->
-<div id="videos" class="videos"></div>
+<div id="videos" class="videos hidden"></div>
 
 <!-- PLAYER -->
 <div id="playerModal" class="modal hidden">
   <div class="modal-box">
     <iframe id="player"></iframe>
-    <button class="close-btn" onclick="closePlayer()">Uždaryti</button>
+    <button onclick="closePlayer()">Uždaryti</button>
   </div>
 </div>
 
@@ -49,9 +48,10 @@
   <div class="lock-box">
     <h2>Limitas pasiektas</h2>
     <p>Įsigykite prenumeratą</p>
+    <button onclick="closeLock()">Gerai</button>
   </div>
 </div>
 
-<script src="app.js"></script>
+<script src="app.js?v=4"></script>
 </body>
 </html>
