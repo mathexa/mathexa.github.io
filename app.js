@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbzqGJrzgTiEqSe4J4kPW6FX-Jp6uXwocXhxeaKyiT2vv9JnYyIqZUAGW79ihCMobvyLMQ/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbxR4KL0Sjl2FtB6uQ4kK11Rsmjl-PMc4_gpYz-bzlcF5t5NcoQHdxPWl6fci_bETaSV/exec";
 
 let currentUser = null;
 
@@ -24,7 +24,7 @@ function toggleInfo() {
   box.style.display = box.style.display === 'block' ? 'none' : 'block';
 }
 
-function validate() {
+function validateRegister() {
   let valid = true;
 
   nameError.innerText = "";
@@ -69,53 +69,61 @@ function setStatus(msg) {
 }
 
 async function register() {
-  if (!validate()) return;
+  if (!validateRegister()) return;
 
   setStatus("Kraunama...");
 
-  const res = await fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify({
-      action: "register",
-      name: nameInput.value,
-      email: emailInput.value,
-      password: passwordInput.value,
-      phone: phoneInput.value,
-      role: roleInput.value
-    })
-  });
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify({
+        action: "register",
+        name: nameInput.value,
+        email: emailInput.value,
+        password: passwordInput.value,
+        phone: phoneInput.value,
+        role: roleInput.value
+      })
+    });
 
-  const data = await res.json();
+    const data = await res.json();
 
-  if (data.success) {
-    setStatus("Sėkminga registracija");
-  } else {
-    setStatus(data.error);
+    if (data.success) {
+      setStatus("Sėkminga registracija");
+    } else {
+      setStatus(data.error);
+    }
+
+  } catch {
+    setStatus("Serverio klaida");
   }
 }
 
 async function login() {
-  if (!validate()) return;
-
   setStatus("Kraunama...");
 
-  const res = await fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify({
-      action: "login",
-      email: emailInput.value,
-      password: passwordInput.value
-    })
-  });
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify({
+        action: "login",
+        email: emailInput.value,
+        password: passwordInput.value
+      })
+    });
 
-  const data = await res.json();
+    const data = await res.json();
 
-  if (data.success) {
-    currentUser = emailInput.value;
-    loadVideos();
-    showScreen('videos');
-  } else {
-    setStatus("Neteisingi duomenys");
+    if (data.success) {
+      currentUser = emailInput.value;
+      loadVideos();
+      showScreen('videos');
+    } else {
+      setStatus("Neteisingi prisijungimo duomenys");
+    }
+
+  } catch {
+    setStatus("Serverio klaida");
   }
 }
 
@@ -159,7 +167,7 @@ async function watchVideo(url) {
     });
 
     const msg = document.createElement('p');
-    msg.innerText = "Free credits used. Please buy a subscription to continue using";
+    msg.innerText = "Nemokami kreditai išnaudoti. Įsigykite prenumeratą";
     document.getElementById('videoList').appendChild(msg);
     return;
   }
