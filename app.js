@@ -3,168 +3,127 @@ const API_URL = "https://script.google.com/macros/s/AKfycbyI9-zOdLM8GwwZlZ6epSal
 let currentUser = null;
 let allVideos = [];
 
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
-function toggleInfo() {
-  const box = document.getElementById('phoneInfo');
-  box.style.display = box.style.display === 'block' ? 'none' : 'block';
+function toggleInfo(){
+  const b=document.getElementById('phoneInfo');
+  b.style.display=b.style.display==='block'?'none':'block';
 }
 
-function toggleSettings() {
-  const box = document.getElementById('settingsBox');
-  box.style.display = box.style.display === 'block' ? 'none' : 'block';
+function toggleSettings(){
+  const b=document.getElementById('settingsBox');
+  b.style.display=b.style.display==='block'?'none':'block';
 }
 
-function setStatus(id, msg) {
-  document.getElementById(id).innerText = msg;
-}
+async function register(){
+  const name=document.getElementById('name').value;
+  const email=document.getElementById('email').value;
+  const password=document.getElementById('password').value;
+  const phone=document.getElementById('phone').value;
+  const role=document.getElementById('role').value;
 
-async function register() {
-  const name = document.getElementById('name').value;
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
-  const phone = document.getElementById('phone').value;
-  const role = document.getElementById('role').value;
-
-  setStatus("registerStatus", "Kraunama...");
-
-  const res = await fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify({
-      action: "register",
-      name,
-      email,
-      password,
-      phone,
-      role
-    })
+  const res=await fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify({action:"register",name,email,password,phone,role})
   });
 
-  const data = await res.json();
+  const data=await res.json();
 
-  if (data.success) {
-    currentUser = email;
+  if(data.success){
+    currentUser=email;
     loadVideos();
     showScreen('videos');
-  } else {
-    setStatus("registerStatus", data.error);
+  }else{
+    document.getElementById('registerStatus').innerText=data.error;
   }
 }
 
-async function login() {
-  const email = document.getElementById('loginEmail').value;
-  const password = document.getElementById('loginPassword').value;
+async function login(){
+  const email=document.getElementById('loginEmail').value;
+  const password=document.getElementById('loginPassword').value;
 
-  setStatus("loginStatus", "Kraunama...");
-
-  const res = await fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify({
-      action: "login",
-      email,
-      password
-    })
+  const res=await fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify({action:"login",email,password})
   });
 
-  const data = await res.json();
+  const data=await res.json();
 
-  if (data.success) {
-    currentUser = email;
+  if(data.success){
+    currentUser=email;
     loadVideos();
     showScreen('videos');
-  } else {
-    setStatus("loginStatus", "Neteisingi prisijungimo duomenys");
+  }else{
+    document.getElementById('loginStatus').innerText="Blogi duomenys";
   }
 }
 
-async function loadVideos() {
-  const res = await fetch('videos.json');
-  allVideos = await res.json();
+async function loadVideos(){
+  const res=await fetch('videos.json');
+  const data=await res.json();
+  allVideos=data;
   renderVideos(allVideos);
 }
 
-function renderVideos(list) {
-  const container = document.getElementById('videoList');
-  container.innerHTML = "";
+function renderVideos(list){
+  const container=document.getElementById('videoList');
+  container.innerHTML="";
 
-  list.forEach(v => {
-    const div = document.createElement('div');
+  const frag=document.createDocumentFragment();
 
-    div.innerHTML = `
-      <p><strong>${v.title}</strong></p>
-      <p>Kategorija: ${v.category}</p>
-      <p>Kalba: ${v.language}</p>
-      <p>Trukmė: ${v.duration}</p>
-      <p>Platforma: ${v.platform}</p>
+  list.forEach(v=>{
+    const d=document.createElement('div');
+    d.innerHTML=`
+      <p><b>${v.title}</b></p>
+      <p>${v.category}</p>
       <button onclick="watchVideo('${v.url}')">Žiūrėti</button>
+      <hr>
     `;
-
-    container.appendChild(div);
-  });
-}
-
-function searchVideos() {
-  const q = document.getElementById('search').value.toLowerCase();
-  const filtered = allVideos.filter(v => v.title.toLowerCase().includes(q));
-  renderVideos(filtered);
-}
-
-function filterCategory() {
-  const cat = document.getElementById('categoryFilter').value;
-
-  if (!cat) {
-    renderVideos(allVideos);
-    return;
-  }
-
-  const filtered = allVideos.filter(v => v.category === cat);
-  renderVideos(filtered);
-}
-
-async function watchVideo(url) {
-  const res = await fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify({
-      action: "use",
-      email: currentUser
-    })
+    frag.appendChild(d);
   });
 
-  const data = await res.json();
+  container.appendChild(frag);
+}
 
-  if (data.blocked) {
+function searchVideos(){
+  const q=document.getElementById('search').value.toLowerCase();
+  renderVideos(allVideos.filter(v=>v.title.toLowerCase().includes(q)));
+}
+
+function filterCategory(){
+  const c=document.getElementById('categoryFilter').value;
+  if(!c)return renderVideos(allVideos);
+  renderVideos(allVideos.filter(v=>v.category===c));
+}
+
+async function watchVideo(url){
+  const res=await fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify({action:"use",email:currentUser})
+  });
+
+  const data=await res.json();
+
+  if(data.blocked){
     alert("Limitas pasiektas");
     return;
   }
 
-  window.open(url, '_blank');
+  window.open(url,'_blank');
 }
 
-async function activateCode() {
-  const code = prompt("Įveskite kodą");
+async function activateCode(){
+  const code=prompt("Kodas");
 
-  if (!code || code.length < 4) {
-    alert("Kodas turi būti bent 4 simbolių");
-    return;
-  }
-
-  const res = await fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify({
-      action: "activate",
-      email: currentUser,
-      code
-    })
+  const res=await fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify({action:"activate",email:currentUser,code})
   });
 
-  const data = await res.json();
+  const data=await res.json();
 
-  if (data.success) {
-    alert("Kodas aktyvuotas");
-  } else {
-    alert(data.error || "Klaida");
-  }
+  alert(data.success?"Aktyvuota":data.error);
 }
