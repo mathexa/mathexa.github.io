@@ -1,1 +1,33 @@
+body {
+  font-family: Arial;
+  text-align: center;
+}
 
+button {
+  margin: 5px;
+  padding: 10px;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background: rgba(0,0,0,0.7);
+}
+
+.modal-content {
+  background: white;
+  margin: 10% auto;
+  padding: 20px;
+  width: 80%;
+}
+
+.lock {
+  display: none;
+  position: fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background: rgba(0,0,0,0.8);
+  color:white;
+}
