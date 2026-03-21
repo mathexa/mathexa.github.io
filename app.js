@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbynF2X9tp2-Vx7Tu-jxCYYje2IRs9Gt1NdU0Eim5uoeTfbhQ9L8cO8QqHQL45Z8FxB1lA/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbyI9-zOdLM8GwwZlZ6epSalg5lYtES8cwit0z3J4dbHaJneC36D_0MiobVmAz6-ZEXaTw/exec";
 
 let currentUser = null;
 let allVideos = [];
@@ -136,13 +136,7 @@ async function watchVideo(url) {
   const data = await res.json();
 
   if (data.blocked) {
-    document.querySelectorAll('#videoList div').forEach(el => {
-      el.classList.add('blur');
-    });
-
-    const msg = document.createElement('p');
-    msg.innerText = "Nemokami kreditai išnaudoti. Įsigykite prenumeratą";
-    document.getElementById('videoList').appendChild(msg);
+    alert("Limitas pasiektas");
     return;
   }
 
@@ -151,7 +145,11 @@ async function watchVideo(url) {
 
 async function activateCode() {
   const code = prompt("Įveskite kodą");
-  if (!code) return;
+
+  if (!code || code.length < 4) {
+    alert("Kodas turi būti bent 4 simbolių");
+    return;
+  }
 
   const res = await fetch(API_URL, {
     method: "POST",
@@ -165,8 +163,8 @@ async function activateCode() {
   const data = await res.json();
 
   if (data.success) {
-    alert("Aktyvuota");
+    alert("Kodas aktyvuotas");
   } else {
-    alert(data.error);
+    alert(data.error || "Klaida");
   }
 }
