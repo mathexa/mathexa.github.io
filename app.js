@@ -1,124 +1,89 @@
-const API_URL = "https://script.google.com/macros/s/AKfycby4oaibD3PfUGJGO2dCTzXW5cjBIW-0g9V1dMH8GeIy6u08jTqGr1BJ_NOREyUZPLaPhw/exec";
+const API = "https://script.google.com/macros/s/AKfycby4oaibD3PfUGJGO2dCTzXW5cjBIW-0g9V1dMH8GeIy6u08jTqGr1BJ_NOREyUZPLaPhw/exec";
 
-function el(id) {
-  return document.getElementById(id);
-}
+function el(id){ return document.getElementById(id); }
 
-function goAuth() {
+function goAuth(){
   el("landing").classList.add("hidden");
   el("auth").classList.remove("hidden");
 }
 
-function validateEmail(email) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-function validatePassword(p) {
-  return p.length >= 6;
-}
-
 // REGISTER
-async function register() {
-  const name = el("name").value.trim();
-  const email = el("email").value.trim();
+async function register(){
+  const name = el("name").value;
+  const email = el("email").value;
   const password = el("password").value;
 
-  el("status").innerText = "";
+  el("status").innerText="Registruojama...";
 
-  if (!validateEmail(email)) {
-    el("status").innerText = "Blogas email";
-    return;
-  }
+  const res = await fetch(API,{
+    method:"POST",
+    body:JSON.stringify({action:"register",name,email,password})
+  });
 
-  if (!validatePassword(password)) {
-    el("status").innerText = "Per trumpas slaptažodis";
-    return;
-  }
+  const data = await res.json();
 
-  el("status").innerText = "Siunčiama...";
-
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify({
-        action: "register",
-        name,
-        email,
-        password
-      })
-    });
-
-    const text = await res.text();
-    console.log("RAW:", text);
-
-    const data = JSON.parse(text);
-
-    if (data.success) {
-      el("status").innerText = "Registruota! Kodas: " + data.token;
-    } else {
-      el("status").innerText = data.error;
-    }
-
-  } catch (err) {
-    el("status").innerText = "ERROR: " + err;
-    console.error(err);
+  if(data.success){
+    el("status").innerText="Registracija sėkminga";
+  } else {
+    el("status").innerText=data.error;
   }
 }
 
 // LOGIN
-async function login() {
-  const email = el("email").value.trim();
+async function login(){
+  const email = el("email").value;
   const password = el("password").value;
 
-  el("status").innerText = "Jungiama...";
+  el("status").innerText="Jungiama...";
 
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify({
-        action: "login",
-        email,
-        password
-      })
-    });
+  const res = await fetch(API,{
+    method:"POST",
+    body:JSON.stringify({action:"login",email,password})
+  });
 
-    const text = await res.text();
-    console.log("RAW:", text);
+  const data = await res.json();
 
-    const data = JSON.parse(text);
-
-    if (data.success) {
-      el("status").innerText = "Prisijungta!";
-      loadVideos();
-      el("auth").classList.add("hidden");
-    } else {
-      el("status").innerText = data.error;
-    }
-
-  } catch (err) {
-    el("status").innerText = "ERROR: " + err;
+  if(data.success){
+    localStorage.setItem("email",email);
+    el("auth").classList.add("hidden");
+    loadVideos();
+  } else {
+    el("status").innerText="Blogi duomenys";
   }
 }
 
-// VIDEOS
-async function loadVideos() {
+// LOAD VIDEOS
+async function loadVideos(){
   const res = await fetch("videos.json");
   const list = await res.json();
 
-  const container = el("videos");
-  container.classList.remove("hidden");
-  container.innerHTML = "";
+  const v = el("videos");
+  v.classList.remove("hidden");
+  v.innerHTML="";
 
-  list.forEach(v => {
-    const d = document.createElement("div");
-    d.innerHTML = `
-      <h3>${v.title}</h3>
-      <button onclick="watch('${v.url}')">Žiūrėti</button>
-    `;
-    container.appendChild(d);
+  list.forEach(x=>{
+    const d=document.createElement("div");
+    d.innerHTML=`<h3>${x.title}</h3>
+    <button onclick="watch('${x.url}')">Žiūrėti</button>`;
+    v.appendChild(d);
   });
 }
 
-async function watch(url) {
-  alert("Video works (test stage)");
+// WATCH + CLICK UPDATE
+async function watch(url){
+  const email = localStorage.getItem("email");
+
+  const res = await fetch(API,{
+    method:"POST",
+    body:JSON.stringify({action:"use",email})
+  });
+
+  const data = await res.json();
+
+  if(data.blocked){
+    el("lock").classList.remove("hidden");
+    return;
+  }
+
+  alert("Video opened");
 }
