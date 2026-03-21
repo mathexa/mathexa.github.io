@@ -1,6 +1,7 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbyZmT5y3R39CNJDAA8vGsjM7eiuwLjFzs5jNLBl0t1PtJWpL8-g3tvV5vUpRkkIbDFbLQ/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbynF2X9tp2-Vx7Tu-jxCYYje2IRs9Gt1NdU0Eim5uoeTfbhQ9L8cO8QqHQL45Z8FxB1lA/exec";
 
 let currentUser = null;
+let allVideos = [];
 
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -9,6 +10,11 @@ function showScreen(id) {
 
 function toggleInfo() {
   const box = document.getElementById('phoneInfo');
+  box.style.display = box.style.display === 'block' ? 'none' : 'block';
+}
+
+function toggleSettings() {
+  const box = document.getElementById('settingsBox');
   box.style.display = box.style.display === 'block' ? 'none' : 'block';
 }
 
@@ -25,31 +31,26 @@ async function register() {
 
   setStatus("registerStatus", "Kraunama...");
 
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify({
-        action: "register",
-        name,
-        email,
-        password,
-        phone,
-        role
-      })
-    });
+  const res = await fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify({
+      action: "register",
+      name,
+      email,
+      password,
+      phone,
+      role
+    })
+  });
 
-    const data = await res.json();
+  const data = await res.json();
 
-    if (data.success) {
-      currentUser = email;
-      loadVideos();
-      showScreen('videos');
-    } else {
-      setStatus("registerStatus", data.error);
-    }
-
-  } catch {
-    setStatus("registerStatus", "Serverio klaida");
+  if (data.success) {
+    currentUser = email;
+    loadVideos();
+    showScreen('videos');
+  } else {
+    setStatus("registerStatus", data.error);
   }
 }
 
@@ -59,40 +60,37 @@ async function login() {
 
   setStatus("loginStatus", "Kraunama...");
 
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify({
-        action: "login",
-        email,
-        password
-      })
-    });
+  const res = await fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify({
+      action: "login",
+      email,
+      password
+    })
+  });
 
-    const text = await res.text();
-    const data = JSON.parse(text);
+  const data = await res.json();
 
-    if (data.success) {
-      currentUser = email;
-      loadVideos();
-      showScreen('videos');
-    } else {
-      setStatus("loginStatus", "Neteisingi prisijungimo duomenys");
-    }
-
-  } catch {
-    setStatus("loginStatus", "Serverio klaida");
+  if (data.success) {
+    currentUser = email;
+    loadVideos();
+    showScreen('videos');
+  } else {
+    setStatus("loginStatus", "Neteisingi prisijungimo duomenys");
   }
 }
 
 async function loadVideos() {
   const res = await fetch('videos.json');
-  const videos = await res.json();
+  allVideos = await res.json();
+  renderVideos(allVideos);
+}
 
+function renderVideos(list) {
   const container = document.getElementById('videoList');
   container.innerHTML = "";
 
-  videos.forEach(v => {
+  list.forEach(v => {
     const div = document.createElement('div');
 
     div.innerHTML = `
@@ -106,6 +104,24 @@ async function loadVideos() {
 
     container.appendChild(div);
   });
+}
+
+function searchVideos() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const filtered = allVideos.filter(v => v.title.toLowerCase().includes(q));
+  renderVideos(filtered);
+}
+
+function filterCategory() {
+  const cat = document.getElementById('categoryFilter').value;
+
+  if (!cat) {
+    renderVideos(allVideos);
+    return;
+  }
+
+  const filtered = allVideos.filter(v => v.category === cat);
+  renderVideos(filtered);
 }
 
 async function watchVideo(url) {
