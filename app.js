@@ -128,10 +128,16 @@ async function loadVideos() {
 
   videos.forEach(v => {
     const div = document.createElement('div');
+
     div.innerHTML = `
-      <p>${v.title}</p>
+      <p><strong>${v.title}</strong></p>
+      <p>Kategorija: ${v.category}</p>
+      <p>Kalba: ${v.language}</p>
+      <p>Trukmė: ${v.duration}</p>
+      <p>Platforma: ${v.platform}</p>
       <button onclick="watchVideo('${v.url}')">Žiūrėti</button>
     `;
+
     container.appendChild(div);
   });
 }
