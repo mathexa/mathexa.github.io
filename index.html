@@ -5,30 +5,40 @@
   <title>Mathexa v0.1.12</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="stylesheet" href="style.css?v=112">
+  <link rel="stylesheet" href="style.css?v=113">
 </head>
 <body>
 
 <div class="background"></div>
 
 <!-- LANDING -->
-<div id="landing" class="card">
-  <h1>Mathexa</h1>
-  <p>Mokykis išmaniau</p>
-  <button onclick="goAuth()">Pradėti</button>
+<div id="landing" class="center">
+  <div class="card">
+    <h1>Mathexa</h1>
+    <p>Mokykis išmaniau</p>
+    <button onclick="goAuth()">Pradėti</button>
+  </div>
 </div>
 
 <!-- AUTH -->
-<div id="auth" class="card hidden">
-  <h2>Prisijungimas / Registracija</h2>
+<div id="auth" class="center hidden">
+  <div class="card">
+    <h2>Prisijungimas / Registracija</h2>
 
-  <input id="name" placeholder="Vardas Pavardė">
-  <input id="email" placeholder="El. paštas">
-  <input id="password" type="password" placeholder="Slaptažodis">
-  <input id="code" placeholder="Kodas (nebūtina)">
+    <input id="name" placeholder="Vardas Pavardė">
+    <input id="email" placeholder="El. paštas">
+    <div id="emailError" class="error"></div>
 
-  <button onclick="register()">Registruotis</button>
-  <button onclick="login()">Prisijungti</button>
+    <input id="password" type="password" placeholder="Slaptažodis">
+    <div id="passError" class="error"></div>
+
+    <input id="code" placeholder="Kodas (nebūtina)">
+
+    <button onclick="register()">Registruotis</button>
+    <button onclick="login()">Prisijungti</button>
+
+    <div id="status" class="status"></div>
+  </div>
 </div>
 
 <!-- VIDEOS -->
@@ -51,6 +61,6 @@
   </div>
 </div>
 
-<script src="app.js?v=112"></script>
+<script src="app.js?v=113"></script>
 </body>
 </html>
