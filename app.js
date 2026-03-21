@@ -1,14 +1,14 @@
 const API_URL = "https://script.google.com/macros/s/AKfycby4oaibD3PfUGJGO2dCTzXW5cjBIW-0g9V1dMH8GeIy6u08jTqGr1BJ_NOREyUZPLaPhw/exec";
 
-let loggedIn = false;
-
-// NAV
-function goAuth() {
-  landing.classList.add("hidden");
-  auth.classList.remove("hidden");
+function el(id) {
+  return document.getElementById(id);
 }
 
-// VALIDATION
+function goAuth() {
+  el("landing").classList.add("hidden");
+  el("auth").classList.remove("hidden");
+}
+
 function validateEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
@@ -19,75 +19,84 @@ function validatePassword(p) {
 
 // REGISTER
 async function register() {
-  const name = nameInput.value.trim();
-  const email = emailInput.value.trim();
-  const password = passwordInput.value;
+  const name = el("name").value.trim();
+  const email = el("email").value.trim();
+  const password = el("password").value;
 
-  emailError.innerText = "";
-  passError.innerText = "";
-  status.innerText = "";
-
-  let valid = true;
+  el("status").innerText = "";
 
   if (!validateEmail(email)) {
-    emailError.innerText = "Neteisingas el. paštas";
-    valid = false;
+    el("status").innerText = "Blogas email";
+    return;
   }
 
   if (!validatePassword(password)) {
-    passError.innerText = "Mažiausiai 6 simboliai";
-    valid = false;
+    el("status").innerText = "Per trumpas slaptažodis";
+    return;
   }
 
-  if (!valid) return;
+  el("status").innerText = "Siunčiama...";
 
-  status.innerText = "Kuriama...";
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify({
+        action: "register",
+        name,
+        email,
+        password
+      })
+    });
 
-  const res = await fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify({
-      action: "register",
-      name,
-      email,
-      password
-    })
-  });
+    const text = await res.text();
+    console.log("RAW:", text);
 
-  const data = await res.json();
+    const data = JSON.parse(text);
 
-  if (data.success) {
-    status.innerText = "Sėkminga registracija. Kodas: " + data.token;
-  } else {
-    status.innerText = data.error;
+    if (data.success) {
+      el("status").innerText = "Registruota! Kodas: " + data.token;
+    } else {
+      el("status").innerText = data.error;
+    }
+
+  } catch (err) {
+    el("status").innerText = "ERROR: " + err;
+    console.error(err);
   }
 }
 
 // LOGIN
 async function login() {
-  const email = emailInput.value.trim();
-  const password = passwordInput.value;
+  const email = el("email").value.trim();
+  const password = el("password").value;
 
-  status.innerText = "Jungiama...";
+  el("status").innerText = "Jungiama...";
 
-  const res = await fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify({
-      action: "login",
-      email,
-      password
-    })
-  });
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify({
+        action: "login",
+        email,
+        password
+      })
+    });
 
-  const data = await res.json();
+    const text = await res.text();
+    console.log("RAW:", text);
 
-  if (data.success) {
-    loggedIn = true;
-    localStorage.setItem("email", email);
+    const data = JSON.parse(text);
 
-    auth.classList.add("hidden");
-    loadVideos();
-  } else {
-    status.innerText = data.error;
+    if (data.success) {
+      el("status").innerText = "Prisijungta!";
+      loadVideos();
+      el("auth").classList.add("hidden");
+    } else {
+      el("status").innerText = data.error;
+    }
+
+  } catch (err) {
+    el("status").innerText = "ERROR: " + err;
   }
 }
 
@@ -96,47 +105,20 @@ async function loadVideos() {
   const res = await fetch("videos.json");
   const list = await res.json();
 
-  videos.classList.remove("hidden");
-  videos.innerHTML = "";
+  const container = el("videos");
+  container.classList.remove("hidden");
+  container.innerHTML = "";
 
   list.forEach(v => {
-    const el = document.createElement("div");
-
-    el.innerHTML = `
+    const d = document.createElement("div");
+    d.innerHTML = `
       <h3>${v.title}</h3>
-      <p>${v.language} | ${v.duration}</p>
       <button onclick="watch('${v.url}')">Žiūrėti</button>
     `;
-
-    videos.appendChild(el);
+    container.appendChild(d);
   });
 }
 
-// WATCH
 async function watch(url) {
-  const email = localStorage.getItem("email");
-
-  const res = await fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify({
-      action: "checkAccess",
-      email
-    })
-  });
-
-  const data = await res.json();
-
-  if (data.allowed === false) {
-    lockScreen.classList.remove("hidden");
-    return;
-  }
-
-  const id = url.split("v=")[1];
-  player.src = `https://www.youtube.com/embed/${id}`;
-  playerModal.classList.remove("hidden");
-}
-
-function closePlayer() {
-  playerModal.classList.add("hidden");
-  player.src = "";
+  alert("Video works (test stage)");
 }
