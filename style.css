@@ -1,4 +1,4 @@
-body {
+body{
   margin:0;
   font-family:Arial;
   background:linear-gradient(135deg,#0a2a5e,#1e90ff);
@@ -16,7 +16,8 @@ body {
 
 .screen{
   display:none;
-  background:rgba(255,255,255,0.1);
+  background:rgba(255,255,255,0.15);
+  backdrop-filter:blur(20px);
   padding:20px;
   border-radius:20px;
   height:100%;
@@ -28,25 +29,58 @@ body {
   flex-direction:column;
 }
 
-.top-settings{
-  position:absolute;
-  top:10px;
-  right:10px;
-  cursor:pointer;
+.center{
+  justify-content:center;
+  align-items:center;
+  text-align:center;
 }
 
-.link{
-  text-decoration:underline;
-  cursor:pointer;
+input,select{
+  padding:14px;
+  margin-top:10px;
+  border:none;
+  border-radius:12px;
+  font-size:16px;
+}
+
+button{
+  padding:14px;
+  margin-top:10px;
+  border:none;
+  border-radius:12px;
+  background:rgba(255,255,255,0.3);
+  color:white;
+  font-size:16px;
+}
+
+.video{
+  background:rgba(0,0,0,0.2);
+  padding:12px;
+  border-radius:12px;
+  margin-top:10px;
 }
 
 .warn{
-  font-size:12px;
+  font-size:13px;
   color:yellow;
+}
+
+.settings-btn{
+  position:absolute;
+  top:10px;
+  right:15px;
+  font-size:22px;
+  cursor:pointer;
 }
 
 .settings{
   display:none;
-  font-size:12px;
+  font-size:13px;
+  margin-bottom:10px;
   color:white;
+}
+
+.policy span{
+  text-decoration:underline;
+  cursor:pointer;
 }
