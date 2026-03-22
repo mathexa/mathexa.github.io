@@ -10,7 +10,7 @@
 
 <div class="app">
 
-<div id="landing" class="screen active">
+<div id="landing" class="screen active center">
   <h1>Mathexa</h1>
   <button onclick="showScreen('login')">Prisijungti</button>
   <button onclick="showScreen('register')">Registruotis</button>
@@ -29,20 +29,20 @@
 
   <input id="name" placeholder="Vardas Pavardė">
   <input id="email" placeholder="El. paštas">
-  <input id="password" type="password" placeholder="Slaptažodis">
+  <input id="password" type="password" placeholder="Slaptažodis" oninput="checkPassword()">
+
+  <div id="passwordFeedback"></div>
 
   <p class="warn">
   Nenaudokite kasdienio slaptažodžio
   </p>
 
-  <div class="phone-row">
-    <input id="phone" value="+370">
-    <span class="info" onclick="toggleInfo()">ℹ️</span>
-  </div>
+  <p class="policy">
+  Kurdamas paskyrą sutinku su 
+  <span class="link" onclick="openPolicy()">privatumo politika, duomenų valdymu ir naudojimo sąlygomis</span>
+  </p>
 
-  <div id="phoneInfo" class="info-box">
-    Jei neturite lietuviško numerio, bus naudojamas el. paštas
-  </div>
+  <input id="phone" value="+370">
 
   <select id="role">
     <option value="">Pasirinkite rolę</option>
@@ -55,14 +55,18 @@
 </div>
 
 <div id="videos" class="screen">
-  <h2>Vaizdo įrašai</h2>
 
-  <button onclick="toggleSettings()">⚙️</button>
+  <div class="topbar">
+    <button onclick="toggleSettings()">⚙️</button>
+  </div>
 
   <div id="settingsBox" class="settings">
-    <p>Versija: v0.1</p>
+    <p>Versija: v0.2</p>
     <p>Saugumas: V2.1</p>
+    <p>Atnaujinta: 2026</p>
   </div>
+
+  <h2>Vaizdo įrašai</h2>
 
   <input id="search" placeholder="Ieškoti..." oninput="searchVideos()">
 
