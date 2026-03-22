@@ -9,16 +9,16 @@
 
 <body>
 
-<div class="settings-btn" onclick="toggleSettings()">⚙️</div>
-
 <div class="app">
 
+<!-- LANDING -->
 <div id="landing" class="screen active center">
   <h1>Mathexa</h1>
   <button onclick="showScreen('login')">Prisijungti</button>
   <button onclick="showScreen('register')">Registruotis</button>
 </div>
 
+<!-- LOGIN -->
 <div id="login" class="screen">
   <h2>Prisijungimas</h2>
 
@@ -26,9 +26,10 @@
   <input id="loginPassword" type="password" placeholder="Įveskite slaptažodį">
 
   <button onclick="login()">Prisijungti</button>
-  <div id="loginStatus"></div>
+  <div id="loginStatus" class="status"></div>
 </div>
 
+<!-- REGISTER -->
 <div id="register" class="screen">
   <h2>Registracija</h2>
 
@@ -38,7 +39,11 @@
   <input id="password" type="password" placeholder="Slaptažodis (min. 8 simboliai)" oninput="checkPassword()">
   <div id="passFeedback" class="warn"></div>
 
-  <input id="phone" placeholder="+370...">
+  <input id="phone" placeholder="+370 (nebūtina)">
+
+  <p class="note">
+    Jei neturite lietuviško numerio, bus naudojamas el. paštas
+  </p>
 
   <select id="role">
     <option value="">Pasirinkite rolę</option>
@@ -48,14 +53,19 @@
 
   <p class="policy">
     Kurdami paskyrą sutinkate su
-    <span onclick="openPolicy()">privatumo politika ir taisyklėmis</span>
+    <span class="link" onclick="openPolicy()">privatumo politika ir taisyklėmis</span>
   </p>
 
   <button onclick="register()">Registruotis</button>
-  <div id="registerStatus"></div>
+  <div id="registerStatus" class="status"></div>
 </div>
 
+<!-- VIDEOS -->
 <div id="videos" class="screen">
+
+  <!-- SETTINGS ONLY HERE -->
+  <div class="settings-btn" onclick="toggleSettings()">⚙️</div>
+
   <h2>Vaizdo įrašai</h2>
 
   <div id="settingsBox" class="settings">
