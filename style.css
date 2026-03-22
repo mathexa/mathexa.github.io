@@ -1,10 +1,6 @@
-*{
-  box-sizing:border-box;
-}
-
-body{
+body {
   margin:0;
-  font-family:Arial, sans-serif;
+  font-family:Arial;
   background:linear-gradient(135deg,#0a2a5e,#1e90ff);
   display:flex;
   justify-content:center;
@@ -15,12 +11,16 @@ body{
 .app{
   width:100%;
   max-width:420px;
-  height:92vh;
+  height:90vh;
 }
 
 .screen{
   display:none;
+  background:rgba(255,255,255,0.1);
+  padding:20px;
+  border-radius:20px;
   height:100%;
+  overflow-y:auto;
 }
 
 .screen.active{
@@ -28,114 +28,11 @@ body{
   flex-direction:column;
 }
 
-.center{
-  justify-content:center;
-  align-items:center;
-}
-
-/* CARD */
-.card{
-  width:100%;
-  background:rgba(255,255,255,0.12);
-  backdrop-filter:blur(15px);
-  padding:20px;
-  border-radius:20px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.2);
-}
-
-/* INPUTS */
-input,select{
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  border-radius:12px;
-  border:none;
-  outline:none;
-  background:rgba(255,255,255,0.2);
-  color:white;
-}
-
-/* BUTTONS */
-.btn{
-  width:100%;
-  margin-top:12px;
-  padding:12px;
-  border-radius:12px;
-  border:none;
+.top-settings{
+  position:absolute;
+  top:10px;
+  right:10px;
   cursor:pointer;
-  font-weight:bold;
-}
-
-.primary{
-  background:#4facfe;
-  color:white;
-}
-
-.secondary{
-  background:rgba(255,255,255,0.2);
-  color:white;
-}
-
-.icon-btn{
-  background:none;
-  border:none;
-  font-size:20px;
-  cursor:pointer;
-  color:white;
-}
-
-/* TOPBAR */
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:10px;
-  color:white;
-}
-
-/* CONTROLS */
-.controls{
-  display:flex;
-  gap:10px;
-  margin-bottom:10px;
-}
-
-/* VIDEO LIST */
-#videoList{
-  flex:1;
-  overflow-y:auto;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-
-/* VIDEO CARD */
-.video{
-  background:rgba(255,255,255,0.15);
-  padding:15px;
-  border-radius:15px;
-}
-
-.video b{
-  display:block;
-  font-size:16px;
-}
-
-.details{
-  display:none;
-  margin-top:10px;
-  font-size:13px;
-}
-
-/* TEXT */
-.status{
-  margin-top:8px;
-  font-size:13px;
-}
-
-.warn{
-  font-size:12px;
-  color:yellow;
 }
 
 .link{
@@ -143,8 +40,13 @@ input,select{
   cursor:pointer;
 }
 
-/* SETTINGS */
+.warn{
+  font-size:12px;
+  color:yellow;
+}
+
 .settings{
   display:none;
-  margin-bottom:10px;
+  font-size:12px;
+  color:white;
 }
