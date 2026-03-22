@@ -9,74 +9,74 @@
 
 <body>
 
-<div class="top-settings" onclick="toggleSettings()">⚙️</div>
+<div class="settings-btn" onclick="toggleSettings()">⚙️</div>
 
 <div class="app">
 
-<div id="landing" class="screen active">
-<h1>Mathexa</h1>
-<button onclick="showScreen('login')">Prisijungti</button>
-<button onclick="showScreen('register')">Registruotis</button>
+<div id="landing" class="screen active center">
+  <h1>Mathexa</h1>
+  <button onclick="showScreen('login')">Prisijungti</button>
+  <button onclick="showScreen('register')">Registruotis</button>
 </div>
 
 <div id="login" class="screen">
-<h2>Prisijungimas</h2>
-<input id="loginEmail">
-<input id="loginPassword" type="password">
-<button onclick="login()">Prisijungti</button>
-<div id="loginStatus"></div>
+  <h2>Prisijungimas</h2>
+
+  <input id="loginEmail" placeholder="Įveskite el. paštą">
+  <input id="loginPassword" type="password" placeholder="Įveskite slaptažodį">
+
+  <button onclick="login()">Prisijungti</button>
+  <div id="loginStatus"></div>
 </div>
 
 <div id="register" class="screen">
-<h2>Registracija</h2>
+  <h2>Registracija</h2>
 
-<input id="name">
-<input id="email">
-<input id="password" type="password" oninput="checkPassword()">
+  <input id="name" placeholder="Vardas ir pavardė">
+  <input id="email" placeholder="El. paštas">
 
-<div id="passFeedback" class="warn"></div>
+  <input id="password" type="password" placeholder="Slaptažodis (min. 8 simboliai)" oninput="checkPassword()">
+  <div id="passFeedback" class="warn"></div>
 
-<p class="warn">Nenaudokite kasdienio slaptažodžio</p>
+  <input id="phone" placeholder="+370...">
 
-<p class="policy">
-Kurdami paskyrą sutinkate su
-<span class="link" onclick="openPolicy()">politika ir taisyklėmis</span>
-</p>
+  <select id="role">
+    <option value="">Pasirinkite rolę</option>
+    <option value="student">Studentas</option>
+    <option value="teacher">Mokytojas</option>
+  </select>
 
-<input id="phone" value="+370">
+  <p class="policy">
+    Kurdami paskyrą sutinkate su
+    <span onclick="openPolicy()">privatumo politika ir taisyklėmis</span>
+  </p>
 
-<select id="role">
-<option value="">Pasirinkite rolę</option>
-<option value="student">Studentas</option>
-<option value="teacher">Mokytojas</option>
-</select>
-
-<button onclick="register()">Registruotis</button>
-<div id="registerStatus"></div>
+  <button onclick="register()">Registruotis</button>
+  <div id="registerStatus"></div>
 </div>
 
 <div id="videos" class="screen">
-<h2>Vaizdo įrašai</h2>
+  <h2>Vaizdo įrašai</h2>
 
-<div id="settingsBox" class="settings">
-<p>Versija: v0.2</p>
-<p>Saugumas: V2.1</p>
-<p>Atnaujinta: 2026-03-22</p>
-</div>
+  <div id="settingsBox" class="settings">
+    <p>Versija: v0.1</p>
+    <p>Saugumas: V2.1</p>
+    <p>Atnaujinta: 2026-03-22</p>
+  </div>
 
-<input id="search" oninput="searchVideos()">
+  <input id="search" placeholder="Ieškoti..." oninput="searchVideos()">
 
-<select id="categoryFilter" onchange="filterCategory()">
-<option value="">Visi</option>
-<option value="math">Matematika</option>
-<option value="science">Mokslas</option>
-<option value="history">Istorija</option>
-<option value="physics">Fizika</option>
-</select>
+  <select id="categoryFilter" onchange="filterCategory()">
+    <option value="">Visos kategorijos</option>
+    <option value="math">Matematika</option>
+    <option value="science">Mokslas</option>
+    <option value="history">Istorija</option>
+    <option value="physics">Fizika</option>
+  </select>
 
-<button onclick="activateCode()">Aktyvuoti kodą</button>
+  <button onclick="activateCode()">Aktyvuoti kodą</button>
 
-<div id="videoList"></div>
+  <div id="videoList"></div>
 </div>
 
 </div>
