@@ -8,22 +8,49 @@ function showScreen(id){
   document.getElementById(id).classList.add('active');
 }
 
-function toggleInfo(){
-  const b=document.getElementById('phoneInfo');
-  b.style.display=b.style.display==='block'?'none':'block';
-}
-
 function toggleSettings(){
   const b=document.getElementById('settingsBox');
   b.style.display=b.style.display==='block'?'none':'block';
 }
 
+function openPolicy(){
+  window.open("policy&terms of use.txt","_blank");
+}
+
+function validEmail(email){
+  const regex=/^[^\s@]+@[^\s@]+\.(com|lt|net|org|edu|gov|io|co|info)$/i;
+  return regex.test(email);
+}
+
+function checkPassword(){
+  const p=document.getElementById('password').value;
+  const fb=document.getElementById('passwordFeedback');
+
+  if(p.length<8){
+    fb.innerText="Mažiausiai 8 simboliai";
+    fb.style.color="red";
+  }else{
+    fb.innerText="Tinkamas";
+    fb.style.color="lightgreen";
+  }
+}
+
 async function register(){
-  const name=document.getElementById('name').value;
-  const email=document.getElementById('email').value;
-  const password=document.getElementById('password').value;
-  const phone=document.getElementById('phone').value;
-  const role=document.getElementById('role').value;
+  const name=nameEl.value;
+  const email=emailEl.value;
+  const password=passwordEl.value;
+  const phone=phoneEl.value;
+  const role=roleEl.value;
+
+  if(!validEmail(email)){
+    registerStatus.innerText="Neteisingas el. paštas";
+    return;
+  }
+
+  if(password.length<8){
+    registerStatus.innerText="Slaptažodis per trumpas";
+    return;
+  }
 
   const res=await fetch(API_URL,{
     method:"POST",
@@ -37,13 +64,13 @@ async function register(){
     loadVideos();
     showScreen('videos');
   }else{
-    document.getElementById('registerStatus').innerText=data.error;
+    registerStatus.innerText=data.error;
   }
 }
 
 async function login(){
-  const email=document.getElementById('loginEmail').value;
-  const password=document.getElementById('loginPassword').value;
+  const email=loginEmail.value;
+  const password=loginPassword.value;
 
   const res=await fetch(API_URL,{
     method:"POST",
@@ -57,7 +84,7 @@ async function login(){
     loadVideos();
     showScreen('videos');
   }else{
-    document.getElementById('loginStatus').innerText="Blogi duomenys";
+    loginStatus.innerText="Blogi duomenys";
   }
 }
 
@@ -72,29 +99,37 @@ function renderVideos(list){
   const container=document.getElementById('videoList');
   container.innerHTML="";
 
-  const frag=document.createDocumentFragment();
-
   list.forEach(v=>{
     const d=document.createElement('div');
-    d.innerHTML=`
-      <p><b>${v.title}</b></p>
-      <p>${v.category}</p>
-      <button onclick="watchVideo('${v.url}')">Žiūrėti</button>
-      <hr>
-    `;
-    frag.appendChild(d);
-  });
+    d.className="video";
 
-  container.appendChild(frag);
+    d.innerHTML=`
+      <b>${v.title}</b>
+      <p>${v.language}</p>
+      <button onclick="toggleDetails(this)">Išsamiau</button>
+      <div class="details">
+        <p>${v.platform}</p>
+        <p>${v.duration}</p>
+        <button onclick="watchVideo('${v.url}')">Žiūrėti</button>
+      </div>
+    `;
+
+    container.appendChild(d);
+  });
+}
+
+function toggleDetails(btn){
+  const d=btn.nextElementSibling;
+  d.style.display=d.style.display==='block'?'none':'block';
 }
 
 function searchVideos(){
-  const q=document.getElementById('search').value.toLowerCase();
+  const q=search.value.toLowerCase();
   renderVideos(allVideos.filter(v=>v.title.toLowerCase().includes(q)));
 }
 
 function filterCategory(){
-  const c=document.getElementById('categoryFilter').value;
+  const c=categoryFilter.value;
   if(!c)return renderVideos(allVideos);
   renderVideos(allVideos.filter(v=>v.category===c));
 }
