@@ -1,7 +1,7 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbyI9-zOdLM8GwwZlZ6epSalg5lYtES8cwit0z3J4dbHaJneC36D_0MiobVmAz6-ZEXaTw/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbyMbxnSOtD9kDn5TXyX_MKUgyg6Og2V6EoYK4gIw6zF8XThAz1Oq-OnAceVms4LytyQJA/exec";
 
-let currentUser = null;
-let allVideos = [];
+let currentUser=null;
+let allVideos=[];
 
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -13,85 +13,68 @@ function toggleSettings(){
   b.style.display=b.style.display==='block'?'none':'block';
 }
 
-function openPolicy(){
-  window.open("policy&terms of use.txt","_blank");
+function checkPassword(){
+  const p=document.getElementById('password').value;
+  const f=document.getElementById('passFeedback');
+
+  if(p.length<8) f.innerText="Mažiausiai 8 simboliai";
+  else if(!/[A-Z]/.test(p)) f.innerText="Pridėkite didžiąją raidę";
+  else if(!/[0-9]/.test(p)) f.innerText="Pridėkite skaičių";
+  else f.innerText="Slaptažodis tinkamas";
 }
 
 function validEmail(email){
-  const regex=/^[^\s@]+@[^\s@]+\.(com|lt|net|org|edu|gov|io|co|info)$/i;
-  return regex.test(email);
-}
-
-function checkPassword(){
-  const p=document.getElementById('password').value;
-  const fb=document.getElementById('passwordFeedback');
-
-  if(p.length<8){
-    fb.innerText="Mažiausiai 8 simboliai";
-    fb.style.color="red";
-  }else{
-    fb.innerText="Tinkamas";
-    fb.style.color="lightgreen";
-  }
+  return /^[^\s@]+@[^\s@]+\.(com|net|org|lt|edu|gov|io|co|me)$/i.test(email);
 }
 
 async function register(){
-  const name=nameEl.value;
-  const email=emailEl.value;
-  const password=passwordEl.value;
-  const phone=phoneEl.value;
-  const role=roleEl.value;
+  const email=document.getElementById('email').value;
+  const password=document.getElementById('password').value;
 
-  if(!validEmail(email)){
-    registerStatus.innerText="Neteisingas el. paštas";
-    return;
-  }
-
-  if(password.length<8){
-    registerStatus.innerText="Slaptažodis per trumpas";
-    return;
-  }
+  if(!validEmail(email)) return alert("Netinkamas email");
+  if(password.length<8) return alert("Per trumpas slaptažodis");
 
   const res=await fetch(API_URL,{
     method:"POST",
-    body:JSON.stringify({action:"register",name,email,password,phone,role})
+    body:JSON.stringify({
+      action:"register",
+      name:document.getElementById('name').value,
+      email,
+      password,
+      phone:document.getElementById('phone').value,
+      role:document.getElementById('role').value
+    })
   });
 
   const data=await res.json();
-
   if(data.success){
     currentUser=email;
     loadVideos();
     showScreen('videos');
-  }else{
-    registerStatus.innerText=data.error;
   }
 }
 
 async function login(){
-  const email=loginEmail.value;
-  const password=loginPassword.value;
-
   const res=await fetch(API_URL,{
     method:"POST",
-    body:JSON.stringify({action:"login",email,password})
+    body:JSON.stringify({
+      action:"login",
+      email:document.getElementById('loginEmail').value,
+      password:document.getElementById('loginPassword').value
+    })
   });
 
   const data=await res.json();
-
   if(data.success){
-    currentUser=email;
+    currentUser=document.getElementById('loginEmail').value;
     loadVideos();
     showScreen('videos');
-  }else{
-    loginStatus.innerText="Blogi duomenys";
   }
 }
 
 async function loadVideos(){
   const res=await fetch('videos.json');
-  const data=await res.json();
-  allVideos=data;
+  allVideos=await res.json();
   renderVideos(allVideos);
 }
 
@@ -99,38 +82,41 @@ function renderVideos(list){
   const container=document.getElementById('videoList');
   container.innerHTML="";
 
-  list.forEach(v=>{
+  list.forEach((v,i)=>{
     const d=document.createElement('div');
-    d.className="video";
 
     d.innerHTML=`
       <b>${v.title}</b>
       <p>${v.language}</p>
-      <button onclick="toggleDetails(this)">Išsamiau</button>
-      <div class="details">
+
+      <button onclick="toggleDetails(${i})">Išsamiau</button>
+
+      <div id="d${i}" style="display:none">
         <p>${v.platform}</p>
         <p>${v.duration}</p>
-        <button onclick="watchVideo('${v.url}')">Žiūrėti</button>
       </div>
+
+      <button onclick="watchVideo('${v.url}')">Žiūrėti</button>
+      <hr>
     `;
 
     container.appendChild(d);
   });
 }
 
-function toggleDetails(btn){
-  const d=btn.nextElementSibling;
-  d.style.display=d.style.display==='block'?'none':'block';
+function toggleDetails(i){
+  const el=document.getElementById(`d${i}`);
+  el.style.display=el.style.display==="none"?"block":"none";
 }
 
 function searchVideos(){
-  const q=search.value.toLowerCase();
+  const q=document.getElementById('search').value.toLowerCase();
   renderVideos(allVideos.filter(v=>v.title.toLowerCase().includes(q)));
 }
 
 function filterCategory(){
-  const c=categoryFilter.value;
-  if(!c)return renderVideos(allVideos);
+  const c=document.getElementById('categoryFilter').value;
+  if(!c) return renderVideos(allVideos);
   renderVideos(allVideos.filter(v=>v.category===c));
 }
 
@@ -141,11 +127,7 @@ async function watchVideo(url){
   });
 
   const data=await res.json();
-
-  if(data.blocked){
-    alert("Limitas pasiektas");
-    return;
-  }
+  if(data.blocked) return alert("Limitas pasiektas");
 
   window.open(url,'_blank');
 }
@@ -155,10 +137,13 @@ async function activateCode(){
 
   const res=await fetch(API_URL,{
     method:"POST",
-    body:JSON.stringify({action:"activate",email:currentUser,code})
+    body:JSON.stringify({
+      action:"activate",
+      email:currentUser,
+      code
+    })
   });
 
   const data=await res.json();
-
   alert(data.success?"Aktyvuota":data.error);
 }
