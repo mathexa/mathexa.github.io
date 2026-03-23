@@ -3,209 +3,197 @@ const API = "https://script.google.com/macros/s/AKfycbznzEG3Y89F0mrA8NxxMne5C-UC
 let token = null;
 let clicksRemaining = 0;
 let subscriptionExpiry = null;
-let lang = "lt";
 
-// ===== TEXT =====
-const TEXT = {
-  lt: {
-    title: "Mokymosi platforma",
-    login: "Prisijungti",
-    signup: "Registruotis",
-    connecting: "Jungiamasi...",
-    loading: "Kraunama...",
-    limit: "Limitas pasiektas"
-  },
-  en: {
-    title: "Learning Platform",
-    login: "Login",
-    signup: "Sign up",
-    connecting: "Connecting...",
-    loading: "Loading...",
-    limit: "Limit reached"
-  }
-};
+// ===== EMAIL VALIDATION =====
+function validEmail(e) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+}
+
+// ===== EU PREFIXES =====
+const prefixes = [
+  "+370","+371","+372","+49","+33","+34","+39","+48","+31","+32","+43",
+  "+45","+46","+47","+358","+353","+420","+421","+386","+385","+36",
+  "+40","+359","+30","+357","+356","+351","+352","+354","+423","+377"
+];
 
 // ===== INIT =====
 document.addEventListener("DOMContentLoaded", () => {
-  bindUI();
-  setLang("lt");
+  const prefixEl = document.getElementById("prefix");
+  prefixes.forEach(p=>{
+    const o=document.createElement("option");
+    o.value=p;
+    o.innerText=p;
+    prefixEl.appendChild(o);
+  });
+
+  bind();
 });
 
-// ===== UI BIND =====
-function bindUI() {
-  const el = id => document.getElementById(id);
+// ===== BIND =====
+function bind() {
+  const el=id=>document.getElementById(id);
 
-  el("btnLogin").onclick = showLogin;
-  el("btnSignup").onclick = showSignup;
-  el("back1").onclick = back;
-  el("back2").onclick = back;
-  el("loginBtn").onclick = login;
-  el("signupBtn").onclick = signup;
-  el("langSwitch").onchange = e => setLang(e.target.value);
+  el("btnLogin").onclick=()=>show("login");
+  el("btnSignup").onclick=()=>show("signup");
+  el("back1").onclick=back;
+  el("back2").onclick=back;
 
-  // password validation
-  el("password2").oninput = () => {
-    const v = el("password2").value;
-    el("passwordFeedback").innerText =
-      v.length < 8 ? "Too short" :
-      v.length > 24 ? "Too long" : "OK";
-  };
+  el("loginBtn").onclick=login;
+  el("signupBtn").onclick=signup;
 
-  el("password3").oninput = () => {
-    el("matchFeedback").innerText =
-      el("password2").value === el("password3").value
-        ? "Match" : "No match";
-  };
-}
-
-// ===== LANGUAGE =====
-function setLang(l) {
-  lang = l;
-  const t = TEXT[l];
-
-  document.getElementById("title").innerText = t.title;
-  document.getElementById("btnLogin").innerText = t.login;
-  document.getElementById("btnSignup").innerText = t.signup;
-  document.getElementById("loginTitle").innerText = t.login;
-  document.getElementById("signupTitle").innerText = t.signup;
-  document.getElementById("loginBtn").innerText = t.login;
-  document.getElementById("signupBtn").innerText = t.signup;
+  el("applyCodeBtn").onclick=applyCode;
+  el("settingsBtn").onclick=()=>showOnly("settings");
 }
 
 // ===== NAV =====
-function showLogin() {
-  toggle("landing", false);
-  toggle("login", true);
+function show(id){
+  ["landing","login","signup"].forEach(x=>toggle(x,false));
+  toggle(id,true);
 }
-
-function showSignup() {
-  toggle("landing", false);
-  toggle("signup", true);
+function showOnly(id){
+  ["app","settings"].forEach(x=>toggle(x,false));
+  toggle(id,true);
 }
-
-function back() {
-  toggle("login", false);
-  toggle("signup", false);
-  toggle("landing", true);
+function back(){
+  ["login","signup","settings"].forEach(x=>toggle(x,false));
+  toggle("landing",true);
 }
-
-function toggle(id, show) {
-  document.getElementById(id).classList.toggle("hidden", !show);
-}
-
-// ===== API =====
-async function api(data) {
-  const res = await fetch(API, {
-    method: "POST",
-    body: JSON.stringify(data)
-  });
-  return res.json();
+function toggle(id,show){
+  document.getElementById(id).classList.toggle("hidden",!show);
 }
 
 // ===== SIGNUP =====
-async function signup() {
-  const el = id => document.getElementById(id);
+async function signup(){
+  const name=document.getElementById("name").value;
+  const email=document.getElementById("email2").value;
+  const pass=document.getElementById("password2").value;
+  const pass2=document.getElementById("password3").value;
 
-  if (!el("name").value || !el("email2").value || !el("password2").value) {
-    alert("Fill required fields");
-    return;
-  }
+  if(!name||!email||!pass) return alert("Required fields");
 
-  if (el("password2").value !== el("password3").value) {
-    alert("Passwords mismatch");
-    return;
-  }
+  if(!validEmail(email)) return alert("Invalid email");
 
-  const phone = el("prefix").value + el("phone").value;
+  if(pass!==pass2) return alert("Passwords mismatch");
 
-  const res = await api({
-    action: "signup",
-    full_name: el("name").value,
-    email: el("email2").value,
+  const phone=document.getElementById("prefix").value+
+              document.getElementById("phone").value;
+
+  const res=await api({
+    action:"signup",
+    full_name:name,
+    email,
     phone,
-    password: el("password2").value,
-    role: el("role").value
+    password:pass,
+    role:document.getElementById("role").value
   });
 
-  alert(res.success ? "Created" : res.error);
+  alert(res.success?"Created":res.error);
 }
 
 // ===== LOGIN =====
-async function login() {
-  const el = id => document.getElementById(id);
+async function login(){
+  const el=id=>document.getElementById(id);
+  el("loginStatus").innerText="Connecting...";
 
-  el("loginStatus").innerText = TEXT[lang].connecting;
-
-  const res = await api({
-    action: "login",
-    email: el("email").value,
-    password: el("password").value
+  const res=await api({
+    action:"login",
+    email:el("email").value,
+    password:el("password").value
   });
 
-  if (res.success) {
-    token = res.token;
-    clicksRemaining = res.clicks_remaining;
-    subscriptionExpiry = res.subscription_expiry;
+  if(res.success){
+    token=res.token;
+    clicksRemaining=res.clicks_remaining;
+    subscriptionExpiry=res.subscription_expiry;
 
-    toggle("login", false);
-    toggle("app", true);
+    toggle("login",false);
+    toggle("app",true);
 
     loadVideos();
-  } else {
-    el("loginStatus").innerText = res.error;
+  }else{
+    el("loginStatus").innerText=res.error;
   }
 }
 
-// ===== SUB =====
-function activeSub() {
-  if (!subscriptionExpiry) return false;
-  const [d,m,y] = subscriptionExpiry.split("/");
-  return new Date(`${y}-${m}-${d}`) > new Date();
+// ===== APPLY CODE =====
+async function applyCode(){
+  const code=document.getElementById("codeInput").value;
+
+  const res=await api({
+    action:"applyCode",
+    code,
+    token
+  });
+
+  alert(res.success?"Activated":"Invalid code");
 }
 
-// ===== VIDEOS =====
-async function loadVideos() {
-  const el = id => document.getElementById(id);
+// ===== VIDEO RENDER (NO FREEZE) =====
+async function loadVideos(){
+  const container=document.getElementById("videos");
+  container.innerHTML="Loading...";
 
-  el("status").innerText = TEXT[lang].loading;
+  const vids=await fetch("videos.json").then(r=>r.json());
 
-  const vids = await fetch("videos.json").then(r => r.json());
+  container.innerHTML="";
 
-  el("videos").innerHTML = "";
+  let i=0;
 
-  const active = activeSub();
+  function renderChunk(){
+    const chunk=10;
+    for(let j=0;j<chunk && i<vids.length;j++,i++){
+      container.appendChild(createCard(vids[i]));
+    }
+    if(i<vids.length){
+      requestAnimationFrame(renderChunk);
+    }
+  }
 
-  el("status").innerText = active
-    ? "Subscription active"
-    : "Clicks: " + clicksRemaining;
+  renderChunk();
+}
 
-  vids.forEach(v => {
-    const btn = document.createElement("button");
-    btn.innerText = v.title;
+// ===== CARD =====
+function createCard(v){
+  const d=document.createElement("div");
+  d.className="videoCard";
 
-    if (!token) btn.disabled = true;
-    else if (!active && clicksRemaining <= 0) {
-      btn.disabled = true;
-      btn.innerText += " (" + TEXT[lang].limit + ")";
+  const min=Math.floor(v.length/60);
+  const sec=(v.length%60).toString().padStart(2,"0");
+
+  d.innerHTML=`
+    <b>${v.title}</b><br>
+    Platform: ${v.platform}<br>
+    Duration: ${min}:${sec}
+  `;
+
+  const btn=document.createElement("button");
+  btn.innerText="Išsamiau (Open)";
+
+  btn.onclick=async()=>{
+    btn.innerText="Loading...";
+
+    const r=await api({action:"watch",token});
+
+    if(!r.allowed){
+      clicksRemaining=0;
+      btn.disabled=true;
+      btn.innerText="Limit reached";
+      return;
     }
 
-    btn.onclick = async () => {
-      btn.innerText = TEXT[lang].loading;
+    clicksRemaining=r.remaining;
+    window.open(v.url,"_blank");
+  };
 
-      const r = await api({ action: "watch", token });
+  d.appendChild(btn);
+  return d;
+}
 
-      if (!r.allowed) {
-        clicksRemaining = 0;
-        loadVideos();
-        return;
-      }
-
-      clicksRemaining = r.remaining;
-
-      window.open(v.url, "_blank");
-      loadVideos();
-    };
-
-    el("videos").appendChild(btn);
+// ===== API =====
+async function api(data){
+  const res=await fetch(API,{
+    method:"POST",
+    body:JSON.stringify(data)
   });
+  return res.json();
 }
