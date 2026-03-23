@@ -1,94 +1,36 @@
 <!DOCTYPE html>
-<html lang="lt">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mathexa</title>
-<link rel="stylesheet" href="style.css">
+  <title>Learning Platform</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<div class="app">
+<div id="auth">
+  <h2>Login</h2>
+  <input id="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+  <button onclick="login()">Login</button>
 
-<!-- LANDING -->
-<div id="landing" class="screen active center">
-  <h1>Mathexa</h1>
-  <button onclick="showScreen('login')">Prisijungti</button>
-  <button onclick="showScreen('register')">Registruotis</button>
-</div>
-
-<!-- LOGIN -->
-<div id="login" class="screen">
-  <h2>Prisijungimas</h2>
-
-  <input id="loginEmail" placeholder="Įveskite el. paštą">
-  <input id="loginPassword" type="password" placeholder="Įveskite slaptažodį">
-
-  <button onclick="login()">Prisijungti</button>
-  <div id="loginStatus" class="status"></div>
-</div>
-
-<!-- REGISTER -->
-<div id="register" class="screen">
-  <h2>Registracija</h2>
-
-  <input id="name" placeholder="Vardas ir pavardė">
-  <input id="email" placeholder="El. paštas">
-
-  <input id="password" type="password" placeholder="Slaptažodis (min. 8 simboliai)" oninput="checkPassword()">
-  <div id="passFeedback" class="warn"></div>
-
-  <input id="phone" placeholder="+370 (nebūtina)">
-
-  <p class="note">
-    Jei neturite lietuviško numerio, bus naudojamas el. paštas
-  </p>
-
+  <h2>Signup</h2>
+  <input id="name" placeholder="Full Name">
+  <input id="phone" placeholder="+370...">
+  <input id="email2" placeholder="Email">
+  <input id="password2" type="password" placeholder="Password">
   <select id="role">
-    <option value="">Pasirinkite rolę</option>
-    <option value="student">Studentas</option>
-    <option value="teacher">Mokytojas</option>
+    <option>student</option>
+    <option>teacher</option>
   </select>
-
-  <p class="policy">
-    Kurdami paskyrą sutinkate su
-    <span class="link" onclick="openPolicy()">privatumo politika ir taisyklėmis</span>
-  </p>
-
-  <button onclick="register()">Registruotis</button>
-  <div id="registerStatus" class="status"></div>
+  <button onclick="signup()">Signup</button>
 </div>
 
-<!-- VIDEOS -->
-<div id="videos" class="screen">
-
-  <!-- SETTINGS ONLY HERE -->
-  <div class="settings-btn" onclick="toggleSettings()">⚙️</div>
-
-  <h2>Vaizdo įrašai</h2>
-
-  <div id="settingsBox" class="settings">
-    <p>Versija: v0.1</p>
-    <p>Saugumas: V2.1</p>
-    <p>Atnaujinta: 2026-03-22</p>
-  </div>
-
-  <input id="search" placeholder="Ieškoti..." oninput="searchVideos()">
-
-  <select id="categoryFilter" onchange="filterCategory()">
-    <option value="">Visos kategorijos</option>
-    <option value="math">Matematika</option>
-    <option value="science">Mokslas</option>
-    <option value="history">Istorija</option>
-    <option value="physics">Fizika</option>
-  </select>
-
-  <button onclick="activateCode()">Aktyvuoti kodą</button>
-
-  <div id="videoList"></div>
+<div id="app" style="display:none;">
+  <h2>Videos</h2>
+  <div id="videos"></div>
 </div>
 
+<div id="overlay" class="hidden">
+  Limit reached. Contact support.
 </div>
 
 <script src="app.js"></script>
