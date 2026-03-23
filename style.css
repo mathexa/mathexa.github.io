@@ -1,17 +1,56 @@
 body {
+  margin:0;
   font-family: Arial;
-  background: linear-gradient(135deg, #3a8dde, #1e3c72);
+  background: linear-gradient(135deg, #4facfe, #00c6ff);
   color: white;
 }
 
-input, button {
-  margin: 5px;
-  padding: 10px;
-  border-radius: 10px;
+.topbar {
+  position: fixed;
+  top:10px;
+  right:10px;
+}
+
+.container {
+  max-width: 400px;
+  margin: auto;
+  padding: 20px;
+  text-align: center;
+}
+
+input, select, button {
+  width: 100%;
+  margin: 8px 0;
+  padding: 12px;
+  border-radius: 12px;
   border: none;
+}
+
+button {
+  background: rgba(255,255,255,0.2);
+  color: white;
+  cursor: pointer;
 }
 
 button:disabled {
   opacity: 0.5;
-  cursor: not-allowed;
+}
+
+.hidden {
+  display: none;
+}
+
+.phoneRow {
+  display: flex;
+  gap: 5px;
+}
+
+.link {
+  background: none;
+  text-decoration: underline;
+}
+
+#passwordFeedback,
+#matchFeedback {
+  font-size: 12px;
 }
