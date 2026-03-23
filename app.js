@@ -3,9 +3,10 @@ const API = "https://script.google.com/macros/s/AKfycbznzEG3Y89F0mrA8NxxMne5C-UC
 let token = null;
 let clicksRemaining = 0;
 let subscriptionExpiry = null;
+let allVideos = [];
 
 // ===== EMAIL VALIDATION =====
-function validEmail(e) {
+function validEmail(e){
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 }
 
@@ -18,23 +19,25 @@ const prefixes = [
 
 // ===== INIT =====
 document.addEventListener("DOMContentLoaded", () => {
-  const prefixEl = document.getElementById("prefix");
-  prefixes.forEach(p=>{
+
+  const p = document.getElementById("prefix");
+  prefixes.forEach(x=>{
     const o=document.createElement("option");
-    o.value=p;
-    o.innerText=p;
-    prefixEl.appendChild(o);
+    o.value=x;
+    o.innerText=x;
+    p.appendChild(o);
   });
 
   bind();
 });
 
 // ===== BIND =====
-function bind() {
+function bind(){
   const el=id=>document.getElementById(id);
 
   el("btnLogin").onclick=()=>show("login");
   el("btnSignup").onclick=()=>show("signup");
+
   el("back1").onclick=back;
   el("back2").onclick=back;
 
@@ -43,6 +46,30 @@ function bind() {
 
   el("applyCodeBtn").onclick=applyCode;
   el("settingsBtn").onclick=()=>showOnly("settings");
+  el("closeSettings").onclick=()=>showOnly("app");
+
+  el("search").oninput=(e)=>{
+    const q=e.target.value.toLowerCase();
+    const filtered=allVideos.filter(v =>
+      v.title.toLowerCase().includes(q) ||
+      v.platform.toLowerCase().includes(q)
+    );
+    renderVideos(filtered);
+  };
+
+  // password feedback
+  el("password2").oninput=()=>{
+    const v=el("password2").value;
+    document.getElementById("passwordFeedback").innerText =
+      v.length<8?"Too short":
+      v.length>24?"Too long":"OK";
+  };
+
+  el("password3").oninput=()=>{
+    document.getElementById("matchFeedback").innerText =
+      el("password2").value===el("password3").value
+        ? "Match" : "No match";
+  };
 }
 
 // ===== NAV =====
@@ -70,12 +97,10 @@ async function signup(){
   const pass2=document.getElementById("password3").value;
 
   if(!name||!email||!pass) return alert("Required fields");
-
   if(!validEmail(email)) return alert("Invalid email");
-
   if(pass!==pass2) return alert("Passwords mismatch");
 
-  const phone=document.getElementById("prefix").value+
+  const phone=document.getElementById("prefix").value +
               document.getElementById("phone").value;
 
   const res=await api({
@@ -128,23 +153,27 @@ async function applyCode(){
   alert(res.success?"Activated":"Invalid code");
 }
 
-// ===== VIDEO RENDER (NO FREEZE) =====
+// ===== LOAD VIDEOS =====
 async function loadVideos(){
   const container=document.getElementById("videos");
   container.innerHTML="Loading...";
 
-  const vids=await fetch("videos.json").then(r=>r.json());
+  allVideos = await fetch("videos.json").then(r=>r.json());
+  renderVideos(allVideos);
+}
 
+// ===== RENDER (NO FREEZE) =====
+function renderVideos(list){
+  const container=document.getElementById("videos");
   container.innerHTML="";
 
   let i=0;
 
   function renderChunk(){
-    const chunk=10;
-    for(let j=0;j<chunk && i<vids.length;j++,i++){
-      container.appendChild(createCard(vids[i]));
+    for(let j=0;j<10 && i<list.length;j++,i++){
+      container.appendChild(createCard(list[i]));
     }
-    if(i<vids.length){
+    if(i<list.length){
       requestAnimationFrame(renderChunk);
     }
   }
@@ -161,9 +190,9 @@ function createCard(v){
   const sec=(v.length%60).toString().padStart(2,"0");
 
   d.innerHTML=`
-    <b>${v.title}</b><br>
-    Platform: ${v.platform}<br>
-    Duration: ${min}:${sec}
+    <b>${v.title}</b>
+    <div>Platform: ${v.platform}</div>
+    <div>Duration: ${min}:${sec}</div>
   `;
 
   const btn=document.createElement("button");
@@ -175,7 +204,6 @@ function createCard(v){
     const r=await api({action:"watch",token});
 
     if(!r.allowed){
-      clicksRemaining=0;
       btn.disabled=true;
       btn.innerText="Limit reached";
       return;
