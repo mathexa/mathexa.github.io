@@ -1,11 +1,5 @@
 [
-  {
-    "id": "1",
-    "title": "Example Video",
-    "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    "category": "math",
-    "language": "lt",
-    "length": 300,
-    "platform": "youtube"
-  }
+  { "id":"1","title":"Video 1","url":"https://youtube.com","platform":"youtube","length":300 },
+  { "id":"2","title":"Video 2","url":"https://youtube.com","platform":"youtube","length":420 },
+  { "id":"3","title":"Video 3","url":"https://youtube.com","platform":"youtube","length":180 }
 ]
