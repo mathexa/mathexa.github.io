@@ -12,44 +12,47 @@
 
   <div id="landing">
     <h1>Mathexa</h1>
-    <button id="btnLogin">Login</button>
-    <button id="btnSignup">Create Account</button>
+    <button id="btnLogin">Prisijungti</button>
+    <button id="btnSignup">Sukurti paskyrą</button>
   </div>
 
   <div id="login" class="hidden">
-    <h2>Login</h2>
-    <input id="email" placeholder="Email">
-    <input id="password" type="password" placeholder="Password">
-    <button id="loginBtn">Login</button>
+    <h2>Prisijungimas</h2>
+    <input id="email" placeholder="El. paštas">
+    <input id="password" type="password" placeholder="Slaptažodis">
+    <button id="loginBtn">Prisijungti</button>
     <div id="loginStatus"></div>
-    <button id="back1">← Back</button>
+    <button id="back1">← Atgal</button>
   </div>
 
   <div id="signup" class="hidden">
-    <h2>Create Account</h2>
+    <h2>Sukurti paskyrą</h2>
 
-    <input id="name" placeholder="Name">
+    <input id="name" placeholder="Vardas ir pavardė">
 
     <div class="phoneRow">
       <select id="prefix"></select>
-      <input id="phone" placeholder="Phone">
+      <input id="phone" placeholder="Telefono numeris">
     </div>
 
-    <input id="email2" placeholder="Email">
+    <input id="email2" placeholder="El. paštas">
 
-    <input id="password2" type="password" placeholder="Password">
+    <input id="password2" type="password" placeholder="Slaptažodis">
+    <div class="smallText">
+      Nors naudojame saugų saugojimą, nerekomenduojame naudoti kasdienių slaptažodžių
+    </div>
     <div id="passwordFeedback"></div>
 
-    <input id="password3" type="password" placeholder="Repeat Password">
+    <input id="password3" type="password" placeholder="Pakartokite slaptažodį">
     <div id="matchFeedback"></div>
 
     <select id="role">
-      <option value="student">student</option>
-      <option value="teacher">teacher</option>
+      <option value="student">Mokinys</option>
+      <option value="teacher">Mokytojas</option>
     </select>
 
-    <button id="signupBtn">Create</button>
-    <button id="back2">← Back</button>
+    <button id="signupBtn">Sukurti</button>
+    <button id="back2">← Atgal</button>
   </div>
 
   <div id="app" class="hidden">
@@ -58,25 +61,24 @@
       <b>Mathexa</b>
     </div>
 
-    <div id="status"></div>
-
-    <input id="search" placeholder="Search by title or category...">
+    <input id="search" placeholder="Ieškoti pagal pavadinimą ar kategoriją...">
 
     <div class="controls">
-      <input id="codeInput" placeholder="Enter subscription code">
-      <button id="applyCodeBtn">Activate</button>
-      <button id="settingsBtn">Settings</button>
+      <input id="codeInput" placeholder="Įveskite prenumeratos kodą">
+      <button id="applyCodeBtn">Aktyvuoti</button>
+      <button id="settingsBtn">Nustatymai</button>
     </div>
 
     <div id="videos"></div>
   </div>
 
   <div id="settings" class="hidden">
-    <h2>Settings</h2>
-    <p>Website version: v3.4</p>
-    <p>Password security: v2.1.2</p>
-    <p>Last updated: 2026-03-23</p>
-    <button id="closeSettings">Close</button>
+    <h2>Nustatymai</h2>
+    <p>Svetainės versija: v3.4</p>
+    <p>Slaptažodžių saugumas: v2.1.2</p>
+    <p>Paskutinis atnaujinimas: 2026-03-23</p>
+    <p id="clicksInfo"></p>
+    <button id="closeSettings">Uždaryti</button>
   </div>
 
 </div>
