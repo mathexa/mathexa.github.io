@@ -3,60 +3,95 @@ const API = "https://script.google.com/macros/s/AKfycbznzEG3Y89F0mrA8NxxMne5C-UC
 let token = null;
 let clicksRemaining = 0;
 let subscriptionExpiry = null;
-
-// ===== LANGUAGE =====
 let lang = "lt";
 
+// ===== TEXT =====
 const TEXT = {
   lt: {
+    title: "Mokymosi platforma",
+    login: "Prisijungti",
+    signup: "Registruotis",
+    connecting: "Jungiamasi...",
     loading: "Kraunama...",
-    connecting: "Jungiamasi su serveriu...",
     limit: "Limitas pasiektas"
   },
   en: {
-    loading: "Loading...",
+    title: "Learning Platform",
+    login: "Login",
+    signup: "Sign up",
     connecting: "Connecting...",
+    loading: "Loading...",
     limit: "Limit reached"
   }
 };
 
-function setLang(l) {
-  lang = l;
+// ===== INIT =====
+document.addEventListener("DOMContentLoaded", () => {
+  bindUI();
+  setLang("lt");
+});
+
+// ===== UI BIND =====
+function bindUI() {
+  const el = id => document.getElementById(id);
+
+  el("btnLogin").onclick = showLogin;
+  el("btnSignup").onclick = showSignup;
+  el("back1").onclick = back;
+  el("back2").onclick = back;
+  el("loginBtn").onclick = login;
+  el("signupBtn").onclick = signup;
+  el("langSwitch").onchange = e => setLang(e.target.value);
+
+  // password validation
+  el("password2").oninput = () => {
+    const v = el("password2").value;
+    el("passwordFeedback").innerText =
+      v.length < 8 ? "Too short" :
+      v.length > 24 ? "Too long" : "OK";
+  };
+
+  el("password3").oninput = () => {
+    el("matchFeedback").innerText =
+      el("password2").value === el("password3").value
+        ? "Match" : "No match";
+  };
 }
 
-// ===== UI NAV =====
+// ===== LANGUAGE =====
+function setLang(l) {
+  lang = l;
+  const t = TEXT[l];
+
+  document.getElementById("title").innerText = t.title;
+  document.getElementById("btnLogin").innerText = t.login;
+  document.getElementById("btnSignup").innerText = t.signup;
+  document.getElementById("loginTitle").innerText = t.login;
+  document.getElementById("signupTitle").innerText = t.signup;
+  document.getElementById("loginBtn").innerText = t.login;
+  document.getElementById("signupBtn").innerText = t.signup;
+}
+
+// ===== NAV =====
 function showLogin() {
-  landing.classList.add("hidden");
-  login.classList.remove("hidden");
+  toggle("landing", false);
+  toggle("login", true);
 }
 
 function showSignup() {
-  landing.classList.add("hidden");
-  signup.classList.remove("hidden");
+  toggle("landing", false);
+  toggle("signup", true);
 }
 
 function back() {
-  login.classList.add("hidden");
-  signup.classList.add("hidden");
-  landing.classList.remove("hidden");
+  toggle("login", false);
+  toggle("signup", false);
+  toggle("landing", true);
 }
 
-// ===== PASSWORD LIVE VALIDATION =====
-password2.oninput = () => {
-  const val = password2.value;
-
-  if (val.length < 8)
-    passwordFeedback.innerText = "Too short";
-  else if (val.length > 24)
-    passwordFeedback.innerText = "Too long";
-  else
-    passwordFeedback.innerText = "OK";
-};
-
-password3.oninput = () => {
-  matchFeedback.innerText =
-    password2.value === password3.value ? "Match" : "No match";
-};
+function toggle(id, show) {
+  document.getElementById(id).classList.toggle("hidden", !show);
+}
 
 // ===== API =====
 async function api(data) {
@@ -69,25 +104,27 @@ async function api(data) {
 
 // ===== SIGNUP =====
 async function signup() {
-  if (!name.value || !email2.value || !password2.value) {
+  const el = id => document.getElementById(id);
+
+  if (!el("name").value || !el("email2").value || !el("password2").value) {
     alert("Fill required fields");
     return;
   }
 
-  if (password2.value !== password3.value) {
-    alert("Passwords do not match");
+  if (el("password2").value !== el("password3").value) {
+    alert("Passwords mismatch");
     return;
   }
 
-  const phoneFull = prefix.value + phone.value;
+  const phone = el("prefix").value + el("phone").value;
 
   const res = await api({
     action: "signup",
-    full_name: name.value,
-    email: email2.value,
-    phone: phoneFull,
-    password: password2.value,
-    role: role.value
+    full_name: el("name").value,
+    email: el("email2").value,
+    phone,
+    password: el("password2").value,
+    role: el("role").value
   });
 
   alert(res.success ? "Created" : res.error);
@@ -95,12 +132,14 @@ async function signup() {
 
 // ===== LOGIN =====
 async function login() {
-  loginStatus.innerText = TEXT[lang].connecting;
+  const el = id => document.getElementById(id);
+
+  el("loginStatus").innerText = TEXT[lang].connecting;
 
   const res = await api({
     action: "login",
-    email: email.value,
-    password: password.value
+    email: el("email").value,
+    password: el("password").value
   });
 
   if (res.success) {
@@ -108,34 +147,35 @@ async function login() {
     clicksRemaining = res.clicks_remaining;
     subscriptionExpiry = res.subscription_expiry;
 
-    login.classList.add("hidden");
-    app.classList.remove("hidden");
+    toggle("login", false);
+    toggle("app", true);
 
     loadVideos();
   } else {
-    loginStatus.innerText = res.error;
+    el("loginStatus").innerText = res.error;
   }
 }
 
-// ===== SUB CHECK =====
+// ===== SUB =====
 function activeSub() {
   if (!subscriptionExpiry) return false;
   const [d,m,y] = subscriptionExpiry.split("/");
   return new Date(`${y}-${m}-${d}`) > new Date();
 }
 
-// ===== LOAD VIDEOS =====
+// ===== VIDEOS =====
 async function loadVideos() {
-  status.innerText = TEXT[lang].loading;
+  const el = id => document.getElementById(id);
 
-  const res = await fetch("videos.json");
-  const vids = await res.json();
+  el("status").innerText = TEXT[lang].loading;
 
-  videos.innerHTML = "";
+  const vids = await fetch("videos.json").then(r => r.json());
+
+  el("videos").innerHTML = "";
 
   const active = activeSub();
 
-  status.innerText = active
+  el("status").innerText = active
     ? "Subscription active"
     : "Clicks: " + clicksRemaining;
 
@@ -152,10 +192,7 @@ async function loadVideos() {
     btn.onclick = async () => {
       btn.innerText = TEXT[lang].loading;
 
-      const r = await api({
-        action: "watch",
-        token
-      });
+      const r = await api({ action: "watch", token });
 
       if (!r.allowed) {
         clicksRemaining = 0;
@@ -166,10 +203,9 @@ async function loadVideos() {
       clicksRemaining = r.remaining;
 
       window.open(v.url, "_blank");
-
       loadVideos();
     };
 
-    videos.appendChild(btn);
+    el("videos").appendChild(btn);
   });
 }
