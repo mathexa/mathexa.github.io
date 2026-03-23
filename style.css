@@ -5,28 +5,27 @@ body {
   color:white;
 }
 
-.topbar {
-  display:flex;
-  justify-content:space-between;
-  padding:10px;
-}
-
-.logo {
-  font-weight:bold;
-}
-
 .container {
-  max-width:500px;
+  max-width:600px;
   margin:auto;
   padding:20px;
 }
 
+#landing, #login, #signup, #app, #settings {
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.hidden {
+  display:none !important;
+}
+
 input, select, button {
   width:100%;
-  padding:10px;
-  margin:6px 0;
+  padding:12px;
   border:none;
-  border-radius:10px;
+  border-radius:12px;
 }
 
 button {
@@ -35,31 +34,43 @@ button {
   cursor:pointer;
 }
 
+button:hover {
+  background:rgba(255,255,255,0.3);
+}
+
 button:disabled {
   opacity:0.5;
 }
 
-.hidden {
-  display:none;
-}
-
 .phoneRow {
   display:flex;
-  gap:5px;
+  gap:8px;
+}
+
+.phoneRow select {
+  width:35%;
+}
+
+.phoneRow input {
+  width:65%;
+}
+
+.topbar {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
 
 .controls {
   display:flex;
-  gap:5px;
-}
-
-#videos {
-  margin-top:10px;
+  gap:8px;
 }
 
 .videoCard {
-  background:rgba(255,255,255,0.1);
-  padding:10px;
-  border-radius:10px;
-  margin-bottom:10px;
+  background:rgba(255,255,255,0.12);
+  padding:12px;
+  border-radius:12px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
 }
