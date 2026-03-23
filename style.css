@@ -1,67 +1,86 @@
-body {
-  margin:0;
-  font-family: Arial;
-  background: linear-gradient(135deg,#4facfe,#00c6ff);
-  color:white;
-}
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mathexa</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-.container {
-  max-width:600px;
-  margin:auto;
-  padding:20px;
-}
+<div class="container">
 
-#landing, #login, #signup, #app, #settings {
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
+  <div id="landing">
+    <h1>Mathexa</h1>
+    <button id="btnLogin">Login</button>
+    <button id="btnSignup">Create Account</button>
+  </div>
 
-.hidden {
-  display:none !important;
-}
+  <div id="login" class="hidden">
+    <h2>Login</h2>
+    <input id="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Password">
+    <button id="loginBtn">Login</button>
+    <div id="loginStatus"></div>
+    <button id="back1">← Back</button>
+  </div>
 
-input, select, button {
-  width:100%;
-  padding:12px;
-  border:none;
-  border-radius:12px;
-}
+  <div id="signup" class="hidden">
+    <h2>Create Account</h2>
 
-button {
-  background:rgba(255,255,255,0.2);
-  color:white;
-  cursor:pointer;
-}
+    <input id="name" placeholder="Name">
 
-button:hover {
-  background:rgba(255,255,255,0.3);
-}
+    <div class="phoneRow">
+      <select id="prefix"></select>
+      <input id="phone" placeholder="Phone">
+    </div>
 
-button:disabled {
-  opacity:0.5;
-}
+    <input id="email2" placeholder="Email">
 
-.phoneRow {
-  display:flex;
-  gap:8px;
-}
+    <input id="password2" type="password" placeholder="Password">
+    <div id="passwordFeedback"></div>
 
-.phoneRow select {
-  width:35%;
-}
+    <input id="password3" type="password" placeholder="Repeat Password">
+    <div id="matchFeedback"></div>
 
-.phoneRow input {
-  width:65%;
-}
+    <select id="role">
+      <option value="student">student</option>
+      <option value="teacher">teacher</option>
+    </select>
 
-.controls {
-  display:flex;
-  gap:8px;
-}
+    <button id="signupBtn">Create</button>
+    <button id="back2">← Back</button>
+  </div>
 
-.videoCard {
-  background:rgba(255,255,255,0.12);
-  padding:12px;
-  border-radius:12px;
-}
+  <div id="app" class="hidden">
+
+    <div class="topbar">
+      <b>Mathexa</b>
+    </div>
+
+    <div id="status"></div>
+
+    <input id="search" placeholder="Search by title or category...">
+
+    <div class="controls">
+      <input id="codeInput" placeholder="Enter subscription code">
+      <button id="applyCodeBtn">Activate</button>
+      <button id="settingsBtn">Settings</button>
+    </div>
+
+    <div id="videos"></div>
+  </div>
+
+  <div id="settings" class="hidden">
+    <h2>Settings</h2>
+    <p>Website version: v3.4</p>
+    <p>Password security: v2.1.2</p>
+    <p>Last updated: 2026-03-23</p>
+    <button id="closeSettings">Close</button>
+  </div>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
