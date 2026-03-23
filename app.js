@@ -45,7 +45,7 @@ function bind(){
   el("signupBtn").onclick=signup;
 
   el("applyCodeBtn").onclick=applyCode;
-  el("settingsBtn").onclick=()=>showOnly("settings");
+  el("settingsBtn").onclick=openSettings;
   el("closeSettings").onclick=()=>showOnly("app");
 
   el("search").oninput=(e)=>{
@@ -63,14 +63,14 @@ function bind(){
   el("password2").oninput=()=>{
     const v=el("password2").value;
     document.getElementById("passwordFeedback").innerText =
-      v.length<8?"Too short":
-      v.length>24?"Too long":"OK";
+      v.length<8?"Per trumpas":
+      v.length>24?"Per ilgas":"Tinkamas";
   };
 
   el("password3").oninput=()=>{
     document.getElementById("matchFeedback").innerText =
       el("password2").value===el("password3").value
-        ? "Match" : "No match";
+        ? "Sutampa" : "Nesutampa";
   };
 }
 
@@ -91,16 +91,16 @@ function toggle(id,show){
   document.getElementById(id).classList.toggle("hidden",!show);
 }
 
-// SIGNUP
+// SIGNUP + AUTO LOGIN
 async function signup(){
   const name=document.getElementById("name").value;
   const email=document.getElementById("email2").value;
   const pass=document.getElementById("password2").value;
   const pass2=document.getElementById("password3").value;
 
-  if(!name||!email||!pass) return alert("Required fields");
-  if(!validEmail(email)) return alert("Invalid email");
-  if(pass!==pass2) return alert("Passwords mismatch");
+  if(!name||!email||!pass) return alert("Užpildykite visus laukus");
+  if(!validEmail(email)) return alert("Neteisingas el. paštas");
+  if(pass!==pass2) return alert("Slaptažodžiai nesutampa");
 
   const phone=document.getElementById("prefix").value +
               document.getElementById("phone").value;
@@ -114,13 +114,33 @@ async function signup(){
     role:document.getElementById("role").value
   });
 
-  alert(res.success?"Created":res.error);
+  if(!res.success){
+    alert(res.error);
+    return;
+  }
+
+  // AUTO LOGIN
+  const loginRes = await api({
+    action:"login",
+    email,
+    password:pass
+  });
+
+  if(loginRes.success){
+    token=loginRes.token;
+    clicksRemaining=loginRes.clicks_remaining;
+
+    toggle("signup",false);
+    toggle("app",true);
+
+    loadVideos();
+  }
 }
 
 // LOGIN
 async function login(){
   const el=id=>document.getElementById(id);
-  el("loginStatus").innerText="Connecting...";
+  el("loginStatus").innerText="Jungiamasi...";
 
   const res=await api({
     action:"login",
@@ -131,7 +151,6 @@ async function login(){
   if(res.success){
     token=res.token;
     clicksRemaining=res.clicks_remaining;
-    subscriptionExpiry=res.subscription_expiry;
 
     toggle("login",false);
     toggle("app",true);
@@ -140,6 +159,18 @@ async function login(){
   }else{
     el("loginStatus").innerText=res.error;
   }
+}
+
+// SETTINGS (SHOW CLICKS)
+function openSettings(){
+  const el=document.getElementById("clicksInfo");
+
+  el.innerText =
+    clicksRemaining > 1000
+      ? "Peržiūros: ∞ (neribota)"
+      : "Liko peržiūrų: " + clicksRemaining;
+
+  showOnly("settings");
 }
 
 // APPLY CODE
@@ -153,18 +184,18 @@ async function applyCode(){
   });
 
   if(res.success){
-    alert("Activated");
+    alert("Aktyvuota");
     clicksRemaining=99999;
     loadVideos();
   } else {
-    alert("Invalid code");
+    alert("Neteisingas kodas");
   }
 }
 
 // LOAD VIDEOS
 async function loadVideos(){
   const container=document.getElementById("videos");
-  container.innerHTML="Loading...";
+  container.innerHTML="Kraunama...";
 
   allVideos = await fetch("videos.json").then(r=>r.json());
   renderVideos(allVideos);
@@ -189,7 +220,7 @@ function renderVideos(list){
   renderChunk();
 }
 
-// CARD (MOBILE SAFE FIX)
+// CARD (mobile safe)
 function createCard(v){
   const d=document.createElement("div");
   d.className="videoCard";
@@ -199,36 +230,34 @@ function createCard(v){
 
   d.innerHTML=`
     <b>${v.title}</b>
-    <div>Category: ${v.category}</div>
-    <div>Platform: ${v.platform}</div>
-    <div>Duration: ${min}:${sec}</div>
+    <div>Kategorija: ${v.category}</div>
+    <div>Platforma: ${v.platform}</div>
+    <div>Trukmė: ${min}:${sec}</div>
   `;
 
   const btn=document.createElement("button");
-  btn.innerText="Išsamiau (Open)";
+  btn.innerText="Atidaryti";
 
   btn.onclick = async () => {
-    // OPEN TAB FIRST (fix)
     const newTab = window.open("", "_blank");
 
     if (!newTab) {
-      alert("Popup blocked");
+      alert("Popup užblokuotas");
       return;
     }
 
-    newTab.document.write("Loading...");
+    newTab.document.write("Kraunama...");
 
     const r = await api({ action: "watch", token });
 
     if (!r.allowed) {
-      newTab.document.body.innerHTML = "Limit reached";
+      newTab.document.body.innerHTML = "Limitas pasiektas";
       btn.disabled = true;
-      btn.innerText = "Limit reached";
+      btn.innerText = "Limitas";
       return;
     }
 
     clicksRemaining = r.remaining;
-
     newTab.location.href = v.url;
   };
 
