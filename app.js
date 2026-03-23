@@ -5,19 +5,19 @@ let clicksRemaining = 0;
 let subscriptionExpiry = null;
 let allVideos = [];
 
-// ===== EMAIL VALIDATION =====
+// EMAIL VALIDATION
 function validEmail(e){
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 }
 
-// ===== EU PREFIXES =====
+// PREFIXES
 const prefixes = [
   "+370","+371","+372","+49","+33","+34","+39","+48","+31","+32","+43",
   "+45","+46","+47","+358","+353","+420","+421","+386","+385","+36",
   "+40","+359","+30","+357","+356","+351","+352","+354","+423","+377"
 ];
 
-// ===== INIT =====
+// INIT
 document.addEventListener("DOMContentLoaded", () => {
 
   const p = document.getElementById("prefix");
@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
   bind();
 });
 
-// ===== BIND =====
+// BIND
 function bind(){
   const el=id=>document.getElementById(id);
 
@@ -74,7 +74,7 @@ function bind(){
   };
 }
 
-// ===== NAV =====
+// NAV
 function show(id){
   ["landing","login","signup"].forEach(x=>toggle(x,false));
   toggle(id,true);
@@ -91,7 +91,7 @@ function toggle(id,show){
   document.getElementById(id).classList.toggle("hidden",!show);
 }
 
-// ===== SIGNUP =====
+// SIGNUP
 async function signup(){
   const name=document.getElementById("name").value;
   const email=document.getElementById("email2").value;
@@ -117,7 +117,7 @@ async function signup(){
   alert(res.success?"Created":res.error);
 }
 
-// ===== LOGIN =====
+// LOGIN
 async function login(){
   const el=id=>document.getElementById(id);
   el("loginStatus").innerText="Connecting...";
@@ -142,7 +142,7 @@ async function login(){
   }
 }
 
-// ===== APPLY CODE (FIXED) =====
+// APPLY CODE
 async function applyCode(){
   const code=document.getElementById("codeInput").value;
 
@@ -154,28 +154,23 @@ async function applyCode(){
 
   if(res.success){
     alert("Activated");
-
-    clicksRemaining = 99999;
-
-    // IMPORTANT FIX: re-render UI
+    clicksRemaining=99999;
     loadVideos();
-
   } else {
     alert("Invalid code");
   }
 }
 
-// ===== LOAD VIDEOS =====
+// LOAD VIDEOS
 async function loadVideos(){
   const container=document.getElementById("videos");
   container.innerHTML="Loading...";
 
   allVideos = await fetch("videos.json").then(r=>r.json());
-
   renderVideos(allVideos);
 }
 
-// ===== RENDER (NO FREEZE) =====
+// RENDER
 function renderVideos(list){
   const container=document.getElementById("videos");
   container.innerHTML="";
@@ -194,7 +189,7 @@ function renderVideos(list){
   renderChunk();
 }
 
-// ===== CARD =====
+// CARD (MOBILE SAFE FIX)
 function createCard(v){
   const d=document.createElement("div");
   d.className="videoCard";
@@ -212,26 +207,36 @@ function createCard(v){
   const btn=document.createElement("button");
   btn.innerText="Išsamiau (Open)";
 
-  btn.onclick=async()=>{
-    btn.innerText="Loading...";
+  btn.onclick = async () => {
+    // OPEN TAB FIRST (fix)
+    const newTab = window.open("", "_blank");
 
-    const r=await api({action:"watch",token});
-
-    if(!r.allowed){
-      btn.disabled=true;
-      btn.innerText="Limit reached";
+    if (!newTab) {
+      alert("Popup blocked");
       return;
     }
 
-    clicksRemaining=r.remaining;
-    window.open(v.url,"_blank");
+    newTab.document.write("Loading...");
+
+    const r = await api({ action: "watch", token });
+
+    if (!r.allowed) {
+      newTab.document.body.innerHTML = "Limit reached";
+      btn.disabled = true;
+      btn.innerText = "Limit reached";
+      return;
+    }
+
+    clicksRemaining = r.remaining;
+
+    newTab.location.href = v.url;
   };
 
   d.appendChild(btn);
   return d;
 }
 
-// ===== API =====
+// API
 async function api(data){
   const res=await fetch(API,{
     method:"POST",
