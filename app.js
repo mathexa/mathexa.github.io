@@ -5,6 +5,8 @@ let clicksRemaining = 0;
 let subscriptionExpiry = null;
 let allVideos = [];
 
+let signupLock = false;
+
 // EMAIL VALIDATION
 function validEmail(e){
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
@@ -72,6 +74,13 @@ function bind(){
       el("password2").value===el("password3").value
         ? "Sutampa" : "Nesutampa";
   };
+
+  // prevent enter spam during signup
+  document.addEventListener("keydown", (e)=>{
+    if(e.key === "Enter" && signupLock){
+      e.preventDefault();
+    }
+  });
 }
 
 // NAV
@@ -91,8 +100,12 @@ function toggle(id,show){
   document.getElementById(id).classList.toggle("hidden",!show);
 }
 
-// SIGNUP + AUTO LOGIN
+// SIGNUP (WITH FULL PROTECTION)
 async function signup(){
+  if (signupLock) return;
+
+  const btn = document.getElementById("signupBtn");
+
   const name=document.getElementById("name").value;
   const email=document.getElementById("email2").value;
   const pass=document.getElementById("password2").value;
@@ -105,35 +118,50 @@ async function signup(){
   const phone=document.getElementById("prefix").value +
               document.getElementById("phone").value;
 
-  const res=await api({
-    action:"signup",
-    full_name:name,
-    email,
-    phone,
-    password:pass,
-    role:document.getElementById("role").value
-  });
+  try {
+    signupLock = true;
+    btn.disabled = true;
+    btn.innerText = "Kuriama...";
 
-  if(!res.success){
-    alert(res.error);
-    return;
-  }
+    const res = await api({
+      action:"signup",
+      full_name:name,
+      email,
+      phone,
+      password:pass,
+      role:document.getElementById("role").value
+    });
 
-  // AUTO LOGIN
-  const loginRes = await api({
-    action:"login",
-    email,
-    password:pass
-  });
+    if(!res.success){
+      alert(res.error || "Klaida");
+      return;
+    }
 
-  if(loginRes.success){
-    token=loginRes.token;
-    clicksRemaining=loginRes.clicks_remaining;
+    // AUTO LOGIN
+    const loginRes = await api({
+      action:"login",
+      email,
+      password:pass
+    });
 
-    toggle("signup",false);
-    toggle("app",true);
+    if(loginRes.success){
+      token=loginRes.token;
+      clicksRemaining=loginRes.clicks_remaining;
 
-    loadVideos();
+      toggle("signup",false);
+      toggle("app",true);
+
+      loadVideos();
+    }
+
+  } catch (err) {
+    alert("Tinklo klaida");
+  } finally {
+    setTimeout(() => {
+      signupLock = false;
+      btn.disabled = false;
+      btn.innerText = "Sukurti";
+    }, 2000);
   }
 }
 
@@ -161,7 +189,7 @@ async function login(){
   }
 }
 
-// SETTINGS (SHOW CLICKS)
+// SETTINGS
 function openSettings(){
   const el=document.getElementById("clicksInfo");
 
@@ -220,7 +248,7 @@ function renderVideos(list){
   renderChunk();
 }
 
-// CARD (mobile safe)
+// CARD (MOBILE SAFE)
 function createCard(v){
   const d=document.createElement("div");
   d.className="videoCard";
