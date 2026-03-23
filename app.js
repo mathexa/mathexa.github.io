@@ -50,10 +50,12 @@ function bind(){
 
   el("search").oninput=(e)=>{
     const q=e.target.value.toLowerCase();
+
     const filtered=allVideos.filter(v =>
       v.title.toLowerCase().includes(q) ||
-      v.platform.toLowerCase().includes(q)
+      v.category.toLowerCase().includes(q)
     );
+
     renderVideos(filtered);
   };
 
@@ -140,7 +142,7 @@ async function login(){
   }
 }
 
-// ===== APPLY CODE =====
+// ===== APPLY CODE (FIXED) =====
 async function applyCode(){
   const code=document.getElementById("codeInput").value;
 
@@ -150,7 +152,17 @@ async function applyCode(){
     token
   });
 
-  alert(res.success?"Activated":"Invalid code");
+  if(res.success){
+    alert("Activated");
+
+    clicksRemaining = 99999;
+
+    // IMPORTANT FIX: re-render UI
+    loadVideos();
+
+  } else {
+    alert("Invalid code");
+  }
 }
 
 // ===== LOAD VIDEOS =====
@@ -159,6 +171,7 @@ async function loadVideos(){
   container.innerHTML="Loading...";
 
   allVideos = await fetch("videos.json").then(r=>r.json());
+
   renderVideos(allVideos);
 }
 
@@ -191,6 +204,7 @@ function createCard(v){
 
   d.innerHTML=`
     <b>${v.title}</b>
+    <div>Category: ${v.category}</div>
     <div>Platform: ${v.platform}</div>
     <div>Duration: ${min}:${sec}</div>
   `;
