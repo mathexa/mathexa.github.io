@@ -1,86 +1,214 @@
-<!DOCTYPE html>
-<html lang="lt">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mathexa</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+/* RESET */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-<div class="container">
+/* BODY */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+  background: linear-gradient(135deg, #4facfe, #00c6ff);
+  min-height: 100vh;
+  color: white;
+}
 
-  <div id="landing">
-    <h1>Mathexa</h1>
-    <button id="btnLogin">Login</button>
-    <button id="btnSignup">Create Account</button>
-  </div>
+/* CONTAINER */
+.container {
+  max-width: 520px;
+  margin: auto;
+  padding: 20px;
+}
 
-  <div id="login" class="hidden">
-    <h2>Login</h2>
-    <input id="email" placeholder="Email">
-    <input id="password" type="password" placeholder="Password">
-    <button id="loginBtn">Login</button>
-    <div id="loginStatus"></div>
-    <button id="back1">← Back</button>
-  </div>
+/* SECTIONS */
+#landing,
+#login,
+#signup,
+#app,
+#settings {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: fadeIn 0.25s ease;
+}
 
-  <div id="signup" class="hidden">
-    <h2>Create Account</h2>
+.hidden {
+  display: none !important;
+}
 
-    <input id="name" placeholder="Name">
+/* TITLES */
+h1 {
+  text-align: center;
+  font-size: 30px;
+  margin-bottom: 10px;
+}
 
-    <div class="phoneRow">
-      <select id="prefix"></select>
-      <input id="phone" placeholder="Phone">
-    </div>
+h2 {
+  text-align: center;
+  font-size: 20px;
+}
 
-    <input id="email2" placeholder="Email">
+/* INPUTS */
+input,
+select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 14px;
+  border: none;
+  outline: none;
 
-    <input id="password2" type="password" placeholder="Password">
-    <div id="passwordFeedback"></div>
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+  color: white;
+}
 
-    <input id="password3" type="password" placeholder="Repeat Password">
-    <div id="matchFeedback"></div>
+input::placeholder {
+  color: rgba(255,255,255,0.7);
+}
 
-    <select id="role">
-      <option value="student">student</option>
-      <option value="teacher">teacher</option>
-    </select>
+/* BUTTONS */
+button {
+  padding: 12px;
+  border-radius: 14px;
+  border: none;
 
-    <button id="signupBtn">Create</button>
-    <button id="back2">← Back</button>
-  </div>
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(12px);
 
-  <div id="app" class="hidden">
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
 
-    <div class="topbar">
-      <b>Mathexa</b>
-    </div>
+  transition: 0.2s ease;
+}
 
-    <div id="status"></div>
+button:hover {
+  background: rgba(255,255,255,0.3);
+}
 
-    <input id="search" placeholder="Search by title or category...">
+button:disabled {
+  opacity: 0.4;
+}
 
-    <div class="controls">
-      <input id="codeInput" placeholder="Enter subscription code">
-      <button id="applyCodeBtn">Activate</button>
-      <button id="settingsBtn">Settings</button>
-    </div>
+/* SMALL TEXT */
+.smallText {
+  font-size: 12px;
+  opacity: 0.75;
+  text-align: center;
+}
 
-    <div id="videos"></div>
-  </div>
+/* PHONE ROW */
+.phoneRow {
+  display: flex;
+  gap: 6px;
+}
 
-  <div id="settings" class="hidden">
-    <h2>Settings</h2>
-    <p>Website version: v3.4</p>
-    <p>Password security: v2.1.2</p>
-    <p>Last updated: 2026-03-23</p>
-    <button id="closeSettings">Close</button>
-  </div>
+.phoneRow select {
+  width: 35%;
+}
 
-</div>
+.phoneRow input {
+  width: 65%;
+}
 
-<script src="app.js"></script>
-</body>
-</html>
+/* TOP BAR */
+.topbar {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+  padding: 8px;
+}
+
+/* SEARCH */
+#search {
+  margin-top: 6px;
+}
+
+/* CONTROLS */
+.controls {
+  display: flex;
+  gap: 6px;
+}
+
+.controls input {
+  flex: 1;
+}
+
+.controls button {
+  flex: 1;
+}
+
+/* VIDEOS LIST (NO GRID — CLEAN STACK) */
+#videos {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* VIDEO CARD */
+.videoCard {
+  padding: 14px;
+  border-radius: 16px;
+
+  background: rgba(255,255,255,0.18);
+  backdrop-filter: blur(14px);
+
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  transition: 0.2s ease;
+}
+
+.videoCard:hover {
+  transform: scale(1.01);
+}
+
+.videoCard b {
+  font-size: 15px;
+}
+
+.videoCard div {
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+/* BUTTON IN CARD */
+.videoCard button {
+  margin-top: 8px;
+}
+
+/* STATUS TEXT */
+#loginStatus,
+#passwordFeedback,
+#matchFeedback {
+  font-size: 12px;
+  opacity: 0.8;
+  text-align: center;
+}
+
+/* SETTINGS */
+#settings p {
+  font-size: 13px;
+  text-align: center;
+  opacity: 0.9;
+}
+
+/* ANIMATION */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* MOBILE POLISH */
+@media (max-width: 400px) {
+  .container {
+    padding: 14px;
+  }
+
+  button,
+  input {
+    padding: 10px;
+  }
+}
