@@ -1,11 +1,11 @@
 [
   {
     "id": "1",
-    "title": "Math Basics",
-    "url": "https://www.youtube.com/watch?v=example",
+    "title": "Example Video",
+    "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
     "category": "math",
     "language": "lt",
-    "length": 600,
+    "length": 300,
     "platform": "youtube"
   }
 ]
