@@ -1,32 +1,85 @@
 <!DOCTYPE html>
-<html>
+<html lang="lt">
 <head>
-  <title>Learning</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MATHEXA</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div id="auth">
-  <h2>Login</h2>
-  <input id="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
-  <button onclick="login()">Login</button>
-
-  <h2>Signup</h2>
-  <input id="name" placeholder="Full Name">
-  <input id="phone" placeholder="+370...">
-  <input id="email2" placeholder="Email">
-  <input id="password2" type="password" placeholder="Password">
-  <select id="role">
-    <option>student</option>
-    <option>teacher</option>
+<div class="topbar">
+  <select id="langSwitch" onchange="setLang(this.value)">
+    <option value="lt">LT</option>
+    <option value="en">EN</option>
+    <option value="de">DE</option>
+    <option value="fr">FR</option>
   </select>
-  <button onclick="signup()">Signup</button>
 </div>
 
-<div id="app" style="display:none;">
-  <h2>Videos</h2>
-  <div id="videos"></div>
+<div class="container">
+
+  <!-- LANDING -->
+  <div id="landing">
+    <h1 id="title">Mokymosi platforma</h1>
+    <button onclick="showLogin()">Turiu paskyrą</button>
+    <button onclick="showSignup()">Esu naujas</button>
+  </div>
+
+  <!-- LOGIN -->
+  <div id="login" class="hidden">
+    <h2 id="loginTitle">Prisijungti</h2>
+
+    <input id="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Slaptažodis">
+
+    <button onclick="login()">Prisijungti</button>
+    <div id="loginStatus"></div>
+
+    <button class="link" onclick="back()">← Atgal</button>
+  </div>
+
+  <!-- SIGNUP -->
+  <div id="signup" class="hidden">
+    <h2 id="signupTitle">Sukurti paskyrą</h2>
+
+    <input id="name" placeholder="Pilnas vardas">
+
+    <div class="phoneRow">
+      <select id="prefix">
+        <option value="+370">+370</option>
+        <option value="+371">+371</option>
+        <option value="+372">+372</option>
+        <option value="+49">+49</option>
+      </select>
+      <input id="phone" placeholder="Telefonas">
+    </div>
+
+    <input id="email2" placeholder="Email">
+
+    <input id="password2" type="password" placeholder="Slaptažodis">
+    <div id="passwordFeedback"></div>
+
+    <input id="password3" type="password" placeholder="Pakartokite slaptažodį">
+    <div id="matchFeedback"></div>
+
+    <select id="role">
+      <option value="student">student</option>
+      <option value="teacher">teacher</option>
+    </select>
+
+    <button onclick="signup()">Sukurti</button>
+
+    <button class="link" onclick="back()">← Atgal</button>
+  </div>
+
+  <!-- APP -->
+  <div id="app" class="hidden">
+    <h2>Videos</h2>
+    <div id="status"></div>
+    <div id="videos"></div>
+  </div>
+
 </div>
 
 <script src="app.js"></script>
