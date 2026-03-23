@@ -3,64 +3,54 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MATHEXA</title>
+  <title>Platforma</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="topbar">
-  <select id="langSwitch" onchange="setLang(this.value)">
+  <select id="langSwitch">
     <option value="lt">LT</option>
     <option value="en">EN</option>
-    <option value="de">DE</option>
-    <option value="fr">FR</option>
   </select>
 </div>
 
 <div class="container">
 
-  <!-- LANDING -->
   <div id="landing">
-    <h1 id="title">Mokymosi platforma</h1>
-    <button onclick="showLogin()">Turiu paskyrą</button>
-    <button onclick="showSignup()">Esu naujas</button>
+    <h1 id="title"></h1>
+    <button id="btnLogin"></button>
+    <button id="btnSignup"></button>
   </div>
 
-  <!-- LOGIN -->
   <div id="login" class="hidden">
-    <h2 id="loginTitle">Prisijungti</h2>
-
+    <h2 id="loginTitle"></h2>
     <input id="email" placeholder="Email">
-    <input id="password" type="password" placeholder="Slaptažodis">
-
-    <button onclick="login()">Prisijungti</button>
+    <input id="password" type="password" placeholder="Password">
+    <button id="loginBtn"></button>
     <div id="loginStatus"></div>
-
-    <button class="link" onclick="back()">← Atgal</button>
+    <button class="link" id="back1">←</button>
   </div>
 
-  <!-- SIGNUP -->
   <div id="signup" class="hidden">
-    <h2 id="signupTitle">Sukurti paskyrą</h2>
+    <h2 id="signupTitle"></h2>
 
-    <input id="name" placeholder="Pilnas vardas">
+    <input id="name" placeholder="Name">
 
     <div class="phoneRow">
       <select id="prefix">
         <option value="+370">+370</option>
         <option value="+371">+371</option>
-        <option value="+372">+372</option>
-        <option value="+49">+49</option>
       </select>
-      <input id="phone" placeholder="Telefonas">
+      <input id="phone" placeholder="Phone">
     </div>
 
     <input id="email2" placeholder="Email">
 
-    <input id="password2" type="password" placeholder="Slaptažodis">
+    <input id="password2" type="password" placeholder="Password">
     <div id="passwordFeedback"></div>
 
-    <input id="password3" type="password" placeholder="Pakartokite slaptažodį">
+    <input id="password3" type="password" placeholder="Repeat password">
     <div id="matchFeedback"></div>
 
     <select id="role">
@@ -68,12 +58,10 @@
       <option value="teacher">teacher</option>
     </select>
 
-    <button onclick="signup()">Sukurti</button>
-
-    <button class="link" onclick="back()">← Atgal</button>
+    <button id="signupBtn"></button>
+    <button class="link" id="back2">←</button>
   </div>
 
-  <!-- APP -->
   <div id="app" class="hidden">
     <h2>Videos</h2>
     <div id="status"></div>
