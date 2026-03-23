@@ -55,11 +55,6 @@ button:disabled {
   width:65%;
 }
 
-.topbar {
-  display:flex;
-  justify-content:space-between;
-}
-
 .controls {
   display:flex;
   gap:8px;
@@ -69,7 +64,4 @@ button:disabled {
   background:rgba(255,255,255,0.12);
   padding:12px;
   border-radius:12px;
-  display:flex;
-  flex-direction:column;
-  gap:6px;
 }
