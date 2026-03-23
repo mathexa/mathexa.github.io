@@ -3,26 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Platforma</title>
+  <title>Mathexa</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="topbar">
-  <select id="langSwitch">
-    <option value="lt">LT</option>
-    <option value="en">EN</option>
-  </select>
+  <span class="logo">Mathexa</span>
+  <select id="langSwitch"></select>
 </div>
 
 <div class="container">
 
+  <!-- LANDING -->
   <div id="landing">
-    <h1 id="title"></h1>
+    <h1>Mathexa</h1>
     <button id="btnLogin"></button>
     <button id="btnSignup"></button>
   </div>
 
+  <!-- LOGIN -->
   <div id="login" class="hidden">
     <h2 id="loginTitle"></h2>
     <input id="email" placeholder="Email">
@@ -32,16 +32,14 @@
     <button class="link" id="back1">←</button>
   </div>
 
+  <!-- SIGNUP -->
   <div id="signup" class="hidden">
     <h2 id="signupTitle"></h2>
 
     <input id="name" placeholder="Name">
 
     <div class="phoneRow">
-      <select id="prefix">
-        <option value="+370">+370</option>
-        <option value="+371">+371</option>
-      </select>
+      <select id="prefix"></select>
       <input id="phone" placeholder="Phone">
     </div>
 
@@ -62,10 +60,28 @@
     <button class="link" id="back2">←</button>
   </div>
 
+  <!-- APP -->
   <div id="app" class="hidden">
-    <h2>Videos</h2>
+    <h2>Mathexa</h2>
+
     <div id="status"></div>
+
+    <div class="controls">
+      <input id="codeInput" placeholder="Enter code">
+      <button id="applyCodeBtn">Activate</button>
+      <button id="settingsBtn">Settings</button>
+    </div>
+
     <div id="videos"></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div id="settings" class="hidden">
+    <h2>Settings</h2>
+    <p>Website version: v3.4</p>
+    <p>Password security: v2.1.2</p>
+    <p>Last updated: 2026-03-23</p>
+    <button onclick="closeSettings()">Close</button>
   </div>
 
 </div>
