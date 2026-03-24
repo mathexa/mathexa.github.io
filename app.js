@@ -5,52 +5,54 @@ let clicksRemaining = 0;
 let allVideos = [];
 let supportId = null;
 
+const SESSION_LIMIT = 3 * 60 * 60 * 1000; // 3h
+
 // INIT
 document.addEventListener("DOMContentLoaded", () => {
-
-  const prefixes = ["+370","+371","+372","+49","+33","+34","+39","+48","+31","+32","+43","+45","+46","+47","+358","+353","+420","+421","+386","+385","+36","+40","+359","+30","+357","+356","+351","+352","+354","+423","+377"];
-  const p = document.getElementById("prefix");
-  prefixes.forEach(x=>{
-    const o=document.createElement("option");
-    o.value=x; o.innerText=x;
-    p.appendChild(o);
-  });
-
   bind();
-
-  // restore simple UI
-  if(localStorage.getItem("simpleUI")==="true"){
-    document.body.classList.add("simple");
-    document.getElementById("simpleUI").checked = true;
-  }
-
-  // FIXED SESSION RESTORE
-  const saved = JSON.parse(localStorage.getItem("session") || "null");
-
-  if(saved){
-    if(Date.now() - saved.time < 3*60*60*1000){
-
-      token = saved.token;
-
-      api({ action:"watch", token }).then(r=>{
-        if(r.error){
-          localStorage.removeItem("session");
-          return;
-        }
-
-        clicksRemaining = r.remaining || 0;
-        showApp();
-        loadVideos();
-      });
-
-    } else {
-      localStorage.removeItem("session");
-      alert("Sesija baigėsi");
-    }
-  }
+  restoreSession();
 });
 
-// BIND
+// ---------------- SESSION ----------------
+
+async function restoreSession(){
+  const raw = localStorage.getItem("session");
+
+  if(!raw) return;
+
+  try {
+    const saved = JSON.parse(raw);
+
+    // expired → clear
+    if(Date.now() - saved.time > SESSION_LIMIT){
+      localStorage.removeItem("session");
+      return;
+    }
+
+    // validate token with backend
+    const res = await api({
+      action: "validateToken",
+      token: saved.token
+    });
+
+    if(res.success){
+      token = saved.token;
+      clicksRemaining = res.clicks_remaining;
+      supportId = res.support_id || null;
+
+      showApp();
+      loadVideos();
+    } else {
+      localStorage.removeItem("session");
+    }
+
+  } catch {
+    localStorage.removeItem("session");
+  }
+}
+
+// ---------------- BIND ----------------
+
 function bind(){
   const el=id=>document.getElementById(id);
 
@@ -64,10 +66,10 @@ function bind(){
   el("signupBtn").onclick=signup;
 
   el("applyCodeBtn").onclick=applyCode;
-  el("settingsBtn").onclick=openSettings;
+  el("settingsBtn").onclick=()=>showOnly("settings");
   el("closeSettings").onclick=()=>showOnly("app");
 
-  // PASSWORD FEEDBACK
+  // PASSWORD realtime
   el("password2").addEventListener("input", ()=>{
     const v = el("password2").value;
 
@@ -79,47 +81,62 @@ function bind(){
       passwordFeedback.innerText="Tinkamas";
     }
 
-    checkMatch();
+    matchCheck();
   });
 
-  el("password3").addEventListener("input", checkMatch);
+  el("password3").addEventListener("input", matchCheck);
 
-  function checkMatch(){
+  function matchCheck(){
     matchFeedback.innerText =
       password2.value === password3.value
         ? "Sutampa"
         : "Nesutampa";
   }
 
+  // SEARCH
   el("search").oninput = (e)=>{
-    const q=e.target.value.toLowerCase();
+    const q = e.target.value.toLowerCase();
+
     renderVideos(allVideos.filter(v =>
       v.title.toLowerCase().includes(q) ||
       v.category.toLowerCase().includes(q)
     ));
   };
 
-  el("toggleSupport").onclick=()=>{
-    supportBox.classList.toggle("hidden");
-    supportBox.innerText = supportId || "Nėra";
-  };
-
+  // SIMPLE UI
   el("simpleUI").onchange = (e)=>{
     document.body.classList.toggle("simple", e.target.checked);
     localStorage.setItem("simpleUI", e.target.checked);
   };
 
-  el("stayLogin").onchange = (e)=>{
-    if(!e.target.checked){
-      localStorage.removeItem("session");
-    }
-  };
+  if(localStorage.getItem("simpleUI")==="true"){
+    document.body.classList.add("simple");
+    el("simpleUI").checked = true;
+  }
 }
 
-// LOGIN
+// ---------------- VALIDATION ----------------
+
+function validEmail(email){
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+// ---------------- LOGIN ----------------
+
+let loginLock = false;
+
 async function login(emailOverride, passOverride){
+  if(loginLock) return;
+  loginLock = true;
+
   const emailVal = (emailOverride || email.value).trim();
   const passVal = (passOverride || password.value).trim();
+
+  if(!validEmail(emailVal)){
+    loginStatus.innerText="Neteisingas el. paštas";
+    loginLock = false;
+    return;
+  }
 
   loginStatus.innerText="Jungiamasi...";
 
@@ -134,7 +151,7 @@ async function login(emailOverride, passOverride){
     clicksRemaining = res.clicks_remaining;
     supportId = res.support_id || null;
 
-    if(document.getElementById("stayLogin")?.checked){
+    if(stayLogin?.checked){
       localStorage.setItem("session", JSON.stringify({
         token,
         time: Date.now()
@@ -144,14 +161,34 @@ async function login(emailOverride, passOverride){
     showApp();
     loadVideos();
   } else {
-    loginStatus.innerText = res.error;
+    loginStatus.innerText = res.error || "Klaida";
   }
+
+  loginLock = false;
 }
 
-// SIGNUP
+// ---------------- SIGNUP ----------------
+
+let signupLock = false;
+
 async function signup(){
+  if(signupLock) return;
+  signupLock = true;
+
   const emailVal = email2.value.trim();
   const passVal = password2.value;
+
+  if(!validEmail(emailVal)){
+    alert("Neteisingas el. paštas");
+    signupLock = false;
+    return;
+  }
+
+  if(passVal !== password3.value){
+    alert("Slaptažodžiai nesutampa");
+    signupLock = false;
+    return;
+  }
 
   const res = await api({
     action:"signup",
@@ -166,23 +203,18 @@ async function signup(){
     supportId = res.support_id;
     alert("Jūsų ID: " + supportId);
 
+    // AUTO LOGIN (important)
     await login(emailVal, passVal);
+
   } else {
-    alert(res.error);
+    alert(res.error || "Klaida");
   }
+
+  signupLock = false;
 }
 
-// SETTINGS
-function openSettings(){
-  clicksInfo.innerText =
-    clicksRemaining > 1000
-      ? "Peržiūros: ∞"
-      : "Liko: " + clicksRemaining;
+// ---------------- APPLY CODE ----------------
 
-  showOnly("settings");
-}
-
-// APPLY CODE
 async function applyCode(){
   const res = await api({
     action:"applyCode",
@@ -191,15 +223,16 @@ async function applyCode(){
   });
 
   if(res.success){
-    alert("Aktyvuota");
     clicksRemaining = 99999;
+    alert("Aktyvuota");
     loadVideos();
   } else {
     alert(res.error);
   }
 }
 
-// VIDEOS
+// ---------------- VIDEOS ----------------
+
 async function loadVideos(){
   videos.innerHTML="Kraunama...";
   allVideos = await fetch("videos.json").then(r=>r.json());
@@ -212,16 +245,17 @@ function renderVideos(list){
 
   function chunk(){
     for(let j=0;j<10 && i<list.length;j++,i++){
-      videos.appendChild(card(list[i]));
+      videos.appendChild(makeCard(list[i]));
     }
     if(i<list.length){
       requestAnimationFrame(chunk);
     }
   }
+
   chunk();
 }
 
-function card(v){
+function makeCard(v){
   const d=document.createElement("div");
   d.className="videoCard";
 
@@ -242,7 +276,7 @@ function card(v){
 
     if(!r.allowed){
       tab.document.body.innerHTML="Limitas pasiektas";
-      btn.disabled=true;
+      btn.disabled = true;
       return;
     }
 
@@ -254,7 +288,8 @@ function card(v){
   return d;
 }
 
-// API
+// ---------------- API ----------------
+
 async function api(data){
   const res = await fetch(API,{
     method:"POST",
@@ -263,19 +298,23 @@ async function api(data){
   return res.json();
 }
 
-// NAV
+// ---------------- NAV ----------------
+
 function show(id){
   ["landing","login","signup"].forEach(x=>toggle(x,false));
   toggle(id,true);
 }
+
 function showOnly(id){
   ["app","settings"].forEach(x=>toggle(x,false));
   toggle(id,true);
 }
+
 function back(){
   ["login","signup","settings"].forEach(x=>toggle(x,false));
   toggle("landing",true);
 }
+
 function toggle(id,show){
   document.getElementById(id).classList.toggle("hidden",!show);
 }
