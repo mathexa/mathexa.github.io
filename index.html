@@ -6,7 +6,6 @@
 <title>Mathexa</title>
 <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
 <div id="landing" class="center">
@@ -31,7 +30,6 @@
 
 <div id="signup" class="center hidden">
   <h2>Registracija</h2>
-
   <input id="name" placeholder="Vardas Pavardė">
   <input id="email2" placeholder="El. paštas">
 
@@ -64,24 +62,22 @@
 
 <div id="app" class="hidden">
   <div class="topbar">
-    <input id="search" placeholder="Ieškoti">
-    <button id="settingsBtn">⚙</button>
+    <div class="logo">Mathexa</div>
+    <div class="actions">
+      <span id="headerClicks">Limitas: --</span>
+      <button id="settingsBtn">⚙</button>
+    </div>
   </div>
-
-  <div id="lowClicks" class="hidden"></div>
-  <div id="videos"></div>
+  
+  <div id="videos" class="video-grid"></div>
 </div>
 
 <div id="settings" class="center hidden">
   <h2>Nustatymai</h2>
-  <div id="clicksInfo"></div>
+  <h3 id="clicksInfo">Liko peržiūrų: Kraunama...</h3>
 
-  <label>
-    <input type="checkbox" id="stayLoginSettings">
-    Likti prisijungus
-  </label>
-
-  <button id="closeSettings">Atgal</button>
+  <button id="logoutBtn" style="background: #ff4d4d;">Atsijungti</button>
+  <button id="closeSettings">Atgal į App</button>
 </div>
 
 <script src="app.js"></script>
