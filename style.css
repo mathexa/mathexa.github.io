@@ -1,123 +1,194 @@
+/* --- GLOBAL STYLES --- */
 body {
-  margin:0;
-  font-family:sans-serif;
-  background:linear-gradient(135deg,#0a1f44,#1e3c72);
-  color:white;
-  min-height: 100vh;
+    margin: 0;
+    font-family: sans-serif;
+    background: linear-gradient(135deg, #0a1f44, #1e3c72);
+    color: white;
+    min-height: 100vh;
 }
 
 .center {
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  height:100vh;
-  gap:10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    gap: 12px;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
-.hidden { display:none !important; }
+.hidden { 
+    display: none !important; 
+}
 
+/* --- INPUTS & BUTTONS --- */
 input, select, button {
-  padding:10px;
-  border-radius:10px;
-  border:none;
-  width:220px;
-  box-sizing: border-box;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    width: 240px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+input, select {
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
 }
 
 button {
-  background:#4da3ff;
-  color:white;
-  cursor:pointer;
-  transition: opacity 0.2s;
+    background: #4da3ff;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.1s, opacity 0.2s;
 }
 
-button:hover { opacity: 0.8; }
+button:hover { 
+    opacity: 0.9; 
+    transform: scale(1.02);
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+/* --- SIGNUP SPECIFIC --- */
+.row {
+    display: flex;
+    gap: 5px;
+    width: 240px;
+}
 
 .policyBox {
-  font-size:13px;
-  text-align:center;
+    font-size: 12px;
+    max-width: 240px;
+    text-align: center;
+    margin: 5px 0;
+    opacity: 0.8;
 }
 
-.policyBox a { color:#7ecbff; text-decoration:underline; }
+.policyBox a { 
+    color: #7ecbff; 
+    text-decoration: underline; 
+}
 
 #signupStatus, #loginStatus {
-  color:#ff8080;
-  min-height:20px;
+    color: #ff8080;
+    font-size: 13px;
+    min-height: 18px;
+    text-align: center;
 }
 
-/* App & Video Layout */
+/* --- APP TOP BAR --- */
 .topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 20px;
-  background: rgba(0,0,0,0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 25px;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(5px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
-.topbar .actions {
-  display: flex;
-  align-items: center;
-  gap: 15px;
+.logo {
+    font-size: 20px;
+    font-weight: bold;
+    letter-spacing: 1px;
 }
 
-.topbar button {
-  width: auto;
-  padding: 8px 12px;
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
+#headerClicks {
+    font-size: 14px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 5px 12px;
+    border-radius: 20px;
+}
+
+#settingsBtn {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+/* --- VIDEO GRID --- */
 .video-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
-  padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 25px;
 }
 
 .video-card {
-  background: rgba(255,255,255,0.1);
-  border-radius: 12px;
-  padding: 15px;
-  cursor: pointer;
-  transition: transform 0.2s, background 0.2s;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 .video-card:hover {
-  transform: translateY(-3px);
-  background: rgba(255,255,255,0.15);
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
 }
 
 .video-card h3 {
-  margin: 0 0 10px 0;
-  font-size: 16px;
+    margin: 0 0 10px 0;
+    font-size: 17px;
+    color: #fff;
 }
 
-.video-meta {
-  font-size: 12px;
-  color: #b3d4ff;
-  display: flex;
-  justify-content: space-between;
-  .video-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 15px;
-  padding: 20px;
+.video-card p {
+    margin: 0;
+    font-size: 13px;
+    color: #b3d4ff;
+    opacity: 0.9;
 }
 
-.video-card {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 15px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: 0.2s;
+/* --- SETTINGS MENU --- */
+#settings h2 {
+    margin-bottom: 5px;
 }
 
-.video-card:hover { background: rgba(255, 255, 255, 0.2); }
-
-.topbar {
-  display: flex;
-  justify-content: space-between;
-  padding: 15px;
-  background: rgba(0,0,0,0.3);
-  align-items: center;
+#supportIdBox {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px dashed rgba(255, 255, 255, 0.3);
+    padding: 15px;
+    border-radius: 12px;
+    width: 240px;
+    text-align: center;
 }
+
+#supportIdDisplay {
+    font-family: monospace;
+    font-size: 16px;
+    font-weight: bold;
+    color: #4da3ff;
+}
+
+#clicksInfo {
+    margin: 15px 0;
+    font-size: 18px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .video-grid {
+        grid-template-columns: 1fr;
+    }
 }
