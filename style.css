@@ -48,13 +48,8 @@ button {
   backdrop-filter:blur(10px);
 }
 
-/* SIMPLE MODE (FIXED) */
-.simple {
-  font-size:1.15em;
-}
-
-.simple button,
-.simple input {
-  font-size:1.1em;
-  padding:14px;
+#lowClicks {
+  color:red;
+  padding:10px;
+  font-weight:bold;
 }
