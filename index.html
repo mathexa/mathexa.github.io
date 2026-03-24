@@ -9,21 +9,25 @@
 
 <body>
 
+<!-- LANDING -->
 <div id="landing" class="center">
   <h1>Mathexa</h1>
   <button id="btnLogin">Turiu paskyrą</button>
   <button id="btnSignup">Esu naujas</button>
 </div>
 
+<!-- LOGIN -->
 <div id="login" class="center hidden">
   <h2>Prisijungti</h2>
   <input id="email" placeholder="El. paštas">
   <input id="password" type="password" placeholder="Slaptažodis">
   <div id="loginStatus"></div>
+  <label><input type="checkbox" id="stayLogin"> Likti prisijungus (3h)</label>
   <button id="loginBtn">Prisijungti</button>
   <button id="back1">Atgal</button>
 </div>
 
+<!-- SIGNUP -->
 <div id="signup" class="center hidden">
   <h2>Registracija</h2>
 
@@ -36,7 +40,7 @@
   </div>
 
   <input id="password2" type="password" placeholder="Slaptažodis">
-  <small>Nerekomenduojame naudoti kasdienių slaptažodžių</small>
+  <small>Nors naudojame saugų saugojimą, nerekomenduojame naudoti kasdienių slaptažodžių</small>
   <div id="passwordFeedback"></div>
 
   <input id="password3" type="password" placeholder="Pakartokite slaptažodį">
@@ -51,15 +55,16 @@
   <button id="back2">Atgal</button>
 </div>
 
+<!-- APP -->
 <div id="app" class="hidden">
   <div class="topbar">
     <input id="search" placeholder="Ieškoti (pavadinimas / kategorija)">
     <button id="settingsBtn">⚙</button>
   </div>
-
   <div id="videos"></div>
 </div>
 
+<!-- SETTINGS -->
 <div id="settings" class="center hidden">
   <h2>Nustatymai</h2>
 
@@ -68,17 +73,9 @@
   <input id="codeInput" placeholder="Aktyvavimo kodas">
   <button id="applyCodeBtn">Aktyvuoti</button>
 
-  <button id="toggleSupport">Rodyti paskyros ID</button>
-  <div id="supportBox" class="hidden"></div>
-
   <label>
     Paprastas režimas
     <input type="checkbox" id="simpleUI">
-  </label>
-
-  <label>
-    Likti prisijungus (3h)
-    <input type="checkbox" id="stayLogin">
   </label>
 
   <button id="closeSettings">Atgal</button>
