@@ -1,194 +1,192 @@
-/* --- GLOBAL STYLES --- */
+/* --- Global Reset & Theme --- */
 body {
-    margin: 0;
-    font-family: sans-serif;
-    background: linear-gradient(135deg, #0a1f44, #1e3c72);
-    color: white;
-    min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #0a1f44, #1e3c72);
+  color: white;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
+/* --- Layout Helpers --- */
 .center {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    gap: 12px;
-    padding: 20px;
-    box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  gap: 15px;
+  text-align: center;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 .hidden { 
-    display: none !important; 
+  display: none !important; 
 }
 
-/* --- INPUTS & BUTTONS --- */
+/* --- Form Elements --- */
 input, select, button {
-    padding: 12px;
-    border-radius: 10px;
-    border: none;
-    width: 240px;
-    box-sizing: border-box;
-    font-size: 14px;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  width: 240px;
+  max-width: 90%;
+  box-sizing: border-box;
+  font-size: 15px;
+  outline: none;
 }
 
 input, select {
-    background: rgba(255, 255, 255, 0.9);
-    color: #333;
+  background: rgba(255, 255, 255, 0.95);
+  color: #333;
 }
 
 button {
-    background: #4da3ff;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    transition: transform 0.1s, opacity 0.2s;
+  background: #4da3ff;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-button:hover { 
-    opacity: 0.9; 
-    transform: scale(1.02);
+button:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
 }
 
 button:active {
-    transform: scale(0.98);
+  transform: translateY(0);
 }
 
-/* --- SIGNUP SPECIFIC --- */
-.row {
-    display: flex;
-    gap: 5px;
-    width: 240px;
-}
-
-.policyBox {
-    font-size: 12px;
-    max-width: 240px;
-    text-align: center;
-    margin: 5px 0;
-    opacity: 0.8;
-}
-
-.policyBox a { 
-    color: #7ecbff; 
-    text-decoration: underline; 
-}
-
-#signupStatus, #loginStatus {
-    color: #ff8080;
-    font-size: 13px;
-    min-height: 18px;
-    text-align: center;
-}
-
-/* --- APP TOP BAR --- */
+/* --- App Navigation (Top Bar) --- */
 .topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 25px;
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(5px);
-    position: sticky;
-    top: 0;
-    z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 25px;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .logo {
-    font-size: 20px;
-    font-weight: bold;
-    letter-spacing: 1px;
+  font-size: 22px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: #4da3ff;
 }
 
 .actions {
-    display: flex;
-    align-items: center;
-    gap: 15px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
 #headerClicks {
-    font-size: 14px;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 5px 12px;
-    border-radius: 20px;
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 #settingsBtn {
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 20px;
 }
 
-/* --- VIDEO GRID --- */
+/* --- Video Content --- */
 .video-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
-    padding: 25px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
+  padding: 30px;
+  box-sizing: border-box;
 }
 
 .video-card {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 20px;
-    border-radius: 15px;
-    cursor: pointer;
-    transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .video-card:hover {
-    background: rgba(255, 255, 255, 0.18);
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+  border-color: rgba(77, 163, 255, 0.4);
 }
 
 .video-card h3 {
-    margin: 0 0 10px 0;
-    font-size: 17px;
-    color: #fff;
+  margin: 0;
+  font-size: 18px;
+  color: #fff;
 }
 
 .video-card p {
-    margin: 0;
-    font-size: 13px;
-    color: #b3d4ff;
-    opacity: 0.9;
+  margin: 0;
+  font-size: 14px;
+  color: #b3d4ff;
 }
 
-/* --- SETTINGS MENU --- */
-#settings h2 {
-    margin-bottom: 5px;
-}
-
-#supportIdBox {
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px dashed rgba(255, 255, 255, 0.3);
-    padding: 15px;
-    border-radius: 12px;
-    width: 240px;
-    text-align: center;
-}
-
-#supportIdDisplay {
-    font-family: monospace;
-    font-size: 16px;
-    font-weight: bold;
-    color: #4da3ff;
+/* --- Settings & Support --- */
+#supportIdView {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px dashed #4da3ff;
+  width: 240px;
+  margin-bottom: 10px;
 }
 
 #clicksInfo {
-    margin: 15px 0;
-    font-size: 18px;
+  margin: 10px 0;
+  font-size: 18px;
 }
 
-/* Responsive adjustments */
+label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 5px;
+}
+
+input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+/* --- Status Messages --- */
+#signupStatus, #loginStatus {
+  font-size: 13px;
+  color: #ff8080;
+  min-height: 20px;
+  max-width: 240px;
+}
+
+/* Responsive */
 @media (max-width: 600px) {
-    .video-grid {
-        grid-template-columns: 1fr;
-    }
+  .video-grid {
+    grid-template-columns: 1fr;
+    padding: 15px;
+  }
 }
