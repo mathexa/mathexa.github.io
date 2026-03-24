@@ -29,50 +29,17 @@ button {
   cursor:pointer;
 }
 
-.topbar {
-  display:flex;
-  padding:10px;
-  gap:10px;
-}
-
-#videos {
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-  gap:10px;
-  padding:10px;
-}
-
-.videoCard {
-  background:rgba(255,255,255,0.1);
-  padding:10px;
-  border-radius:15px;
-  backdrop-filter:blur(10px);
-}
-
-#lowClicks {
-  color:red;
-  padding:10px;
-  font-weight:bold;
-}
-
-/* POLICY */
 .policyBox {
   font-size:13px;
   text-align:center;
-  max-width:260px;
-  opacity:0.9;
 }
 
 .policyBox a {
   color:#7ecbff;
-  font-weight:bold;
   text-decoration:underline;
 }
 
-/* SMALL TEXT */
-.hint {
-  font-size:12px;
-  opacity:0.85;
-  max-width:260px;
-  text-align:center;
+#signupStatus, #loginStatus {
+  color:#ff8080;
+  min-height:20px;
 }
