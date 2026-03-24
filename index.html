@@ -9,25 +9,26 @@
 
 <body>
 
-<!-- LANDING -->
 <div id="landing" class="center">
   <h1>Mathexa</h1>
   <button id="btnLogin">Turiu paskyrą</button>
   <button id="btnSignup">Esu naujas</button>
 </div>
 
-<!-- LOGIN -->
 <div id="login" class="center hidden">
   <h2>Prisijungti</h2>
   <input id="email" placeholder="El. paštas">
   <input id="password" type="password" placeholder="Slaptažodis">
   <div id="loginStatus"></div>
-  <label><input type="checkbox" id="stayLogin"> Likti prisijungus (3h)</label>
+
+  <label>
+    <input type="checkbox" id="stayLogin"> Likti prisijungus (3h)
+  </label>
+
   <button id="loginBtn">Prisijungti</button>
   <button id="back1">Atgal</button>
 </div>
 
-<!-- SIGNUP -->
 <div id="signup" class="center hidden">
   <h2>Registracija</h2>
 
@@ -46,32 +47,42 @@
   <input id="password3" type="password" placeholder="Pakartokite slaptažodį">
   <div id="matchFeedback"></div>
 
-  <select id="role">
-    <option value="student">Studentas</option>
-    <option value="teacher">Mokytojas</option>
-  </select>
+  <!-- DISCLAIMER -->
+  <small>
+    Sukurdami paskyrą jūs sutinkate su mūsų
+    <a href="policy.txt" target="_blank">privatumo politika, naudojimo sąlygomis ir duomenų valdymu</a>
+  </small>
 
   <button id="signupBtn">Sukurti</button>
   <button id="back2">Atgal</button>
 </div>
 
-<!-- APP -->
 <div id="app" class="hidden">
   <div class="topbar">
     <input id="search" placeholder="Ieškoti (pavadinimas / kategorija)">
     <button id="settingsBtn">⚙</button>
   </div>
+
+  <!-- LOW CLICKS WARNING -->
+  <div id="lowClicks" class="hidden"></div>
+
   <div id="videos"></div>
 </div>
 
-<!-- SETTINGS -->
 <div id="settings" class="center hidden">
   <h2>Nustatymai</h2>
 
   <div id="clicksInfo"></div>
 
+  <label>
+    <input type="checkbox" id="stayLoginSettings">
+    Likti prisijungus (įjungta/išjungta)
+  </label>
+
   <input id="codeInput" placeholder="Aktyvavimo kodas">
   <button id="applyCodeBtn">Aktyvuoti</button>
+
+  <div id="supportBox"></div>
 
   <button id="closeSettings">Atgal</button>
 </div>
