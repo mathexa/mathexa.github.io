@@ -1,11 +1,8 @@
-const API = "https://script.google.com/macros/s/AKfycbwOWGjM7tkAiwbuhtCziAGjubYERxrZV8FW-pk76GR2BH2RnMeuILCQOuFXv87zFrDM1w/exec";
+const API = "https://script.google.com/macros/s/AKfycbwqHsQ88kSO9FdD8En9xepi79t8sL6L-rQ5diy8AtiWxNGFFU6JNm3B9GJpu-IwvS9OoQ/exec";
 
 let token = null;
 let clicksRemaining = 0;
 let allVideos = [];
-let supportId = null;
-
-const SESSION_LIMIT = 3 * 60 * 60 * 1000; // 3h
 
 // INIT
 document.addEventListener("DOMContentLoaded", () => {
@@ -13,78 +10,67 @@ document.addEventListener("DOMContentLoaded", () => {
   restoreSession();
 });
 
-// ---------------- SESSION ----------------
-
+// SESSION RESTORE
 async function restoreSession(){
   const raw = localStorage.getItem("session");
-
   if(!raw) return;
 
-  try {
-    const saved = JSON.parse(raw);
+  const saved = JSON.parse(raw);
 
-    // expired → clear
-    if(Date.now() - saved.time > SESSION_LIMIT){
-      localStorage.removeItem("session");
-      return;
-    }
+  if(Date.now() - saved.time > 3*60*60*1000){
+    localStorage.removeItem("session");
+    return;
+  }
 
-    // validate token with backend
-    const res = await api({
-      action: "validateToken",
-      token: saved.token
-    });
+  const res = await api({
+    action:"validateToken",
+    token:saved.token
+  });
 
-    if(res.success){
-      token = saved.token;
-      clicksRemaining = res.clicks_remaining;
-      supportId = res.support_id || null;
-
-      showApp();
-      loadVideos();
-    } else {
-      localStorage.removeItem("session");
-    }
-
-  } catch {
+  if(res.success){
+    token = saved.token;
+    clicksRemaining = res.clicks_remaining;
+    showApp();
+    loadVideos();
+  } else {
     localStorage.removeItem("session");
   }
 }
 
-// ---------------- BIND ----------------
-
+// BIND
 function bind(){
-  const el=id=>document.getElementById(id);
+  btnLogin.onclick=()=>show("login");
+  btnSignup.onclick=()=>show("signup");
 
-  el("btnLogin").onclick=()=>show("login");
-  el("btnSignup").onclick=()=>show("signup");
+  back1.onclick=back;
+  back2.onclick=back;
 
-  el("back1").onclick=back;
-  el("back2").onclick=back;
+  loginBtn.onclick=login;
+  signupBtn.onclick=signup;
 
-  el("loginBtn").onclick=login;
-  el("signupBtn").onclick=signup;
+  settingsBtn.onclick=()=>showOnly("settings");
+  closeSettings.onclick=()=>showOnly("app");
 
-  el("applyCodeBtn").onclick=applyCode;
-  el("settingsBtn").onclick=()=>showOnly("settings");
-  el("closeSettings").onclick=()=>showOnly("app");
+  applyCodeBtn.onclick=applyCode;
 
-  // PASSWORD realtime
-  el("password2").addEventListener("input", ()=>{
-    const v = el("password2").value;
+  search.oninput = e=>{
+    const q=e.target.value.toLowerCase();
+    renderVideos(allVideos.filter(v =>
+      v.title.toLowerCase().includes(q) ||
+      v.category.toLowerCase().includes(q)
+    ));
+  };
 
-    if(v.length < 8){
+  password2.oninput = ()=>{
+    if(password2.value.length < 8){
       passwordFeedback.innerText="Per trumpas";
-    } else if(v.length > 24){
-      passwordFeedback.innerText="Per ilgas";
     } else {
       passwordFeedback.innerText="Tinkamas";
     }
-
     matchCheck();
-  });
+  };
 
-  el("password3").addEventListener("input", matchCheck);
+  password3.oninput = matchCheck;
 
   function matchCheck(){
     matchFeedback.innerText =
@@ -92,66 +78,23 @@ function bind(){
         ? "Sutampa"
         : "Nesutampa";
   }
-
-  // SEARCH
-  el("search").oninput = (e)=>{
-    const q = e.target.value.toLowerCase();
-
-    renderVideos(allVideos.filter(v =>
-      v.title.toLowerCase().includes(q) ||
-      v.category.toLowerCase().includes(q)
-    ));
-  };
-
-  // SIMPLE UI
-  el("simpleUI").onchange = (e)=>{
-    document.body.classList.toggle("simple", e.target.checked);
-    localStorage.setItem("simpleUI", e.target.checked);
-  };
-
-  if(localStorage.getItem("simpleUI")==="true"){
-    document.body.classList.add("simple");
-    el("simpleUI").checked = true;
-  }
 }
 
-// ---------------- VALIDATION ----------------
-
-function validEmail(email){
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-// ---------------- LOGIN ----------------
-
-let loginLock = false;
-
-async function login(emailOverride, passOverride){
-  if(loginLock) return;
-  loginLock = true;
-
-  const emailVal = (emailOverride || email.value).trim();
-  const passVal = (passOverride || password.value).trim();
-
-  if(!validEmail(emailVal)){
-    loginStatus.innerText="Neteisingas el. paštas";
-    loginLock = false;
-    return;
-  }
-
+// LOGIN
+async function login(){
   loginStatus.innerText="Jungiamasi...";
 
   const res = await api({
     action:"login",
-    email: emailVal,
-    password: passVal
+    email: email.value.trim(),
+    password: password.value.trim()
   });
 
   if(res.success){
     token = res.token;
     clicksRemaining = res.clicks_remaining;
-    supportId = res.support_id || null;
 
-    if(stayLogin?.checked){
+    if(stayLogin.checked){
       localStorage.setItem("session", JSON.stringify({
         token,
         time: Date.now()
@@ -160,61 +103,46 @@ async function login(emailOverride, passOverride){
 
     showApp();
     loadVideos();
-  } else {
-    loginStatus.innerText = res.error || "Klaida";
-  }
-
-  loginLock = false;
-}
-
-// ---------------- SIGNUP ----------------
-
-let signupLock = false;
-
-async function signup(){
-  if(signupLock) return;
-  signupLock = true;
-
-  const emailVal = email2.value.trim();
-  const passVal = password2.value;
-
-  if(!validEmail(emailVal)){
-    alert("Neteisingas el. paštas");
-    signupLock = false;
     return;
   }
 
-  if(passVal !== password3.value){
+  // 🔴 HANDLE SECURITY STATES
+  if(res.error.includes("užblokuota")){
+    loginStatus.innerText="Paskyra užblokuota";
+  } 
+  else if(res.error.includes("Bandykite vėliau")){
+    loginStatus.innerText="Per daug bandymų. Palaukite 15 min";
+  } 
+  else {
+    loginStatus.innerText="Neteisingi duomenys";
+  }
+}
+
+// SIGNUP
+async function signup(){
+  if(password2.value !== password3.value){
     alert("Slaptažodžiai nesutampa");
-    signupLock = false;
     return;
   }
 
   const res = await api({
     action:"signup",
     full_name:name.value,
-    email:emailVal,
+    email:email2.value.trim(),
     phone:prefix.value+phone.value,
-    password:passVal,
+    password:password2.value,
     role:role.value
   });
 
   if(res.success){
-    supportId = res.support_id;
-    alert("Jūsų ID: " + supportId);
-
-    // AUTO LOGIN (important)
-    await login(emailVal, passVal);
-
+    alert("Sukurta!");
+    await login(email2.value, password2.value);
   } else {
-    alert(res.error || "Klaida");
+    alert(res.error);
   }
-
-  signupLock = false;
 }
 
-// ---------------- APPLY CODE ----------------
-
+// APPLY CODE
 async function applyCode(){
   const res = await api({
     action:"applyCode",
@@ -231,8 +159,7 @@ async function applyCode(){
   }
 }
 
-// ---------------- VIDEOS ----------------
-
+// VIDEOS
 async function loadVideos(){
   videos.innerHTML="Kraunama...";
   allVideos = await fetch("videos.json").then(r=>r.json());
@@ -251,7 +178,6 @@ function renderVideos(list){
       requestAnimationFrame(chunk);
     }
   }
-
   chunk();
 }
 
@@ -276,7 +202,7 @@ function makeCard(v){
 
     if(!r.allowed){
       tab.document.body.innerHTML="Limitas pasiektas";
-      btn.disabled = true;
+      btn.disabled=true;
       return;
     }
 
@@ -288,8 +214,7 @@ function makeCard(v){
   return d;
 }
 
-// ---------------- API ----------------
-
+// API
 async function api(data){
   const res = await fetch(API,{
     method:"POST",
@@ -298,27 +223,22 @@ async function api(data){
   return res.json();
 }
 
-// ---------------- NAV ----------------
-
+// NAV
 function show(id){
   ["landing","login","signup"].forEach(x=>toggle(x,false));
   toggle(id,true);
 }
-
 function showOnly(id){
   ["app","settings"].forEach(x=>toggle(x,false));
   toggle(id,true);
 }
-
 function back(){
   ["login","signup","settings"].forEach(x=>toggle(x,false));
   toggle("landing",true);
 }
-
 function toggle(id,show){
   document.getElementById(id).classList.toggle("hidden",!show);
 }
-
 function showApp(){
   toggle("landing",false);
   toggle("login",false);
