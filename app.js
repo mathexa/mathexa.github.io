@@ -1,21 +1,15 @@
 const API = "https://script.google.com/macros/s/AKfycbwqHsQ88kSO9FdD8En9xepi79t8sL6L-rQ5diy8AtiWxNGFFU6JNm3B9GJpu-IwvS9OoQ/exec";
 
-let token = null;
-let clicksRemaining = 0;
-let supportId = null;
-let allVideos = [];
+let isSubmitting = false;
 
 // INIT
 document.addEventListener("DOMContentLoaded", () => {
   loadPrefixes();
   bind();
-  restoreSession();
 });
 
-// PREFIXES
 function loadPrefixes(){
-  const list = ["+370","+371","+372","+49","+33","+34","+39","+48"];
-  list.forEach(p=>{
+  ["+370","+371","+372"].forEach(p=>{
     const o=document.createElement("option");
     o.value=p;
     o.innerText=p;
@@ -23,34 +17,6 @@ function loadPrefixes(){
   });
 }
 
-// SESSION
-async function restoreSession(){
-  const raw = localStorage.getItem("session");
-  if(!raw) return;
-
-  const saved = JSON.parse(raw);
-
-  if(Date.now() - saved.time > 3*60*60*1000){
-    localStorage.removeItem("session");
-    return;
-  }
-
-  const res = await api({ action:"validateToken", token:saved.token });
-
-  if(res.success){
-    token = saved.token;
-    clicksRemaining = res.clicks_remaining;
-    supportId = res.support_id;
-
-    showApp();
-    updateClicksUI();
-    loadVideos();
-  } else {
-    localStorage.removeItem("session");
-  }
-}
-
-// BIND
 function bind(){
   btnLogin.onclick=()=>show("login");
   btnSignup.onclick=()=>show("signup");
@@ -61,169 +27,100 @@ function bind(){
   loginBtn.onclick=login;
   signupBtn.onclick=signup;
 
-  settingsBtn.onclick=openSettings;
-  closeSettings.onclick=()=>showOnly("app");
+  password2.oninput = ()=>{
+    passwordFeedback.innerText =
+      password2.value.length < 8 ? "Per trumpas" : "Tinkamas";
+  };
 
-  applyCodeBtn.onclick=applyCode;
+  password3.oninput = ()=>{
+    matchFeedback.innerText =
+      password2.value === password3.value ? "Sutampa" : "Nesutampa";
+  };
+}
 
-  stayLoginSettings.onchange = ()=>{
-    if(!stayLoginSettings.checked){
-      localStorage.removeItem("session");
+// SIGNUP (HARD FIX)
+async function signup(){
+  if(isSubmitting) return;
+  isSubmitting = true;
+
+  signupStatus.innerText = "";
+
+  const full_name = name.value.trim();
+  const emailVal = email2.value.trim();
+  const phoneVal = prefix.value + phone.value.trim();
+  const pass = password2.value;
+  const roleVal = role.value;
+
+  // VALIDATION
+  if(!full_name || !emailVal || !phoneVal || !pass){
+    signupStatus.innerText = "Užpildykite visus laukus";
+    isSubmitting = false;
+    return;
+  }
+
+  if(pass !== password3.value){
+    signupStatus.innerText = "Slaptažodžiai nesutampa";
+    isSubmitting = false;
+    return;
+  }
+
+  try {
+    const res = await fetch(API,{
+      method:"POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action:"signup",
+        full_name,
+        email:emailVal,
+        phone:phoneVal,
+        password:pass,
+        role:roleVal
+      })
+    });
+
+    const data = await res.json();
+
+    if(data.success){
+      signupStatus.style.color="#80ff80";
+      signupStatus.innerText="Sukurta, jungiamasi...";
+      await login(emailVal, pass);
+    } else {
+      signupStatus.innerText = data.error || "Serverio klaida";
     }
-  };
 
-  search.oninput = e=>{
-    const q=e.target.value.toLowerCase();
-    renderVideos(allVideos.filter(v =>
-      v.title.toLowerCase().includes(q) ||
-      v.category.toLowerCase().includes(q)
-    ));
-  };
+  } catch (e){
+    signupStatus.innerText = "Ryšio klaida (API neveikia)";
+  }
+
+  isSubmitting = false;
 }
 
 // LOGIN
 async function login(emailOverride, passOverride){
   loginStatus.innerText="Jungiamasi...";
 
-  const res = await api({
-    action:"login",
-    email:(emailOverride || email.value).trim(),
-    password:(passOverride || password.value).trim()
-  });
+  try {
+    const res = await fetch(API,{
+      method:"POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action:"login",
+        email:(emailOverride || email.value),
+        password:(passOverride || password.value)
+      })
+    });
 
-  if(res.success){
-    token = res.token;
-    clicksRemaining = res.clicks_remaining;
-    supportId = res.support_id;
+    const data = await res.json();
 
-    if(stayLogin.checked){
-      localStorage.setItem("session", JSON.stringify({
-        token,
-        time: Date.now()
-      }));
-      stayLoginSettings.checked = true;
+    if(data.success){
+      showApp();
+    } else {
+      loginStatus.innerText=data.error || "Klaida";
     }
 
-    showApp();
-    updateClicksUI();
-    loadVideos();
-    return;
+  } catch(e){
+    loginStatus.innerText="Ryšio klaida";
   }
-
-  loginStatus.innerText = res.error || "Klaida";
-}
-
-// SIGNUP (FIXED)
-async function signup(){
-  if(password2.value !== password3.value){
-    alert("Slaptažodžiai nesutampa");
-    return;
-  }
-
-  const res = await api({
-    action:"signup",
-    full_name:name.value.trim(),
-    email:email2.value.trim(),
-    phone:prefix.value + phone.value.trim(),
-    password:password2.value,
-    role:role.value // ✅ REQUIRED + FIXED
-  });
-
-  if(res.success){
-    await login(email2.value, password2.value);
-  } else {
-    alert(res.error || "Registracijos klaida");
-  }
-}
-
-// SETTINGS
-function openSettings(){
-  clicksInfo.innerText =
-    clicksRemaining > 1000 ? "Peržiūros: ∞" : "Liko: " + clicksRemaining;
-
-  supportBox.innerText = "ID: " + supportId;
-
-  showOnly("settings");
-}
-
-// APPLY CODE
-async function applyCode(){
-  const res = await api({
-    action:"applyCode",
-    code:codeInput.value,
-    token
-  });
-
-  if(res.success){
-    clicksRemaining = 99999;
-    updateClicksUI();
-    loadVideos();
-  } else {
-    alert(res.error);
-  }
-}
-
-// CLICK UI
-function updateClicksUI(){
-  if(clicksRemaining <= 3){
-    lowClicks.classList.remove("hidden");
-    lowClicks.innerText = "Liko peržiūrų: " + clicksRemaining;
-  } else {
-    lowClicks.classList.add("hidden");
-  }
-}
-
-// VIDEOS
-async function loadVideos(){
-  videos.innerHTML="Kraunama...";
-  allVideos = await fetch("videos.json").then(r=>r.json());
-  renderVideos(allVideos);
-}
-
-function renderVideos(list){
-  videos.innerHTML="";
-  list.forEach(v=>videos.appendChild(makeCard(v)));
-}
-
-function makeCard(v){
-  const d=document.createElement("div");
-  d.className="videoCard";
-
-  d.innerHTML=`
-    <b>${v.title}</b>
-    <div>${v.category}</div>
-    <div>${v.platform}</div>
-  `;
-
-  const btn=document.createElement("button");
-  btn.innerText="Atidaryti";
-
-  btn.onclick=async ()=>{
-    const r = await api({ action:"watch", token });
-
-    if(!r.allowed){
-      alert("Limitas pasiektas");
-      btn.disabled=true;
-      return;
-    }
-
-    clicksRemaining = r.remaining;
-    updateClicksUI();
-
-    window.open(v.url,"_blank");
-  };
-
-  d.appendChild(btn);
-  return d;
-}
-
-// API
-async function api(data){
-  const res = await fetch(API,{
-    method:"POST",
-    body:JSON.stringify(data)
-  });
-  return res.json();
 }
 
 // NAV
@@ -231,12 +128,8 @@ function show(id){
   ["landing","login","signup"].forEach(x=>toggle(x,false));
   toggle(id,true);
 }
-function showOnly(id){
-  ["app","settings"].forEach(x=>toggle(x,false));
-  toggle(id,true);
-}
 function back(){
-  ["login","signup","settings"].forEach(x=>toggle(x,false));
+  ["login","signup"].forEach(x=>toggle(x,false));
   toggle("landing",true);
 }
 function toggle(id,show){
