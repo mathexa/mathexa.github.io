@@ -1,79 +1,85 @@
 <!DOCTYPE html>
 <html lang="lt">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mathexa</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathexa 2026</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div id="landing" class="center">
-  <h1>Mathexa</h1>
-  <button id="btnLogin">Turiu paskyrą</button>
-  <button id="btnSignup">Esu naujas</button>
+    <h1>Mathexa</h1>
+    <button id="btnLogin">Turiu paskyrą</button>
+    <button id="btnSignup">Esu naujas</button>
 </div>
 
 <div id="login" class="center hidden">
-  <h2>Prisijungti</h2>
-  <input id="email" placeholder="El. paštas">
-  <input id="password" type="password" placeholder="Slaptažodis">
-  <div id="loginStatus"></div>
-  <button id="loginBtn">Prisijungti</button>
-  <button onclick="back()">Atgal</button>
+    <h2>Prisijungti</h2>
+    <input id="email" placeholder="El. paštas">
+    <input id="password" type="password" placeholder="Slaptažodis">
+    <div id="loginStatus" class="status-msg"></div>
+    <button id="loginBtn">Prisijungti</button>
+    <button onclick="back()">Atgal</button>
 </div>
 
 <div id="signup" class="center hidden">
-  <h2>Registracija</h2>
-  <input id="name" placeholder="Vardas Pavardė">
-  <input id="email2" placeholder="El. paštas">
-  
-  <div class="row">
-    <select id="prefix" style="width:70px;"></select>
-    <input id="phone" placeholder="Tel. nr." style="width:145px;">
-  </div>
-
-  <select id="role">
-    <option value="student">Studentas</option>
-    <option value="teacher">Mokytojas</option>
-  </select>
-
-  <div class="password-box">
-    <input id="password2" type="password" placeholder="Slaptažodis">
-    <div id="passwordFeedback" class="feedback">8+ simboliai</div>
+    <h2>Registracija</h2>
+    <input id="name" placeholder="Vardas Pavardė">
+    <input id="email2" placeholder="El. paštas">
     
-    <input id="password3" type="password" placeholder="Pakartokite slaptažodį">
-    <div id="matchFeedback" class="feedback">Sutapimas</div>
-  </div>
+    <div class="row">
+        <select id="prefix" style="width:75px;"></select>
+        <input id="phone" placeholder="Tel. nr." style="width:140px;">
+    </div>
 
-  <p class="security-note">Nors naudojame saugią saugyklą, rekomenduojame nenaudoti kasdienių slaptažodžių.</p>
+    <select id="role">
+        <option value="student">Studentas</option>
+        <option value="teacher">Mokytojas</option>
+    </select>
 
-  <div id="signupStatus"></div>
-  <button id="signupBtn">Sukurti</button>
-  <button onclick="back()">Atgal</button>
+    <div class="password-section">
+        <input id="password2" type="password" placeholder="Slaptažodis">
+        <div id="passwordFeedback" class="feedback">8+ simboliai</div>
+        
+        <input id="password3" type="password" placeholder="Pakartokite slaptažodį">
+        <div id="matchFeedback" class="feedback">Sutapimas</div>
+    </div>
+
+    <p class="security-note">Nors naudojame saugią saugyklą, rekomenduojame nenaudoti kasdienių slaptažodžių.</p>
+
+    <div id="signupStatus" class="status-msg"></div>
+    <button id="signupBtn">Sukurti</button>
+    <button onclick="back()">Atgal</button>
 </div>
 
 <div id="app" class="hidden">
-  <div class="topbar">
-    <div class="logo">Mathexa</div>
-    <div class="actions">
-      <span id="headerClicks">Limitas: --</span>
-      <button id="settingsBtn">⚙</button>
+    <div class="topbar">
+        <div class="logo">Mathexa</div>
+        <div class="actions">
+            <span id="headerClicks">Limitas: --</span>
+            <button id="settingsBtn">⚙</button>
+        </div>
     </div>
-  </div>
-  <div id="videos" class="video-grid"></div>
+    <div id="videos" class="video-grid"></div>
 </div>
 
 <div id="settings" class="center hidden">
-  <h2>Nustatymai</h2>
-  <div id="supportIdView">ID: Kraunama...</div>
-  <h3 id="clicksInfo">Liko peržiūrų: Kraunama...</h3>
-  
-  <label><input type="checkbox" id="stayLoginSettings"> Likti prisijungus</label>
-  
-  <button id="clearCacheBtn" style="background:#ffa500; margin-top:10px;">Išvalyti atmintį</button>
-  <button id="logoutBtn" style="background:#ff4d4d;">Atsijungti</button>
-  <button id="closeSettings">Atgal į App</button>
+    <h2>Nustatymai</h2>
+    <div id="supportIdView">ID: Kraunama...</div>
+    <h3 id="clicksInfo">Liko peržiūrų: Kraunama...</h3>
+    
+    <div class="sub-area">
+        <input id="subCode" placeholder="Prenumeratos kodas">
+        <button id="btnRedeem">Aktyvuoti</button>
+        <div id="subStatus"></div>
+    </div>
+
+    <label class="check-container"><input type="checkbox" id="stayLoginSettings"> Likti prisijungus</label>
+    
+    <button id="clearCacheBtn" style="background:#ffa500; margin-top:10px;">Išvalyti atmintį</button>
+    <button id="logoutBtn" style="background:#ff4d4d;">Atsijungti</button>
+    <button id="closeSettings">Atgal į App</button>
 </div>
 
 <script src="app.js"></script>
