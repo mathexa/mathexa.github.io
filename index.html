@@ -19,11 +19,6 @@
   <input id="email" placeholder="El. paštas">
   <input id="password" type="password" placeholder="Slaptažodis">
   <div id="loginStatus"></div>
-
-  <label>
-    <input type="checkbox" id="stayLogin"> Likti prisijungus (3h)
-  </label>
-
   <button id="loginBtn">Prisijungti</button>
   <button id="back1">Atgal</button>
 </div>
@@ -35,7 +30,7 @@
 
   <div class="row">
     <select id="prefix"></select>
-    <input id="phone" placeholder="Telefono nr.">
+    <input id="phone" placeholder="Telefono nr. (neprivaloma)">
   </div>
 
   <select id="role">
@@ -50,12 +45,10 @@
   <div id="matchFeedback"></div>
 
   <div class="policyBox">
-    Sukurdami paskyrą jūs sutinkate su
-    <a href="policy.txt" target="_blank">taisyklemis</a>
+    Sukurdami paskyrą sutinkate su <a href="policy.txt" target="_blank">taisyklėmis</a>
   </div>
 
   <div id="signupStatus"></div>
-
   <button id="signupBtn">Sukurti</button>
   <button id="back2">Atgal</button>
 </div>
@@ -68,14 +61,19 @@
       <button id="settingsBtn">⚙</button>
     </div>
   </div>
-  
   <div id="videos" class="video-grid"></div>
 </div>
 
 <div id="settings" class="center hidden">
   <h2>Nustatymai</h2>
+  <p id="supportIdView" style="font-size: 0.8em; color: #aaa;"></p>
   <h3 id="clicksInfo">Liko peržiūrų: Kraunama...</h3>
 
+  <label style="margin-bottom: 15px; display: block;">
+    <input type="checkbox" id="stayLoginSettings"> Likti prisijungus
+  </label>
+
+  <button id="clearCacheBtn" style="background: #ffa500;">Išvalyti atmintį (Reset)</button>
   <button id="logoutBtn" style="background: #ff4d4d;">Atsijungti</button>
   <button id="closeSettings">Atgal į App</button>
 </div>
