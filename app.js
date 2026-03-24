@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
   restoreSession();
 });
 
-// SESSION RESTORE
+// ---------------- SESSION ----------------
 async function restoreSession(){
   const raw = localStorage.getItem("session");
   if(!raw) return;
@@ -37,7 +37,7 @@ async function restoreSession(){
   }
 }
 
-// BIND
+// ---------------- BIND ----------------
 function bind(){
   btnLogin.onclick=()=>show("login");
   btnSignup.onclick=()=>show("signup");
@@ -61,12 +61,16 @@ function bind(){
     ));
   };
 
+  // PASSWORD FEEDBACK
   password2.oninput = ()=>{
     if(password2.value.length < 8){
       passwordFeedback.innerText="Per trumpas";
+    } else if(password2.value.length > 24){
+      passwordFeedback.innerText="Per ilgas";
     } else {
       passwordFeedback.innerText="Tinkamas";
     }
+
     matchCheck();
   };
 
@@ -80,21 +84,25 @@ function bind(){
   }
 }
 
-// LOGIN
-async function login(){
+// ---------------- LOGIN ----------------
+async function login(emailOverride, passOverride){
+
   loginStatus.innerText="Jungiamasi...";
+
+  const emailVal = (emailOverride || email.value).trim();
+  const passVal = (passOverride || password.value).trim();
 
   const res = await api({
     action:"login",
-    email: email.value.trim(),
-    password: password.value.trim()
+    email: emailVal,
+    password: passVal
   });
 
   if(res.success){
     token = res.token;
     clicksRemaining = res.clicks_remaining;
 
-    if(stayLogin.checked){
+    if(stayLogin && stayLogin.checked){
       localStorage.setItem("session", JSON.stringify({
         token,
         time: Date.now()
@@ -106,11 +114,11 @@ async function login(){
     return;
   }
 
-  // 🔴 HANDLE SECURITY STATES
+  // HANDLE ERRORS
   if(res.error.includes("užblokuota")){
     loginStatus.innerText="Paskyra užblokuota";
   } 
-  else if(res.error.includes("Bandykite vėliau")){
+  else if(res.error.includes("Bandykite")){
     loginStatus.innerText="Per daug bandymų. Palaukite 15 min";
   } 
   else {
@@ -118,31 +126,38 @@ async function login(){
   }
 }
 
-// SIGNUP
+// ---------------- SIGNUP ----------------
 async function signup(){
+
   if(password2.value !== password3.value){
     alert("Slaptažodžiai nesutampa");
     return;
   }
 
+  const emailVal = email2.value.trim();
+  const passVal = password2.value;
+
   const res = await api({
     action:"signup",
     full_name:name.value,
-    email:email2.value.trim(),
+    email:emailVal,
     phone:prefix.value+phone.value,
-    password:password2.value,
+    password:passVal,
     role:role.value
   });
 
   if(res.success){
-    alert("Sukurta!");
-    await login(email2.value, password2.value);
+    alert("Paskyra sukurta");
+
+    // 🔥 FIX: pass values directly
+    await login(emailVal, passVal);
+
   } else {
     alert(res.error);
   }
 }
 
-// APPLY CODE
+// ---------------- APPLY CODE ----------------
 async function applyCode(){
   const res = await api({
     action:"applyCode",
@@ -159,7 +174,7 @@ async function applyCode(){
   }
 }
 
-// VIDEOS
+// ---------------- VIDEOS ----------------
 async function loadVideos(){
   videos.innerHTML="Kraunama...";
   allVideos = await fetch("videos.json").then(r=>r.json());
@@ -214,7 +229,7 @@ function makeCard(v){
   return d;
 }
 
-// API
+// ---------------- API ----------------
 async function api(data){
   const res = await fetch(API,{
     method:"POST",
@@ -223,7 +238,7 @@ async function api(data){
   return res.json();
 }
 
-// NAV
+// ---------------- NAV ----------------
 function show(id){
   ["landing","login","signup"].forEach(x=>toggle(x,false));
   toggle(id,true);
