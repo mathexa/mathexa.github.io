@@ -2,15 +2,29 @@ const API = "https://script.google.com/macros/s/AKfycbwqHsQ88kSO9FdD8En9xepi79t8
 
 let token = null;
 let clicksRemaining = 0;
+let supportId = null;
 let allVideos = [];
 
 // INIT
 document.addEventListener("DOMContentLoaded", () => {
+  loadPrefixes();
   bind();
   restoreSession();
 });
 
-// ---------------- SESSION ----------------
+// PREFIXES
+function loadPrefixes(){
+  const list = ["+370","+371","+372","+49","+33","+34","+39","+48","+31","+32","+43","+45","+46","+47","+358","+353","+420","+421","+386","+385","+36","+40","+359","+30","+357","+356","+351","+352","+354"];
+
+  list.forEach(p=>{
+    const o=document.createElement("option");
+    o.value=p;
+    o.innerText=p;
+    prefix.appendChild(o);
+  });
+}
+
+// SESSION
 async function restoreSession(){
   const raw = localStorage.getItem("session");
   if(!raw) return;
@@ -22,22 +36,22 @@ async function restoreSession(){
     return;
   }
 
-  const res = await api({
-    action:"validateToken",
-    token:saved.token
-  });
+  const res = await api({ action:"validateToken", token:saved.token });
 
   if(res.success){
     token = saved.token;
     clicksRemaining = res.clicks_remaining;
+    supportId = res.support_id;
+
     showApp();
+    updateClicksUI();
     loadVideos();
   } else {
     localStorage.removeItem("session");
   }
 }
 
-// ---------------- BIND ----------------
+// BIND
 function bind(){
   btnLogin.onclick=()=>show("login");
   btnSignup.onclick=()=>show("signup");
@@ -48,10 +62,16 @@ function bind(){
   loginBtn.onclick=login;
   signupBtn.onclick=signup;
 
-  settingsBtn.onclick=()=>showOnly("settings");
+  settingsBtn.onclick=openSettings;
   closeSettings.onclick=()=>showOnly("app");
 
   applyCodeBtn.onclick=applyCode;
+
+  stayLoginSettings.onchange = ()=>{
+    if(!stayLoginSettings.checked){
+      localStorage.removeItem("session");
+    }
+  };
 
   search.oninput = e=>{
     const q=e.target.value.toLowerCase();
@@ -61,32 +81,19 @@ function bind(){
     ));
   };
 
-  // PASSWORD FEEDBACK
   password2.oninput = ()=>{
-    if(password2.value.length < 8){
-      passwordFeedback.innerText="Per trumpas";
-    } else if(password2.value.length > 24){
-      passwordFeedback.innerText="Per ilgas";
-    } else {
-      passwordFeedback.innerText="Tinkamas";
-    }
-
-    matchCheck();
+    passwordFeedback.innerText =
+      password2.value.length < 8 ? "Per trumpas" : "Tinkamas";
   };
 
-  password3.oninput = matchCheck;
-
-  function matchCheck(){
+  password3.oninput = ()=>{
     matchFeedback.innerText =
-      password2.value === password3.value
-        ? "Sutampa"
-        : "Nesutampa";
-  }
+      password2.value === password3.value ? "Sutampa" : "Nesutampa";
+  };
 }
 
-// ---------------- LOGIN ----------------
+// LOGIN
 async function login(emailOverride, passOverride){
-
   loginStatus.innerText="Jungiamasi...";
 
   const emailVal = (emailOverride || email.value).trim();
@@ -94,70 +101,66 @@ async function login(emailOverride, passOverride){
 
   const res = await api({
     action:"login",
-    email: emailVal,
-    password: passVal
+    email:emailVal,
+    password:passVal
   });
 
   if(res.success){
     token = res.token;
     clicksRemaining = res.clicks_remaining;
+    supportId = res.support_id;
 
     if(stayLogin && stayLogin.checked){
       localStorage.setItem("session", JSON.stringify({
         token,
         time: Date.now()
       }));
+      stayLoginSettings.checked = true;
     }
 
     showApp();
+    updateClicksUI();
     loadVideos();
     return;
   }
 
-  // HANDLE ERRORS
-  if(res.error.includes("užblokuota")){
-    loginStatus.innerText="Paskyra užblokuota";
-  } 
-  else if(res.error.includes("Bandykite")){
-    loginStatus.innerText="Per daug bandymų. Palaukite 15 min";
-  } 
-  else {
-    loginStatus.innerText="Neteisingi duomenys";
-  }
+  loginStatus.innerText = res.error;
 }
 
-// ---------------- SIGNUP ----------------
+// SIGNUP
 async function signup(){
-
   if(password2.value !== password3.value){
     alert("Slaptažodžiai nesutampa");
     return;
   }
 
-  const emailVal = email2.value.trim();
-  const passVal = password2.value;
-
   const res = await api({
     action:"signup",
-    full_name:name.value,
-    email:emailVal,
+    full_name:name.value, // ✅ FIXED
+    email:email2.value.trim(),
     phone:prefix.value+phone.value,
-    password:passVal,
+    password:password2.value,
     role:role.value
   });
 
   if(res.success){
-    alert("Paskyra sukurta");
-
-    // 🔥 FIX: pass values directly
-    await login(emailVal, passVal);
-
+    await login(email2.value, password2.value);
   } else {
     alert(res.error);
   }
 }
 
-// ---------------- APPLY CODE ----------------
+// SETTINGS
+function openSettings(){
+  clicksInfo.innerText =
+    clicksRemaining > 1000 ? "Peržiūros: ∞" : "Liko: " + clicksRemaining;
+
+  supportBox.innerText = "ID: " + supportId;
+
+  showOnly("settings");
+}
+
+// APPLY CODE
 async function applyCode(){
   const res = await api({
     action:"applyCode",
@@ -167,14 +170,24 @@ async function applyCode(){
 
   if(res.success){
     clicksRemaining = 99999;
-    alert("Aktyvuota");
+    updateClicksUI();
     loadVideos();
   } else {
     alert(res.error);
   }
 }
 
-// ---------------- VIDEOS ----------------
+// CLICK UI
+function updateClicksUI(){
+  if(clicksRemaining <= 3){
+    lowClicks.classList.remove("hidden");
+    lowClicks.innerText = "Liko peržiūrų: " + clicksRemaining;
+  } else {
+    lowClicks.classList.add("hidden");
+  }
+}
+
+// VIDEOS
 async function loadVideos(){
   videos.innerHTML="Kraunama...";
   allVideos = await fetch("videos.json").then(r=>r.json());
@@ -222,6 +235,8 @@ function makeCard(v){
     }
 
     clicksRemaining = r.remaining;
+    updateClicksUI();
+
     tab.location.href = v.url;
   };
 
@@ -229,7 +244,7 @@ function makeCard(v){
   return d;
 }
 
-// ---------------- API ----------------
+// API
 async function api(data){
   const res = await fetch(API,{
     method:"POST",
@@ -238,7 +253,7 @@ async function api(data){
   return res.json();
 }
 
-// ---------------- NAV ----------------
+// NAV
 function show(id){
   ["landing","login","signup"].forEach(x=>toggle(x,false));
   toggle(id,true);
