@@ -40,26 +40,23 @@
     <input id="phone" placeholder="Telefono nr.">
   </div>
 
-  <!-- ROLE (RESTORED) -->
   <select id="role">
     <option value="student">Studentas</option>
     <option value="teacher">Mokytojas</option>
   </select>
 
   <input id="password2" type="password" placeholder="Slaptažodis">
-  <small class="hint">
-    Nors naudojame saugų saugojimą, nerekomenduojame naudoti kasdienių slaptažodžių
-  </small>
   <div id="passwordFeedback"></div>
 
   <input id="password3" type="password" placeholder="Pakartokite slaptažodį">
   <div id="matchFeedback"></div>
 
-  <!-- POLICY -->
   <div class="policyBox">
     Sukurdami paskyrą jūs sutinkate su
-    <a href="policy.txt" target="_blank">privatumo politika ir taisyklėmis</a>
+    <a href="policy.txt" target="_blank">taisyklemis</a>
   </div>
+
+  <div id="signupStatus"></div>
 
   <button id="signupBtn">Sukurti</button>
   <button id="back2">Atgal</button>
@@ -67,29 +64,22 @@
 
 <div id="app" class="hidden">
   <div class="topbar">
-    <input id="search" placeholder="Ieškoti (pavadinimas / kategorija)">
+    <input id="search" placeholder="Ieškoti">
     <button id="settingsBtn">⚙</button>
   </div>
 
   <div id="lowClicks" class="hidden"></div>
-
   <div id="videos"></div>
 </div>
 
 <div id="settings" class="center hidden">
   <h2>Nustatymai</h2>
-
   <div id="clicksInfo"></div>
 
   <label>
     <input type="checkbox" id="stayLoginSettings">
     Likti prisijungus
   </label>
-
-  <input id="codeInput" placeholder="Aktyvavimo kodas">
-  <button id="applyCodeBtn">Aktyvuoti</button>
-
-  <div id="supportBox"></div>
 
   <button id="closeSettings">Atgal</button>
 </div>
