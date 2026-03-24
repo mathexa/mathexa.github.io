@@ -27,11 +27,27 @@
   <h2>Registracija</h2>
   <input id="name" placeholder="Vardas Pavardė">
   <input id="email2" placeholder="El. paštas">
-  <div style="display:flex; gap:5px; width:220px;">
+  
+  <div class="row">
     <select id="prefix" style="width:70px;"></select>
     <input id="phone" placeholder="Tel. nr." style="width:145px;">
   </div>
-  <input id="password2" type="password" placeholder="Slaptažodis">
+
+  <select id="role">
+    <option value="student">Studentas</option>
+    <option value="teacher">Mokytojas</option>
+  </select>
+
+  <div class="password-box">
+    <input id="password2" type="password" placeholder="Slaptažodis">
+    <div id="passwordFeedback" class="feedback">8+ simboliai</div>
+    
+    <input id="password3" type="password" placeholder="Pakartokite slaptažodį">
+    <div id="matchFeedback" class="feedback">Sutapimas</div>
+  </div>
+
+  <p class="security-note">Nors naudojame saugią saugyklą, rekomenduojame nenaudoti kasdienių slaptažodžių.</p>
+
   <div id="signupStatus"></div>
   <button id="signupBtn">Sukurti</button>
   <button onclick="back()">Atgal</button>
@@ -50,9 +66,11 @@
 
 <div id="settings" class="center hidden">
   <h2>Nustatymai</h2>
-  <p id="supportIdView" style="font-size:14px; color:#4da3ff; font-weight:bold;"></p>
+  <div id="supportIdView">ID: Kraunama...</div>
   <h3 id="clicksInfo">Liko peržiūrų: Kraunama...</h3>
+  
   <label><input type="checkbox" id="stayLoginSettings"> Likti prisijungus</label>
+  
   <button id="clearCacheBtn" style="background:#ffa500; margin-top:10px;">Išvalyti atmintį</button>
   <button id="logoutBtn" style="background:#ff4d4d;">Atsijungti</button>
   <button id="closeSettings">Atgal į App</button>
