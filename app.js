@@ -1,4 +1,4 @@
-const API = "https://script.google.com/macros/s/AKfycbwV9VieSzHrdJp5_jahzqqzAPv6Lv-h-jAncTmzKnGFo0YbN0qxw3P0mumwCkzv3WAnQA/exec";
+const API = "https://script.google.com/macros/s/AKfycbwqHsQ88kSO9FdD8En9xepi79t8sL6L-rQ5diy8AtiWxNGFFU6JNm3B9GJpu-IwvS9OoQ/exec";
 let VIDEOS_DB = [];
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -22,6 +22,20 @@ function bindEvents() {
     document.getElementById("closeSettings").onclick = () => { document.getElementById("settings").classList.add("hidden"); document.getElementById("app").classList.remove("hidden"); };
     document.getElementById("logoutBtn").onclick = logout;
     document.getElementById("clearCacheBtn").onclick = () => { localStorage.clear(); location.reload(); };
+
+    // Password Real-time Feedback
+    document.getElementById("password2").oninput = (e) => {
+        const fb = document.getElementById("passwordFeedback");
+        if(e.target.value.length >= 8) { fb.innerText = "Tinkamas"; fb.style.color = "#80ff80"; }
+        else { fb.innerText = "8+ simboliai"; fb.style.color = "#ff8080"; }
+    };
+    document.getElementById("password3").oninput = (e) => {
+        const fb = document.getElementById("matchFeedback");
+        const p2 = document.getElementById("password2").value;
+        if(e.target.value === p2 && p2 !== "") { fb.innerText = "Sutampa"; fb.style.color = "#80ff80"; }
+        else { fb.innerText = "Nesutampa"; fb.style.color = "#ff8080"; }
+    };
+
     document.getElementById("stayLoginSettings").onchange = (e) => {
         let s = JSON.parse(localStorage.getItem('mathexa_session'));
         if(s) { s.permanent = e.target.checked; localStorage.setItem('mathexa_session', JSON.stringify(s)); }
@@ -35,8 +49,11 @@ async function checkSession() {
     try {
         const res = await fetch(API, { method:"POST", body: JSON.stringify({ action:"validateToken", token: s.token }) });
         const data = await res.json();
-        if(data.success) { updateUI(data.clicks_remaining, data.expiry, data.support_id); showApp(); }
-        else logout();
+        if(data.success) { 
+            updateUI(data.clicks_remaining, data.expiry, data.support_id); 
+            showApp(); 
+            document.getElementById("stayLoginSettings").checked = s.permanent;
+        } else logout();
     } catch(e) {}
 }
 
@@ -55,11 +72,17 @@ async function login(u, p) {
 async function signup() {
     const name = document.getElementById("name").value;
     const email = document.getElementById("email2").value;
-    const pass = document.getElementById("password2").value;
+    const p2 = document.getElementById("password2").value;
+    const p3 = document.getElementById("password3").value;
     const phone = document.getElementById("prefix").value + document.getElementById("phone").value;
-    const res = await fetch(API, { method:"POST", body: JSON.stringify({ action:"signup", full_name:name, email, password:pass, phone })});
+    const role = document.getElementById("role").value;
+
+    if(p2.length < 8) { alert("Slaptažodis per trumpas!"); return; }
+    if(p2 !== p3) { alert("Slaptažodžiai nesutampa!"); return; }
+
+    const res = await fetch(API, { method:"POST", body: JSON.stringify({ action:"signup", full_name:name, email, password:p2, phone, role })});
     const data = await res.json();
-    if(data.success) login(email, pass); else alert(data.error);
+    if(data.success) login(email, p2); else alert(data.error);
 }
 
 function updateUI(c, e, id) {
@@ -95,7 +118,7 @@ async function handleWatch(url) {
 
 function logout() { localStorage.clear(); location.reload(); }
 function show(id) { 
-    ["landing","login","signup","app","settings"].forEach(i => document.getElementById(i).classList.add("hidden"));
+    ["landing","login","signup","app","settings"].forEach(i => { if(document.getElementById(i)) document.getElementById(i).classList.add("hidden"); });
     if(id !== "none") document.getElementById(id).classList.remove("hidden");
 }
 function back() { show("landing"); }
