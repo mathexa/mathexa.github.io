@@ -5,10 +5,9 @@ let clicksRemaining = 0;
 let allVideos = [];
 let supportId = null;
 
-// ===== INIT =====
+// INIT
 document.addEventListener("DOMContentLoaded", () => {
 
-  // EU prefixes
   const prefixes = ["+370","+371","+372","+49","+33","+34","+39","+48","+31","+32","+43","+45","+46","+47","+358","+353","+420","+421","+386","+385","+36","+40","+359","+30","+357","+356","+351","+352","+354","+423","+377"];
   const p = document.getElementById("prefix");
   prefixes.forEach(x=>{
@@ -19,19 +18,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
   bind();
 
-  // restore simple mode
+  // restore simple UI
   if(localStorage.getItem("simpleUI")==="true"){
     document.body.classList.add("simple");
     document.getElementById("simpleUI").checked = true;
   }
 
-  // restore session (token only, 3h)
+  // FIXED SESSION RESTORE
   const saved = JSON.parse(localStorage.getItem("session") || "null");
+
   if(saved){
     if(Date.now() - saved.time < 3*60*60*1000){
+
       token = saved.token;
-      showApp();
-      loadVideos();
+
+      api({ action:"watch", token }).then(r=>{
+        if(r.error){
+          localStorage.removeItem("session");
+          return;
+        }
+
+        clicksRemaining = r.remaining || 0;
+        showApp();
+        loadVideos();
+      });
+
     } else {
       localStorage.removeItem("session");
       alert("Sesija baigėsi");
@@ -39,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// ===== BIND =====
+// BIND
 function bind(){
   const el=id=>document.getElementById(id);
 
@@ -56,42 +67,30 @@ function bind(){
   el("settingsBtn").onclick=openSettings;
   el("closeSettings").onclick=()=>showOnly("app");
 
-  // ===== PASSWORD REALTIME =====
+  // PASSWORD FEEDBACK
   el("password2").addEventListener("input", ()=>{
     const v = el("password2").value;
-    const fb = el("passwordFeedback");
 
-    if(v.length === 0){
-      fb.innerText = "";
-    } else if(v.length < 8){
-      fb.innerText = "Per trumpas";
+    if(v.length < 8){
+      passwordFeedback.innerText="Per trumpas";
     } else if(v.length > 24){
-      fb.innerText = "Per ilgas";
+      passwordFeedback.innerText="Per ilgas";
     } else {
-      fb.innerText = "Tinkamas";
+      passwordFeedback.innerText="Tinkamas";
     }
 
-    // also update match in real time
     checkMatch();
   });
 
   el("password3").addEventListener("input", checkMatch);
 
   function checkMatch(){
-    const p1 = el("password2").value;
-    const p2 = el("password3").value;
-    const fb = el("matchFeedback");
-
-    if(p2.length === 0){
-      fb.innerText = "";
-    } else if(p1 === p2){
-      fb.innerText = "Sutampa";
-    } else {
-      fb.innerText = "Nesutampa";
-    }
+    matchFeedback.innerText =
+      password2.value === password3.value
+        ? "Sutampa"
+        : "Nesutampa";
   }
 
-  // ===== SEARCH =====
   el("search").oninput = (e)=>{
     const q=e.target.value.toLowerCase();
     renderVideos(allVideos.filter(v =>
@@ -100,11 +99,9 @@ function bind(){
     ));
   };
 
-  // ===== SETTINGS =====
   el("toggleSupport").onclick=()=>{
-    const box = el("supportBox");
-    box.classList.toggle("hidden");
-    box.innerText = supportId || "Nėra";
+    supportBox.classList.toggle("hidden");
+    supportBox.innerText = supportId || "Nėra";
   };
 
   el("simpleUI").onchange = (e)=>{
@@ -119,30 +116,12 @@ function bind(){
   };
 }
 
-// ===== NAV =====
-function show(id){
-  ["landing","login","signup"].forEach(x=>toggle(x,false));
-  toggle(id,true);
-}
-function showOnly(id){
-  ["app","settings"].forEach(x=>toggle(x,false));
-  toggle(id,true);
-}
-function back(){
-  ["login","signup","settings"].forEach(x=>toggle(x,false));
-  toggle("landing",true);
-}
-function toggle(id,show){
-  document.getElementById(id).classList.toggle("hidden",!show);
-}
-
-// ===== LOGIN =====
+// LOGIN
 async function login(emailOverride, passOverride){
-  const emailVal = emailOverride || document.getElementById("email").value;
-  const passVal = passOverride || document.getElementById("password").value;
+  const emailVal = (emailOverride || email.value).trim();
+  const passVal = (passOverride || password.value).trim();
 
-  const status = document.getElementById("loginStatus");
-  status.innerText = "Jungiamasi...";
+  loginStatus.innerText="Jungiamasi...";
 
   const res = await api({
     action:"login",
@@ -155,7 +134,7 @@ async function login(emailOverride, passOverride){
     clicksRemaining = res.clicks_remaining;
     supportId = res.support_id || null;
 
-    if(document.getElementById("stayLogin").checked){
+    if(document.getElementById("stayLogin")?.checked){
       localStorage.setItem("session", JSON.stringify({
         token,
         time: Date.now()
@@ -165,54 +144,37 @@ async function login(emailOverride, passOverride){
     showApp();
     loadVideos();
   } else {
-    status.innerText = res.error;
+    loginStatus.innerText = res.error;
   }
 }
 
-// ===== SIGNUP (FIXED AUTO LOGIN) =====
+// SIGNUP
 async function signup(){
-  const nameVal = document.getElementById("name").value;
-  const emailVal = document.getElementById("email2").value;
-  const passVal = document.getElementById("password2").value;
-  const pass2 = document.getElementById("password3").value;
-
-  if(!nameVal || !emailVal || !passVal){
-    alert("Užpildykite visus laukus");
-    return;
-  }
-
-  if(passVal !== pass2){
-    alert("Slaptažodžiai nesutampa");
-    return;
-  }
+  const emailVal = email2.value.trim();
+  const passVal = password2.value;
 
   const res = await api({
     action:"signup",
-    full_name: nameVal,
-    email: emailVal,
-    phone: document.getElementById("prefix").value + document.getElementById("phone").value,
-    password: passVal,
-    role: document.getElementById("role").value
+    full_name:name.value,
+    email:emailVal,
+    phone:prefix.value+phone.value,
+    password:passVal,
+    role:role.value
   });
 
   if(res.success){
-    supportId = res.support_id || null;
+    supportId = res.support_id;
+    alert("Jūsų ID: " + supportId);
 
-    alert("Jūsų paskyros ID: " + supportId);
-
-    // ✅ FIX: login with SAME credentials
     await login(emailVal, passVal);
-
   } else {
     alert(res.error);
   }
 }
 
-// ===== SETTINGS =====
+// SETTINGS
 function openSettings(){
-  const el=document.getElementById("clicksInfo");
-
-  el.innerText =
+  clicksInfo.innerText =
     clicksRemaining > 1000
       ? "Peržiūros: ∞"
       : "Liko: " + clicksRemaining;
@@ -220,11 +182,11 @@ function openSettings(){
   showOnly("settings");
 }
 
-// ===== APPLY CODE =====
+// APPLY CODE
 async function applyCode(){
   const res = await api({
     action:"applyCode",
-    code:document.getElementById("codeInput").value,
+    code:codeInput.value,
     token
   });
 
@@ -237,35 +199,28 @@ async function applyCode(){
   }
 }
 
-// ===== LOAD VIDEOS =====
+// VIDEOS
 async function loadVideos(){
-  const container = document.getElementById("videos");
-  container.innerHTML="Kraunama...";
-
+  videos.innerHTML="Kraunama...";
   allVideos = await fetch("videos.json").then(r=>r.json());
   renderVideos(allVideos);
 }
 
-// ===== RENDER (NO FREEZE) =====
 function renderVideos(list){
-  const container=document.getElementById("videos");
-  container.innerHTML="";
-
+  videos.innerHTML="";
   let i=0;
 
   function chunk(){
     for(let j=0;j<10 && i<list.length;j++,i++){
-      container.appendChild(card(list[i]));
+      videos.appendChild(card(list[i]));
     }
     if(i<list.length){
       requestAnimationFrame(chunk);
     }
   }
-
   chunk();
 }
 
-// ===== CARD =====
 function card(v){
   const d=document.createElement("div");
   d.className="videoCard";
@@ -281,12 +236,6 @@ function card(v){
 
   btn.onclick=async ()=>{
     const tab = window.open("", "_blank");
-
-    if(!tab){
-      alert("Popup užblokuotas");
-      return;
-    }
-
     tab.document.write("Kraunama...");
 
     const r = await api({ action:"watch", token });
@@ -305,7 +254,7 @@ function card(v){
   return d;
 }
 
-// ===== API =====
+// API
 async function api(data){
   const res = await fetch(API,{
     method:"POST",
@@ -314,7 +263,23 @@ async function api(data){
   return res.json();
 }
 
-// ===== SHOW APP =====
+// NAV
+function show(id){
+  ["landing","login","signup"].forEach(x=>toggle(x,false));
+  toggle(id,true);
+}
+function showOnly(id){
+  ["app","settings"].forEach(x=>toggle(x,false));
+  toggle(id,true);
+}
+function back(){
+  ["login","signup","settings"].forEach(x=>toggle(x,false));
+  toggle("landing",true);
+}
+function toggle(id,show){
+  document.getElementById(id).classList.toggle("hidden",!show);
+}
+
 function showApp(){
   toggle("landing",false);
   toggle("login",false);
