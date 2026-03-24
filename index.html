@@ -1,81 +1,85 @@
 <!DOCTYPE html>
 <html lang="lt">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mathexa</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathexa</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div id="landing" class="center">
-  <h1>Mathexa</h1>
-  <button id="btnLogin">Turiu paskyrą</button>
-  <button id="btnSignup">Esu naujas</button>
+    <h1>Mathexa</h1>
+    <button id="btnLogin">Turiu paskyrą</button>
+    <button id="btnSignup">Esu naujas</button>
 </div>
 
 <div id="login" class="center hidden">
-  <h2>Prisijungti</h2>
-  <input id="email" placeholder="El. paštas">
-  <input id="password" type="password" placeholder="Slaptažodis">
-  <div id="loginStatus"></div>
-  <button id="loginBtn">Prisijungti</button>
-  <button id="back1">Atgal</button>
+    <h2>Prisijungti</h2>
+    <input id="email" placeholder="El. paštas">
+    <input id="password" type="password" placeholder="Slaptažodis">
+    <div id="loginStatus"></div>
+    <button id="loginBtn">Prisijungti</button>
+    <button id="back1">Atgal</button>
 </div>
 
 <div id="signup" class="center hidden">
-  <h2>Registracija</h2>
-  <input id="name" placeholder="Vardas Pavardė">
-  <input id="email2" placeholder="El. paštas">
+    <h2>Registracija</h2>
+    <input id="name" placeholder="Vardas Pavardė">
+    <input id="email2" placeholder="El. paštas">
 
-  <div class="row">
-    <select id="prefix"></select>
-    <input id="phone" placeholder="Telefono nr. (neprivaloma)">
-  </div>
+    <div class="row" style="display: flex; gap: 5px;">
+        <select id="prefix" style="width: 80px;"></select>
+        <input id="phone" placeholder="Telefonas (neprivaloma)" style="width: 135px;">
+    </div>
 
-  <select id="role">
-    <option value="student">Studentas</option>
-    <option value="teacher">Mokytojas</option>
-  </select>
+    <select id="role">
+        <option value="student">Studentas</option>
+        <option value="teacher">Mokytojas</option>
+    </select>
 
-  <input id="password2" type="password" placeholder="Slaptažodis">
-  <div id="passwordFeedback"></div>
+    <input id="password2" type="password" placeholder="Slaptažodis">
+    <div id="passwordFeedback" style="font-size: 12px;"></div>
 
-  <input id="password3" type="password" placeholder="Pakartokite slaptažodį">
-  <div id="matchFeedback"></div>
+    <input id="password3" type="password" placeholder="Pakartokite slaptažodį">
+    <div id="matchFeedback" style="font-size: 12px;"></div>
 
-  <div class="policyBox">
-    Sukurdami paskyrą sutinkate su <a href="policy.txt" target="_blank">taisyklėmis</a>
-  </div>
+    <div class="policyBox">
+        Sutinkate su <a href="policy.txt" target="_blank">taisyklėmis</a>
+    </div>
 
-  <div id="signupStatus"></div>
-  <button id="signupBtn">Sukurti</button>
-  <button id="back2">Atgal</button>
+    <div id="signupStatus"></div>
+    <button id="signupBtn">Sukurti</button>
+    <button id="back2">Atgal</button>
 </div>
 
 <div id="app" class="hidden">
-  <div class="topbar">
-    <div class="logo">Mathexa</div>
-    <div class="actions">
-      <span id="headerClicks">Limitas: --</span>
-      <button id="settingsBtn">⚙</button>
+    <div class="topbar">
+        <div class="logo">Mathexa</div>
+        <div class="actions">
+            <span id="headerClicks">Kraunama...</span>
+            <button id="settingsBtn">⚙</button>
+        </div>
     </div>
-  </div>
-  <div id="videos" class="video-grid"></div>
+    <div id="videos" class="video-grid"></div>
 </div>
 
 <div id="settings" class="center hidden">
-  <h2>Nustatymai</h2>
-  <p id="supportIdView" style="font-size: 0.8em; color: #aaa;"></p>
-  <h3 id="clicksInfo">Liko peržiūrų: Kraunama...</h3>
+    <h2>Nustatymai</h2>
+    <div id="supportIdBox" style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 13px; text-align: center;">
+        <div id="supportIdDisplay">ID: --</div>
+        <div style="font-size: 10px; opacity: 0.7;">Šio ID reikės kreipiantis į pagalbą</div>
+    </div>
+    
+    <h3 id="clicksInfo">Liko peržiūrų: --</h3>
 
-  <label style="margin-bottom: 15px; display: block;">
-    <input type="checkbox" id="stayLoginSettings"> Likti prisijungus
-  </label>
+    <label style="margin: 10px 0; display: flex; align-items: center; gap: 10px; cursor: pointer;">
+        <input type="checkbox" id="stayLoginSettings" style="width: 20px;"> Likti prisijungus
+    </label>
 
-  <button id="clearCacheBtn" style="background: #ffa500;">Išvalyti atmintį (Reset)</button>
-  <button id="logoutBtn" style="background: #ff4d4d;">Atsijungti</button>
-  <button id="closeSettings">Atgal į App</button>
+    <button id="clearCacheBtn" style="background: #e67e22; margin-top: 10px;">Išvalyti atmintį</button>
+    <button id="logoutBtn" style="background: #ff4d4d;">Atsijungti</button>
+    <button id="closeSettings">Atgal</button>
 </div>
 
 <script src="app.js"></script>
