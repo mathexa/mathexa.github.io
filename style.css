@@ -48,22 +48,13 @@ button {
   backdrop-filter:blur(10px);
 }
 
-/* FIXED SIMPLE MODE */
+/* SIMPLE MODE (FIXED) */
 .simple {
   font-size:1.15em;
 }
 
-.simple h1, .simple h2 {
-  font-size:1.4em !important;
-}
-
 .simple button,
-.simple input,
-.simple select {
-  font-size:1.1em !important;
-  padding:14px !important;
-}
-
-.simple .videoCard {
-  backdrop-filter:none !important;
+.simple input {
+  font-size:1.1em;
+  padding:14px;
 }
