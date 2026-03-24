@@ -1,159 +1,176 @@
-const API = "https://script.google.com/macros/s/AKfycbxWf86gFL6z0vZG5N4cdgUhR3I9NLmOMAUOpKzNxTK8bXiOWSFSn46WWFafeb4Soa0QZg/exec";
+const API = "https://script.google.com/macros/s/AKfycbwqHsQ88kSO9FdD8En9xepi79t8sL6L-rQ5diy8AtiWxNGFFU6JNm3B9GJpu-IwvS9OoQ/exec";
 
 let VIDEOS_DB = [];
 let isSubmitting = false;
 
 document.addEventListener("DOMContentLoaded", () => {
-  loadPrefixes();
-  bindEvents();
-  checkSession();
-  fetchVideos();
+    loadPrefixes();
+    bindEvents();
+    checkSession();
 });
 
-async function fetchVideos() {
-  try {
-    const res = await fetch('videos.json');
-    VIDEOS_DB = await res.json();
-    if(document.getElementById("app").classList.contains("hidden") === false) renderVideos();
-  } catch (e) { console.error("Failed to load videos.json"); }
+function loadPrefixes() {
+    const pref = document.getElementById("prefix");
+    const euCodes = ["+370", "+371", "+372", "+43", "+32", "+359", "+385", "+357", "+420", "+45", "+358", "+33", "+49", "+30", "+36", "+353", "+39", "+352", "+356", "+31", "+48", "+351", "+40", "+421", "+386", "+34", "+46"];
+    euCodes.sort().forEach(code => {
+        const opt = document.createElement("option");
+        opt.value = code;
+        opt.innerText = code;
+        pref.appendChild(opt);
+    });
 }
 
-function loadPrefixes(){
-  const pref = document.getElementById("prefix");
-  // All EU Prefixes (sample set, add more as needed)
-  const eu = ["+370","+371","+372","+43","+32","+359","+385","+357","+420","+45","+358","+33","+49","+30","+36","+353","+39","+352","+356","+31","+48","+351","+40","+421","+386","+34","+46"];
-  eu.sort().forEach(p => {
-    const o = document.createElement("option"); o.value = p; o.innerText = p; pref.appendChild(o);
-  });
-}
+function bindEvents() {
+    document.getElementById("btnLogin").onclick = () => show("login");
+    document.getElementById("btnSignup").onclick = () => show("signup");
+    document.getElementById("back1").onclick = () => show("landing");
+    document.getElementById("back2").onclick = () => show("landing");
+    
+    document.getElementById("settingsBtn").onclick = () => {
+        document.getElementById("app").classList.add("hidden");
+        document.getElementById("settings").classList.remove("hidden");
+    };
+    
+    document.getElementById("closeSettings").onclick = () => {
+        document.getElementById("settings").classList.add("hidden");
+        document.getElementById("app").classList.remove("hidden");
+    };
 
-function bindEvents(){
-  document.getElementById("btnLogin").onclick = () => show("login");
-  document.getElementById("btnSignup").onclick = () => show("signup");
-  document.getElementById("back1").onclick = back;
-  document.getElementById("back2").onclick = back;
-  document.getElementById("settingsBtn").onclick = () => { toggle("app", false); toggle("settings", true); };
-  document.getElementById("closeSettings").onclick = () => { toggle("settings", false); toggle("app", true); };
-  
-  document.getElementById("loginBtn").onclick = () => login();
-  document.getElementById("signupBtn").onclick = signup;
-  document.getElementById("logoutBtn").onclick = logout;
-  
-  document.getElementById("clearCacheBtn").onclick = () => {
-    localStorage.clear();
-    location.reload();
-  };
-
-  document.getElementById("stayLoginSettings").onchange = (e) => {
-    const session = JSON.parse(localStorage.getItem('mathexa_session'));
-    if(session) {
-      session.permanent = e.target.checked;
-      localStorage.setItem('mathexa_session', JSON.stringify(session));
-    }
-  };
+    document.getElementById("loginBtn").onclick = () => login();
+    document.getElementById("signupBtn").onclick = signup;
+    document.getElementById("logoutBtn").onclick = logout;
+    
+    document.getElementById("clearCacheBtn").onclick = () => {
+        localStorage.clear();
+        alert("Atmintis išvalyta. Puslapis bus perkrautas.");
+        location.reload();
+    };
 }
 
 async function checkSession() {
-  const session = JSON.parse(localStorage.getItem('mathexa_session'));
-  if (!session) return;
+    const session = JSON.parse(localStorage.getItem('mathexa_session'));
+    if (!session) return;
 
-  // 3-hour expiry check if NOT permanent
-  if (!session.permanent && Date.now() > session.expiresAt) {
-    logout();
-    return;
-  }
-
-  try {
-    const res = await fetch(API, { method: "POST", body: JSON.stringify({ action: "validateToken", token: session.token }) });
-    const data = await res.json();
-    if (data.success) {
-      updateUI(data.clicks_remaining, data.expiry, data.support_id);
-      showApp();
-      document.getElementById("stayLoginSettings").checked = !!session.permanent;
-    } else {
-        logout();
+    // 3 Hour Expiry Logic
+    if (!session.permanent && Date.now() > session.expiresAt) {
+        localStorage.removeItem('mathexa_session');
+        return;
     }
-  } catch(e) { console.error("Session error"); }
+
+    try {
+        const res = await fetch(API, { 
+            method: "POST", 
+            body: JSON.stringify({ action: "validateToken", token: session.token }) 
+        });
+        const data = await res.json();
+        if (data.success) {
+            updateUI(data.clicks_remaining, data.expiry, data.support_id);
+            showApp();
+        }
+    } catch(e) { console.error("Session failed"); }
 }
 
-async function signup(){
-  if(isSubmitting) return;
-  const status = document.getElementById("signupStatus");
-  const nameVal = document.getElementById("name").value.trim();
-  const emailVal = document.getElementById("email2").value.trim();
-  const phoneVal = document.getElementById("phone").value.trim() ? document.getElementById("prefix").value + document.getElementById("phone").value.trim() : "";
-  const passVal = document.getElementById("password2").value;
+async function signup() {
+    if(isSubmitting) return;
+    const status = document.getElementById("signupStatus");
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email2").value.trim();
+    const pass = document.getElementById("password2").value;
+    const phone = document.getElementById("phone").value.trim() ? document.getElementById("prefix").value + document.getElementById("phone").value.trim() : "";
 
-  if(!nameVal || !emailVal || !passVal) { status.innerText = "Užpildykite laukus"; return; }
+    if(!name || !email || !pass) { status.innerText = "Užpildykite duomenis"; return; }
 
-  isSubmitting = true;
-  status.innerText = "Kuriama...";
+    isSubmitting = true;
+    status.innerText = "Kuriama...";
 
-  try {
-    const res = await fetch(API, {
-      method: "POST",
-      body: JSON.stringify({ action: "signup", full_name: nameVal, email: emailVal, phone: phoneVal, password: passVal })
-    });
-    const data = await res.json();
-    if(data.success) await login(emailVal, passVal);
-    else { status.innerText = data.error; isSubmitting = false; }
-  } catch(e) { status.innerText = "Klaida"; isSubmitting = false; }
+    try {
+        const res = await fetch(API, {
+            method: "POST",
+            body: JSON.stringify({ action: "signup", full_name: name, email: email, password: pass, phone: phone })
+        });
+        const data = await res.json();
+        if(data.success) await login(email, pass);
+        else { status.innerText = data.error; isSubmitting = false; }
+    } catch(e) { status.innerText = "Ryšio klaida"; isSubmitting = false; }
 }
 
-async function login(u, p){
-  const user = u || document.getElementById("email").value;
-  const pass = p || document.getElementById("password").value;
-  const status = u ? document.getElementById("signupStatus") : document.getElementById("loginStatus");
+async function login(u, p) {
+    const email = u || document.getElementById("email").value;
+    const pass = p || document.getElementById("password").value;
+    const status = u ? document.getElementById("signupStatus") : document.getElementById("loginStatus");
 
-  try {
-    const res = await fetch(API, { method: "POST", body: JSON.stringify({ action: "login", email: user, password: pass }) });
-    const data = await res.json();
-
-    if(data.success) {
-      localStorage.setItem('mathexa_session', JSON.stringify({
-        token: data.token,
-        expiresAt: Date.now() + (3 * 60 * 60 * 1000),
-        permanent: false
-      }));
-      updateUI(data.clicks_remaining, data.expiry, data.support_id);
-      showApp();
-    } else { status.innerText = data.error; }
-  } catch(e) { status.innerText = "Klaida"; }
+    try {
+        const res = await fetch(API, { 
+            method: "POST", 
+            body: JSON.stringify({ action: "login", email, password: pass }) 
+        });
+        const data = await res.json();
+        if(data.success) {
+            localStorage.setItem('mathexa_session', JSON.stringify({
+                token: data.token,
+                expiresAt: Date.now() + (3 * 60 * 60 * 1000),
+                permanent: false
+            }));
+            updateUI(data.clicks_remaining, data.expiry, data.support_id);
+            showApp();
+        } else { status.innerText = data.error; }
+    } catch(e) { status.innerText = "Klaida prisijungiant"; }
 }
 
 function updateUI(clicks, expiry, supportId) {
-  const isSub = expiry && new Date(expiry) > new Date();
-  const text = isSub ? "Premium" : `Liko: ${clicks}`;
-  document.getElementById("headerClicks").innerText = text;
-  document.getElementById("clicksInfo").innerText = "Liko peržiūrų: " + text;
-  document.getElementById("supportIdView").innerText = "Support ID: " + supportId + " (reikės susisiekiant)";
+    const isPremium = expiry && new Date(expiry) > new Date();
+    const val = isPremium ? "Premium (Neribota)" : clicks;
+    document.getElementById("headerClicks").innerText = "Limitas: " + val;
+    document.getElementById("clicksInfo").innerText = "Liko peržiūrų: " + val;
+    if(supportId) document.getElementById("supportIdDisplay").innerText = "ID: " + supportId;
+}
+
+async function showApp() {
+    show("none");
+    document.getElementById("app").classList.remove("hidden");
+    
+    // Fetch videos from JSON file
+    try {
+        const res = await fetch('videos.json');
+        VIDEOS_DB = await res.json();
+        renderVideos();
+    } catch(e) { console.error("Could not load videos.json"); }
 }
 
 function renderVideos() {
-  const grid = document.getElementById("videos");
-  grid.innerHTML = "";
-  VIDEOS_DB.forEach(v => {
-    const card = document.createElement("div");
-    card.className = "video-card";
-    card.innerHTML = `<h3>${v.title}</h3><p>${v.category} • ${Math.floor(v.length/60)} min</p>`;
-    card.onclick = () => handleWatch(v.url);
-    grid.appendChild(card);
-  });
+    const grid = document.getElementById("videos");
+    grid.innerHTML = "";
+    VIDEOS_DB.forEach(v => {
+        const card = document.createElement("div");
+        card.className = "video-card";
+        card.innerHTML = `<h3>${v.title}</h3><p>${v.category} • ${Math.floor(v.length/60)} min</p>`;
+        card.onclick = () => handleWatch(v.url);
+        grid.appendChild(card);
+    });
 }
 
 async function handleWatch(url) {
-  const session = JSON.parse(localStorage.getItem('mathexa_session'));
-  const res = await fetch(API, { method: "POST", body: JSON.stringify({ action: "watch", token: session.token }) });
-  const data = await res.json();
-
-  if(data.allowed) {
-    updateUI(data.remaining, data.expiry, ""); // supportId update not needed here
-    window.open(url, "_blank");
-  } else { alert(data.error || "Baigėsi limitas"); }
+    const session = JSON.parse(localStorage.getItem('mathexa_session'));
+    const res = await fetch(API, { 
+        method: "POST", 
+        body: JSON.stringify({ action: "watch", token: session.token }) 
+    });
+    const data = await res.json();
+    if(data.allowed) {
+        updateUI(data.remaining, data.expiry, null);
+        window.open(url, "_blank");
+    } else { alert(data.error); }
 }
 
-function logout() { localStorage.removeItem('mathexa_session'); location.reload(); }
-function show(id){ ["landing","login","signup"].forEach(x=>toggle(x,false)); toggle(id,true); }
-function back(){ show("landing"); }
-function toggle(id,s){ document.getElementById(id).classList.toggle("hidden",!s); }
-function showApp(){ show("none"); toggle("app", true); renderVideos(); }
+function logout() {
+    localStorage.removeItem('mathexa_session');
+    location.reload();
+}
+
+function show(id) {
+    ["landing","login","signup","app","settings"].forEach(div => {
+        const el = document.getElementById(div);
+        if(el) el.classList.add("hidden");
+    });
+    if(id !== "none") document.getElementById(id).classList.remove("hidden");
+}
