@@ -2,11 +2,60 @@ const API = "https://script.google.com/macros/s/AKfycbwqHsQ88kSO9FdD8En9xepi79t8
 
 let isSubmitting = false;
 
-// INIT
+// ---------------- ANONYMOUS CRASH LOGGING ----------------
+window.onerror = function(message, source, lineno, colno, error) {
+  const anonymousLog = `${message} (Line: ${lineno})`;
+  fetch(API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "crash_log", message: anonymousLog })
+  }).catch(() => {}); // Fail silently
+  return false;
+};
+
+window.onunhandledrejection = function(event) {
+  fetch(API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "crash_log", message: "Unhandled Promise: " + event.reason })
+  }).catch(() => {});
+};
+
+// ---------------- INIT & SESSION CHECK ----------------
 document.addEventListener("DOMContentLoaded", () => {
   loadPrefixes();
   bind();
+  checkSession();
 });
+
+async function checkSession() {
+  const sessionData = JSON.parse(localStorage.getItem('mathexa_session'));
+  if (!sessionData) return;
+
+  // Check if 3 hours have passed
+  if (Date.now() > sessionData.expiresAt) {
+    localStorage.removeItem('mathexa_session');
+    return;
+  }
+
+  // Validate existing token silently
+  try {
+    const res = await fetch(API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "validateToken", token: sessionData.token })
+    });
+    const data = await res.json();
+    
+    if (data.success) {
+      showApp();
+    } else {
+      localStorage.removeItem('mathexa_session');
+    }
+  } catch(e) {
+    console.warn("Could not validate session on load.");
+  }
+}
 
 function loadPrefixes(){
   ["+370","+371","+372"].forEach(p=>{
@@ -24,7 +73,7 @@ function bind(){
   back1.onclick=back;
   back2.onclick=back;
 
-  loginBtn.onclick=login;
+  loginBtn.onclick=() => login();
   signupBtn.onclick=signup;
 
   password2.oninput = ()=>{
@@ -38,12 +87,11 @@ function bind(){
   };
 }
 
-// SIGNUP (HARD FIX)
+// ---------------- SIGNUP ----------------
 async function signup(){
   if(isSubmitting) return;
   isSubmitting = true;
-
-  signupStatus.innerText = "";
+  signupStatus.innerText = "Kuriama paskyra...";
 
   const full_name = name.value.trim();
   const emailVal = email2.value.trim();
@@ -51,7 +99,6 @@ async function signup(){
   const pass = password2.value;
   const roleVal = role.value;
 
-  // VALIDATION
   if(!full_name || !emailVal || !phoneVal || !pass){
     signupStatus.innerText = "Užpildykite visus laukus";
     isSubmitting = false;
@@ -83,11 +130,12 @@ async function signup(){
     if(data.success){
       signupStatus.style.color="#80ff80";
       signupStatus.innerText="Sukurta, jungiamasi...";
+      // Force "stay logged in" checked for brand new users optionally
+      document.getElementById('stayLogin').checked = true;
       await login(emailVal, pass);
     } else {
       signupStatus.innerText = data.error || "Serverio klaida";
     }
-
   } catch (e){
     signupStatus.innerText = "Ryšio klaida (API neveikia)";
   }
@@ -95,9 +143,11 @@ async function signup(){
   isSubmitting = false;
 }
 
-// LOGIN
+// ---------------- LOGIN ----------------
 async function login(emailOverride, passOverride){
-  loginStatus.innerText="Jungiamasi...";
+  // Check which DOM element to use to show status
+  const statusEl = (emailOverride) ? signupStatus : loginStatus;
+  statusEl.innerText = "Jungiamasi...";
 
   try {
     const res = await fetch(API,{
@@ -113,17 +163,28 @@ async function login(emailOverride, passOverride){
     const data = await res.json();
 
     if(data.success){
+      // Token logic - 3 Hours (10800000 milliseconds)
+      const shouldStay = document.getElementById('stayLogin').checked || emailOverride; 
+      
+      if(shouldStay) {
+        const expiresAt = Date.now() + (3 * 60 * 60 * 1000);
+        localStorage.setItem('mathexa_session', JSON.stringify({
+          token: data.token,
+          expiresAt: expiresAt
+        }));
+      }
+
       showApp();
     } else {
-      loginStatus.innerText=data.error || "Klaida";
+      statusEl.innerText=data.error || "Klaida";
     }
 
   } catch(e){
-    loginStatus.innerText="Ryšio klaida";
+    statusEl.innerText="Ryšio klaida";
   }
 }
 
-// NAV
+// ---------------- NAV ----------------
 function show(id){
   ["landing","login","signup"].forEach(x=>toggle(x,false));
   toggle(id,true);
