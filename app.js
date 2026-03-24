@@ -1,202 +1,194 @@
 const API = "https://script.google.com/macros/s/AKfycbwqHsQ88kSO9FdD8En9xepi79t8sL6L-rQ5diy8AtiWxNGFFU6JNm3B9GJpu-IwvS9OoQ/exec";
 
-// Your video DB (I truncated it slightly here for brevity, paste your full 50 videos here)
+// Video Database
 const VIDEOS_DB = [
   { "id":"1","title":"Algebra Basics 1","category":"algebra","url":"https://youtube.com","platform":"YouTube","length":300 },
   { "id":"2","title":"Algebra Basics 2","category":"algebra","url":"https://youtube.com","platform":"YouTube","length":420 },
   { "id":"3","title":"Algebra Basics 3","category":"algebra","url":"https://youtube.com","platform":"YouTube","length":360 },
   { "id":"4","title":"Algebra Basics 4","category":"algebra","url":"https://youtube.com","platform":"YouTube","length":280 },
   { "id":"5","title":"Algebra Basics 5","category":"algebra","url":"https://youtube.com","platform":"YouTube","length":500 }
-  // ... Paste the rest of your video array here
+  // ... (Add your other 45 videos here)
 ];
 
 let isSubmitting = false;
-let currentClicks = "--";
 
-// ---------------- ANONYMOUS CRASH LOGGING ----------------
-window.onerror = function(message, source, lineno, colno, error) {
-  fetch(API, { method: "POST", body: JSON.stringify({ action: "crash_log", message: `${message} (Line: ${lineno})` }) }).catch(()=>{});
-  return false;
-};
-window.onunhandledrejection = function(event) {
-  fetch(API, { method: "POST", body: JSON.stringify({ action: "crash_log", message: "Promise: " + event.reason }) }).catch(()=>{});
-};
-
-// ---------------- INIT & SESSION ----------------
+// ---------------- INIT ----------------
 document.addEventListener("DOMContentLoaded", () => {
   loadPrefixes();
-  bind();
+  bindEvents();
   checkSession();
 });
 
-async function checkSession() {
-  const sessionData = JSON.parse(localStorage.getItem('mathexa_session'));
-  if (!sessionData) return;
+function loadPrefixes(){
+  const pref = document.getElementById("prefix");
+  ["+370","+371","+372"].forEach(p=>{
+    const o=document.createElement("option"); o.value=p; o.innerText=p; pref.appendChild(o);
+  });
+}
 
-  if (Date.now() > sessionData.expiresAt) {
+function bindEvents(){
+  // Navigation
+  document.getElementById("btnLogin").onclick = () => show("login");
+  document.getElementById("btnSignup").onclick = () => show("signup");
+  document.getElementById("back1").onclick = back;
+  document.getElementById("back2").onclick = back;
+  document.getElementById("settingsBtn").onclick = () => { toggle("app", false); toggle("settings", true); };
+  document.getElementById("closeSettings").onclick = () => { toggle("settings", false); toggle("app", true); };
+  
+  // Actions
+  document.getElementById("loginBtn").onclick = () => login();
+  document.getElementById("signupBtn").onclick = signup;
+  
+  // Settings
+  document.getElementById("stayLoginSettings").onchange = (e) => {
+    const session = JSON.parse(localStorage.getItem('mathexa_session'));
+    if(session) {
+      session.permanent = e.target.checked;
+      localStorage.setItem('mathexa_session', JSON.stringify(session));
+    }
+  };
+
+  // Feedback
+  document.getElementById("password2").oninput = (e) => {
+    document.getElementById("passwordFeedback").innerText = e.target.value.length < 8 ? "Per trumpas" : "Tinkamas";
+  };
+  document.getElementById("password3").oninput = (e) => {
+    const p2 = document.getElementById("password2").value;
+    document.getElementById("matchFeedback").innerText = p2 === e.target.value ? "Sutampa" : "Nesutampa";
+  };
+}
+
+// ---------------- SESSION ----------------
+async function checkSession() {
+  const session = JSON.parse(localStorage.getItem('mathexa_session'));
+  if (!session) return;
+
+  // If not set to permanent in settings, check 3h expiry
+  if (!session.permanent && Date.now() > session.expiresAt) {
     localStorage.removeItem('mathexa_session');
     return;
   }
 
   try {
-    const res = await fetch(API, {
-      method: "POST", body: JSON.stringify({ action: "validateToken", token: sessionData.token })
-    });
+    const res = await fetch(API, { method: "POST", body: JSON.stringify({ action: "validateToken", token: session.token }) });
     const data = await res.json();
     if (data.success) {
-      updateClicksUI(data.clicks_remaining, data.expiry);
+      updateUI(data.clicks_remaining, data.expiry);
       showApp();
-    } else {
-      localStorage.removeItem('mathexa_session');
+      document.getElementById("stayLoginSettings").checked = !!session.permanent;
     }
-  } catch(e) { console.warn("Session check failed."); }
+  } catch(e) { console.error("Session invalid"); }
 }
 
-function loadPrefixes(){
-  ["+370","+371","+372"].forEach(p=>{
-    const o=document.createElement("option"); o.value=p; o.innerText=p; prefix.appendChild(o);
-  });
-}
-
-function bind(){
-  btnLogin.onclick=()=>show("login");
-  btnSignup.onclick=()=>show("signup");
-  back1.onclick=back; back2.onclick=back;
-  
-  loginBtn.onclick=() => login();
-  signupBtn.onclick=signup;
-  
-  settingsBtn.onclick=() => { toggle("app", false); toggle("settings", true); };
-  closeSettings.onclick=() => { toggle("settings", false); toggle("app", true); };
-  logoutBtn.onclick=() => { localStorage.removeItem('mathexa_session'); location.reload(); };
-
-  password2.oninput = ()=> passwordFeedback.innerText = password2.value.length < 8 ? "Per trumpas" : "Tinkamas";
-  password3.oninput = ()=> matchFeedback.innerText = password2.value === password3.value ? "Sutampa" : "Nesutampa";
-}
-
-// ---------------- AUTHENTICATION ----------------
+// ---------------- SIGNUP (FIXED) ----------------
 async function signup(){
   if(isSubmitting) return;
+  const status = document.getElementById("signupStatus");
+  
+  const nameVal = document.getElementById("name").value.trim();
+  const emailVal = document.getElementById("email2").value.trim();
+  const phoneVal = document.getElementById("prefix").value + document.getElementById("phone").value.trim();
+  const passVal = document.getElementById("password2").value;
+
+  if(!nameVal || !emailVal || !passVal) {
+    status.innerText = "Užpildykite pagrindinius laukus";
+    return;
+  }
+
   isSubmitting = true;
-  signupStatus.innerText = "Kuriama paskyra...";
-
-  const full_name = name.value.trim();
-  const emailVal = email2.value.trim();
-  const phoneVal = prefix.value + phone.value.trim();
-  const pass = password2.value;
-
-  if(!full_name || !emailVal || !phoneVal || !pass){
-    signupStatus.innerText = "Užpildykite visus laukus";
-    isSubmitting = false; return;
-  }
-  if(pass !== password3.value){
-    signupStatus.innerText = "Slaptažodžiai nesutampa";
-    isSubmitting = false; return;
-  }
+  status.innerText = "Kuriama paskyra...";
+  status.style.color = "white";
 
   try {
-    const res = await fetch(API,{ method:"POST", body: JSON.stringify({ action:"signup", full_name, email:emailVal, phone:phoneVal, password:pass }) });
+    const res = await fetch(API, {
+      method: "POST",
+      body: JSON.stringify({ action: "signup", full_name: nameVal, email: emailVal, phone: phoneVal, password: passVal })
+    });
     const data = await res.json();
 
     if(data.success){
-      signupStatus.style.color="#80ff80";
-      signupStatus.innerText="Sukurta, jungiamasi...";
-      await login(emailVal, pass, true); // Force stay-logged in on signup
+      status.style.color = "#80ff80";
+      status.innerText = "Sukurta! Jungiamasi...";
+      // Auto login
+      await login(emailVal, passVal);
     } else {
-      signupStatus.innerText = data.error || "Serverio klaida";
+      status.innerText = data.error || "Klaida";
+      isSubmitting = false;
     }
-  } catch (e){ signupStatus.innerText = "Ryšio klaida"; }
+  } catch(e) {
+    status.innerText = "Ryšio klaida. Patikrinkite internetą.";
+    isSubmitting = false;
+  }
+}
+
+// ---------------- LOGIN ----------------
+async function login(u, p){
+  const user = u || document.getElementById("email").value;
+  const pass = p || document.getElementById("password").value;
+  const status = u ? document.getElementById("signupStatus") : document.getElementById("loginStatus");
+
+  status.innerText = "Tikrinama...";
+
+  try {
+    const res = await fetch(API, {
+      method: "POST",
+      body: JSON.stringify({ action: "login", email: user, password: pass })
+    });
+    const data = await res.json();
+
+    if(data.success) {
+      // Create 3h session by default
+      localStorage.setItem('mathexa_session', JSON.stringify({
+        token: data.token,
+        expiresAt: Date.now() + (3 * 60 * 60 * 1000),
+        permanent: false
+      }));
+      updateUI(data.clicks_remaining, data.expiry);
+      showApp();
+    } else {
+      status.innerText = data.error || "Neteisingi duomenys";
+    }
+  } catch(e) { status.innerText = "Klaida"; }
   isSubmitting = false;
 }
 
-async function login(emailOverride, passOverride, forceStayLogin = false){
-  const statusEl = (emailOverride) ? signupStatus : loginStatus;
-  statusEl.innerText = "Jungiamasi...";
-
-  try {
-    const res = await fetch(API,{
-      method:"POST", body: JSON.stringify({ action:"login", email:(emailOverride || email.value), password:(passOverride || password.value) })
-    });
-    const data = await res.json();
-
-    if(data.success){
-      const loginCheck = document.getElementById('stayLogin');
-      const shouldStay = forceStayLogin || (loginCheck && loginCheck.checked);
-      
-      if(shouldStay) {
-        localStorage.setItem('mathexa_session', JSON.stringify({ token: data.token, expiresAt: Date.now() + (3*60*60*1000) }));
-      }
-      
-      updateClicksUI(data.clicks_remaining, data.expiry);
-      showApp();
-    } else { statusEl.innerText=data.error || "Klaida"; }
-  } catch(e){ statusEl.innerText="Ryšio klaida"; }
-}
-
-// ---------------- APP & VIDEO LOGIC ----------------
-function updateClicksUI(clicks, expiry) {
-  let display = expiry && new Date(expiry) > new Date() ? "Neribota" : clicks;
-  document.getElementById("headerClicks").innerText = `Limitas: ${display}`;
-  document.getElementById("clicksInfo").innerText = `Liko peržiūrų: ${display}`;
+// ---------------- APP LOGIC ----------------
+function updateUI(clicks, expiry) {
+  const isSub = expiry && new Date(expiry) > new Date();
+  const text = isSub ? "Premium (Neribota)" : `Liko: ${clicks}`;
+  document.getElementById("headerClicks").innerText = text;
+  document.getElementById("clicksInfo").innerText = "Liko peržiūrų: " + text;
 }
 
 function renderVideos() {
-  const container = document.getElementById('videos');
-  container.innerHTML = ""; 
-  
-  // Use DocumentFragment so we don't freeze the DOM drawing 50+ items
-  const fragment = document.createDocumentFragment();
+  const grid = document.getElementById("videos");
+  grid.innerHTML = "";
+  const frag = document.createDocumentFragment();
 
-  VIDEOS_DB.forEach(vid => {
+  VIDEOS_DB.forEach(v => {
     const card = document.createElement("div");
     card.className = "video-card";
-    card.innerHTML = `
-      <h3>${vid.title}</h3>
-      <div class="video-meta">
-        <span>${vid.category.toUpperCase()}</span>
-        <span>${Math.floor(vid.length / 60)} min</span>
-      </div>
-    `;
-    
-    card.onclick = () => handleVideoClick(vid.url);
-    fragment.appendChild(card);
+    card.innerHTML = `<h3>${v.title}</h3><p>${v.category} • ${Math.floor(v.length/60)} min</p>`;
+    card.onclick = () => handleWatch(v.url);
+    frag.appendChild(card);
   });
-
-  container.appendChild(fragment);
+  grid.appendChild(frag);
 }
 
-async function handleVideoClick(url) {
-  const sessionData = JSON.parse(localStorage.getItem('mathexa_session'));
-  if(!sessionData) return alert("Prašome prisijungti.");
+async function handleWatch(url) {
+  const session = JSON.parse(localStorage.getItem('mathexa_session'));
+  const res = await fetch(API, { method: "POST", body: JSON.stringify({ action: "watch", token: session.token }) });
+  const data = await res.json();
 
-  const prevText = document.getElementById("headerClicks").innerText;
-  document.getElementById("headerClicks").innerText = "Kraunama...";
-
-  try {
-    const res = await fetch(API, {
-      method:"POST", body: JSON.stringify({ action: "watch", token: sessionData.token })
-    });
-    const data = await res.json();
-
-    if(data.allowed) {
-      updateClicksUI(data.remaining, null);
-      window.open(url, "_blank"); // Open video
-    } else {
-      document.getElementById("headerClicks").innerText = prevText;
-      alert(data.error || "Baigėsi limitas!");
-    }
-  } catch(e) {
-    document.getElementById("headerClicks").innerText = prevText;
-    alert("Klaida susisiekiant su serveriu.");
+  if(data.allowed) {
+    updateUI(data.remaining, data.expiry);
+    window.open(url, "_blank");
+  } else {
+    alert(data.error || "Baigėsi limitas");
   }
 }
 
-// ---------------- NAV ----------------
 function show(id){ ["landing","login","signup"].forEach(x=>toggle(x,false)); toggle(id,true); }
 function back(){ ["login","signup"].forEach(x=>toggle(x,false)); toggle("landing",true); }
-function toggle(id,show){ document.getElementById(id).classList.toggle("hidden",!show); }
-
-function showApp(){
-  toggle("landing",false); toggle("login",false); toggle("signup",false); toggle("app",true);
-  renderVideos();
-}
+function toggle(id,s){ document.getElementById(id).classList.toggle("hidden",!s); }
+function showApp(){ show("none"); toggle("app", true); renderVideos(); }
