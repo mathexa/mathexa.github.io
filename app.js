@@ -55,14 +55,23 @@ async function signup() {
 }
 
 async function redeem() {
-    const code = document.getElementById("subCode").value, s = JSON.parse(localStorage.getItem('mathexa_session'));
+    const code = document.getElementById("subCode").value;
+    const s = JSON.parse(localStorage.getItem('mathexa_session'));
+    if(!code) return;
     document.getElementById("subStatus").innerText = "Tikrinama...";
+    document.getElementById("subStatus").style.color = "white";
+
     const res = await fetch(API, { method:"POST", body: JSON.stringify({ action:"redeemCode", token: s.token, code })});
     const data = await res.json();
+    
     if(data.success) {
         document.getElementById("subStatus").innerText = "Aktyvuota iki " + data.expiry;
-        updateUI(999, data.expiry, null);
-    } else document.getElementById("subStatus").innerText = data.error;
+        document.getElementById("subStatus").style.color = "#80ff80";
+        updateUI("PREMIUM", data.expiry, null);
+    } else {
+        document.getElementById("subStatus").innerText = data.error;
+        document.getElementById("subStatus").style.color = "#ff8080";
+    }
 }
 
 function updateUI(c, e, id) {
