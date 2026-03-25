@@ -1,4 +1,4 @@
-const API = "https://script.google.com/macros/s/AKfycbw7eCh8QNIBc1p_mKwb4GZTwiLdgyDJJyUa6i3h6Wnel0mz_ybQb3IQX2lbDBHrpkp7EQ/exec";
+const API = "https://script.google.com/macros/s/AKfycbxFdfhpSSGl5T5nsv8-tjkzGHHy01d72lNudier_e6VXKlTH5-47HNBPxzDzenWGmBWXw/exec";
 
 const isIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
@@ -36,13 +36,15 @@ async function login() {
     const email = document.getElementById("email").value, password = document.getElementById("password").value;
     if(!email || !password) return;
     document.getElementById("loginStatus").innerText = "Jungiamasi...";
-    const res = await fetch(API, { method:"POST", body: JSON.stringify({ action:"login", email, password })});
-    const data = await res.json();
-    if(data.success) {
-        localStorage.setItem('mathexa_session', JSON.stringify({ token: data.token }));
-        updateUI(data.clicks_remaining, data.expiry, data.support_id);
-        showApp();
-    } else document.getElementById("loginStatus").innerText = data.error;
+    try {
+        const res = await fetch(API, { method:"POST", body: JSON.stringify({ action:"login", email, password })});
+        const data = await res.json();
+        if(data.success) {
+            localStorage.setItem('mathexa_session', JSON.stringify({ token: data.token }));
+            updateUI(data.clicks_remaining, data.expiry, data.support_id);
+            showApp();
+        } else document.getElementById("loginStatus").innerText = data.error;
+    } catch(e) { document.getElementById("loginStatus").innerText = "Ryšio klaida. Rašykite: mathexa.dev@gmail.com"; }
 }
 
 async function signup() {
@@ -57,20 +59,24 @@ async function signup() {
 async function redeem() {
     const code = document.getElementById("subCode").value;
     const s = JSON.parse(localStorage.getItem('mathexa_session'));
-    if(!code) return;
-    document.getElementById("subStatus").innerText = "Tikrinama...";
-    document.getElementById("subStatus").style.color = "white";
-
-    const res = await fetch(API, { method:"POST", body: JSON.stringify({ action:"redeemCode", token: s.token, code })});
-    const data = await res.json();
-    
-    if(data.success) {
-        document.getElementById("subStatus").innerText = "Aktyvuota iki " + data.expiry;
-        document.getElementById("subStatus").style.color = "#80ff80";
-        updateUI("PREMIUM", data.expiry, null);
-    } else {
-        document.getElementById("subStatus").innerText = data.error;
-        document.getElementById("subStatus").style.color = "#ff8080";
+    const status = document.getElementById("subStatus");
+    if(!code || !s) return;
+    status.innerText = "Tikrinama...";
+    status.style.color = "white";
+    try {
+        const res = await fetch(API, { method:"POST", body: JSON.stringify({ action:"redeemCode", token: s.token, code })});
+        const data = await res.json();
+        if(data.success) {
+            status.innerText = "Aktyvuota iki " + data.expiry;
+            status.style.color = "#80ff80";
+            updateUI(999, data.expiry, null);
+        } else {
+            status.innerText = data.error;
+            status.style.color = "#ff8080";
+        }
+    } catch(err) {
+        status.innerText = "Ryšio klaida. Rašykite: mathexa.dev@gmail.com";
+        status.style.color = "#ff8080";
     }
 }
 
@@ -88,13 +94,12 @@ async function showApp() {
     const VIDEOS_DB = await res.json();
     const grid = document.getElementById("videos"), fragment = document.createDocumentFragment();
     grid.innerHTML = "";
-    
     VIDEOS_DB.forEach(v => {
         const div = document.createElement("div");
         div.className = "video-card";
         div.innerHTML = `<div class="v-meta">${v.platform} • ${v.category}</div><h3>${v.title}</h3><div class="v-footer"><span class="v-tag">Video</span><span class="v-dur">⏱ ${formatTime(v.length)}</span></div>`;
         div.onclick = async () => {
-            const h = div.innerHTML; div.innerHTML = "<h3>Prašome palaukti...</h3>";
+            const h = div.innerHTML; div.innerHTML = "<h3>Kraunama...</h3>";
             const s = JSON.parse(localStorage.getItem('mathexa_session'));
             const r = await fetch(API, { method:"POST", body: JSON.stringify({ action:"watch", token: s.token })});
             const d = await r.json();
@@ -117,7 +122,9 @@ function back() { show("landing"); }
 async function checkSession() {
     let s = JSON.parse(localStorage.getItem('mathexa_session'));
     if(!s) return;
-    const res = await fetch(API, { method:"POST", body: JSON.stringify({ action:"validateToken", token: s.token }) });
-    const data = await res.json();
-    if(data.success) { updateUI(data.clicks_remaining, data.expiry, data.support_id); showApp(); }
+    try {
+        const res = await fetch(API, { method:"POST", body: JSON.stringify({ action:"validateToken", token: s.token }) });
+        const data = await res.json();
+        if(data.success) { updateUI(data.clicks_remaining, data.expiry, data.support_id); showApp(); }
+    } catch(e) { localStorage.clear(); }
 }
