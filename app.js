@@ -1,7 +1,6 @@
 const API = "https://script.google.com/macros/s/AKfycbz69pxvZ942vatBifEhS34_EDxkg-j62WKfIQKdiHnrNrSMLC_2f7O9K7NBIm6ZlQEOAg/exec";
 let VIDEOS_DB = [];
 
-// iOS Detection
 const isIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -33,7 +32,6 @@ async function checkSession() {
         const res = await fetch(API, { method:"POST", body: JSON.stringify({ action:"validateToken", token: s.token }) });
         const data = await res.json();
         if(data.success) { updateUI(data.clicks_remaining, data.expiry, data.support_id); showApp(); }
-        else { localStorage.clear(); }
     } catch(e) {}
 }
 
@@ -56,25 +54,18 @@ async function signup() {
     const p2 = document.getElementById("password2").value;
     const p3 = document.getElementById("password3").value;
     if(p2.length < 8 || p2 !== p3) return;
-    const data = {
-        action: "signup",
-        full_name: document.getElementById("name").value,
-        email: document.getElementById("email2").value,
-        password: p2,
-        phone: document.getElementById("prefix").value + document.getElementById("phone").value,
-        role: document.getElementById("role").value
-    };
+    const data = { action: "signup", full_name: document.getElementById("name").value, email: document.getElementById("email2").value, password: p2, phone: document.getElementById("prefix").value + document.getElementById("phone").value, role: document.getElementById("role").value };
     const res = await fetch(API, { method:"POST", body: JSON.stringify(data)});
     const resData = await res.json();
-    if(resData.success) { alert("Paskyra sukurta! Prisijunkite."); show("login"); }
+    if(resData.success) { alert("Paskyra sukurta!"); show("login"); }
     else alert(resData.error);
 }
 
 function updateUI(c, e, id) {
     const isP = e && new Date(e) > new Date();
-    const txt = isP ? "PREMIUM" : "Liko: " + c;
-    document.getElementById("headerClicks").innerText = txt;
-    document.getElementById("clicksInfo").innerText = "Liko peržiūrų: " + txt;
+    const val = isP ? "PREMIUM" : c;
+    document.getElementById("headerClicks").innerText = isP ? "PREMIUM" : "Liko: " + c;
+    document.getElementById("clicksInfo").innerText = val; // Big number in settings
     if(id) document.getElementById("supportIdView").innerText = "ID: " + id;
 }
 
@@ -87,30 +78,18 @@ async function showApp() {
     VIDEOS_DB.forEach(v => {
         const div = document.createElement("div");
         div.className = "video-card";
-        // UI Update: Added Meta Data
-        div.innerHTML = `
-            <div style="font-size:10px; opacity:0.6;">${v.platform} | ${v.language || 'LT'}</div>
-            <h3>${v.title}</h3>
-            <p>${v.category}</p>
-        `;
+        div.innerHTML = `<div class="v-meta">${v.platform} • ${v.language || 'LT'}</div><h3>${v.title}</h3><p>${v.category}</p>`;
         div.onclick = async () => {
-            // Feedback UI
-            const originalHTML = div.innerHTML;
-            div.innerHTML = "<h3>Prašome palaukti...</h3><p>Jungiamasi prie serverio</p>";
-            
+            const old = div.innerHTML;
+            div.innerHTML = "<h3>Kraunama...</h3><p>Susisiekiama su serveriu</p>";
             const s = JSON.parse(localStorage.getItem('mathexa_session'));
             const r = await fetch(API, { method:"POST", body: JSON.stringify({ action:"watch", token: s.token })});
             const d = await r.json();
-            
-            div.innerHTML = originalHTML; // Reset UI
-            
+            div.innerHTML = old;
             if(d.allowed) {
                 updateUI(d.remaining, null, null);
-                if(isIOS()) {
-                    window.location.href = v.url; // iOS Workaround
-                } else {
-                    window.open(v.url, "_blank");
-                }
+                if(isIOS()) window.location.href = v.url;
+                else window.open(v.url, "_blank");
             } else alert(d.error);
         };
         grid.appendChild(div);
