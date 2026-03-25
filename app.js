@@ -10,7 +10,12 @@ function formatTime(s) {
 
 document.addEventListener("DOMContentLoaded", () => {
     const pref = document.getElementById("prefix");
-    ["+370","+371","+372","+44","+49"].forEach(c => { const o = document.createElement("option"); o.value = c; o.innerText = c; pref.appendChild(o); });
+    ["+370","+371","+372","+44","+49"].forEach(c => { 
+        const o = document.createElement("option"); 
+        o.value = c; 
+        o.innerText = c; 
+        pref.appendChild(o); 
+    });
     
     document.getElementById("btnLogin").onclick = () => show("login");
     document.getElementById("btnSignup").onclick = () => show("signup");
@@ -50,7 +55,14 @@ async function login() {
 async function signup() {
     const p2 = document.getElementById("password2").value, p3 = document.getElementById("password3").value;
     if(p2.length < 8 || p2 !== p3) return;
-    const data = { action: "signup", full_name: document.getElementById("name").value, email: document.getElementById("email2").value, password: p2, phone: document.getElementById("prefix").value + document.getElementById("phone").value, role: document.getElementById("role").value };
+    const data = { 
+        action: "signup", 
+        full_name: document.getElementById("name").value, 
+        email: document.getElementById("email2").value, 
+        password: p2, 
+        phone: document.getElementById("prefix").value + document.getElementById("phone").value, 
+        role: document.getElementById("role").value 
+    };
     const res = await fetch(API, { method:"POST", body: JSON.stringify(data)});
     const resData = await res.json();
     if(resData.success) { alert("Sukurta! Prisijunkite."); show("login"); } else alert(resData.error);
@@ -90,41 +102,72 @@ function updateUI(c, e, id) {
 
 async function showApp() {
     show("app");
-    const res = await fetch('videos.json');
-    const VIDEOS_DB = await res.json();
-    const grid = document.getElementById("videos"), fragment = document.createDocumentFragment();
-    grid.innerHTML = "";
-    VIDEOS_DB.forEach(v => {
-        const div = document.createElement("div");
-        div.className = "video-card";
-        div.innerHTML = `<div class="v-meta">${v.platform} • ${v.category}</div><h3>${v.title}</h3><div class="v-footer"><span class="v-tag">Video</span><span class="v-dur">⏱ ${formatTime(v.length)}</span></div>`;
-        div.onclick = async () => {
-            const h = div.innerHTML; div.innerHTML = "<h3>Kraunama...</h3>";
-            const s = JSON.parse(localStorage.getItem('mathexa_session'));
-            const r = await fetch(API, { method:"POST", body: JSON.stringify({ action:"watch", token: s.token })});
-            const d = await r.json();
-            div.innerHTML = h;
-            if(d.allowed) {
-                updateUI(d.remaining, null, null);
-                if(isIOS()) window.location.href = v.url; else window.open(v.url, "_blank");
-            } else alert(d.error);
+    const grid = document.getElementById("videos");
+    const searchInput = document.getElementById("searchInput");
+    
+    try {
+        const res = await fetch('videos.json');
+        const VIDEOS_DB = await res.json();
+
+        // Helper function to draw cards
+        const render = (list) => {
+            grid.innerHTML = "";
+            const fragment = document.createDocumentFragment();
+            list.forEach(v => {
+                const div = document.createElement("div");
+                div.className = "video-card";
+                div.innerHTML = `<div class="v-meta">${v.platform} • ${v.category}</div><h3>${v.title}</h3><div class="v-footer"><span class="v-tag">Video</span><span class="v-dur">⏱ ${formatTime(v.length)}</span></div>`;
+                
+                div.onclick = async () => {
+                    const h = div.innerHTML; div.innerHTML = "<h3>Kraunama...</h3>";
+                    const s = JSON.parse(localStorage.getItem('mathexa_session'));
+                    const r = await fetch(API, { method:"POST", body: JSON.stringify({ action:"watch", token: s.token })});
+                    const d = await r.json();
+                    div.innerHTML = h;
+                    if(d.allowed) {
+                        updateUI(d.remaining, null, null);
+                        if(isIOS()) window.location.href = v.url; else window.open(v.url, "_blank");
+                    } else alert(d.error);
+                };
+                fragment.appendChild(div);
+            });
+            grid.appendChild(fragment);
         };
-        fragment.appendChild(div);
-    });
-    grid.appendChild(fragment);
+
+        // Initial render of all videos
+        render(VIDEOS_DB);
+
+        // Filter event
+        searchInput.oninput = () => {
+            const query = searchInput.value.toLowerCase();
+            const filtered = VIDEOS_DB.filter(v => 
+                v.title.toLowerCase().includes(query) || 
+                v.category.toLowerCase().includes(query)
+            );
+            render(filtered);
+        };
+
+    } catch (err) {
+        grid.innerHTML = "<p>Nepavyko užkrauti video sąrašo.</p>";
+    }
 }
 
 function show(id) {
     ["landing","login","signup","app","settings"].forEach(div => document.getElementById(div).classList.add("hidden"));
     document.getElementById(id).classList.remove("hidden");
 }
+
 function back() { show("landing"); }
+
 async function checkSession() {
     let s = JSON.parse(localStorage.getItem('mathexa_session'));
     if(!s) return;
     try {
         const res = await fetch(API, { method:"POST", body: JSON.stringify({ action:"validateToken", token: s.token }) });
         const data = await res.json();
-        if(data.success) { updateUI(data.clicks_remaining, data.expiry, data.support_id); showApp(); }
+        if(data.success) { 
+            updateUI(data.clicks_remaining, data.expiry, data.support_id); 
+            showApp(); 
+        }
     } catch(e) { localStorage.clear(); }
 }
