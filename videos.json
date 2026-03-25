@@ -1,8 +1,8 @@
 [
-  { "id":"1","title":"Algebra Basics 1","category":"algebra","url":"https://youtube.com","platform":"YouTube","length":300 },
-  { "id":"2","title":"Algebra Basics 2","category":"algebra","url":"https://youtube.com","platform":"YouTube","length":420 },
-  { "id":"3","title":"Algebra Basics 3","category":"algebra","url":"https://youtube.com","platform":"YouTube","length":360 },
-  { "id":"4","title":"Algebra Basics 4","category":"algebra","url":"https://youtube.com","platform":"YouTube","length":280 },
+  { "id":"1","title":"Algebros pagrindai 1: Trupmeniniai reiškiniai (Apibrėžimo sritis)","category":"algebra","url":"https://www.youtube.com/watch?v=WT84iXucQgI","platform":"YouTube","length":1290 },
+  { "id":"2","title":"Algebros pagrindai 2: Trupmenų prastinimas","category":"algebra","url":"https://www.youtube.com/watch?v=fNk_zzaMoSs","platform":"YouTube","length":1452 },
+  { "id":"3","title":"Algebros pagrindai 3: Sudėtis ir atimtis","category":"algebra","url":"https://www.youtube.com/watch?v=fNk_zzaMoSs","platform":"YouTube","length":1594 },
+  { "id":"4","title":"Algebros pagrindai 4: Lygčių sistemos (Sudėties būdas)","category":"algebra","url":"https://www.youtube.com/watch?v=fNk_zzaMoSs","platform":"YouTube","length":740 },
   { "id":"5","title":"Algebra Basics 5","category":"algebra","url":"https://youtube.com","platform":"YouTube","length":500 },
   { "id":"6","title":"Geometry Intro 1","category":"geometry","url":"https://youtube.com","platform":"YouTube","length":310 },
   { "id":"7","title":"Geometry Intro 2","category":"geometry","url":"https://youtube.com","platform":"YouTube","length":290 },
