@@ -2,18 +2,11 @@
 <html lang="lt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mathexa 2026</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="globalLoader" class="loading-overlay hidden">
-        <div class="loader-content">
-            <div class="spinner"></div>
-            <p>Kreipiamasi į serverį...<br><span style="font-size:12px; opacity:0.7;">Prašome palaukti</span></p>
-        </div>
-    </div>
-
     <div id="landing" class="center">
         <h1>Mathexa</h1>
         <button id="btnLogin">Prisijungti</button>
@@ -54,7 +47,7 @@
         <div class="topbar">
             <div class="logo">Mathexa</div>
             <div class="actions">
-                <span id="headerClicks" class="click-badge">--</span>
+                <span id="headerClicks">--</span>
                 <button id="settingsBtn">⚙</button>
             </div>
         </div>
@@ -64,7 +57,17 @@
     <div id="settings" class="center hidden">
         <h2>Nustatymai</h2>
         <div id="supportIdView">ID: Kraunama...</div>
-        <h3 id="clicksInfo">Liko: --</h3>
+        
+        <div style="text-align: center; margin: 15px 0;">
+            <div style="font-size: 11px; opacity: 0.6; letter-spacing: 1px;">LIKUSIOS PERŽIŪROS</div>
+            <h3 id="clicksInfo">--</h3>
+        </div>
+
+        <div class="sub-area">
+            <input id="subCode" placeholder="Kodas (pvz. Aa2026Gf)">
+            <button id="btnRedeem">Aktyvuoti</button>
+            <div id="subStatus"></div>
+        </div>
         <label class="check-container"><input type="checkbox" id="stayLoginSettings"> Likti prisijungus</label>
         <button id="logoutBtn" style="background:#ff4d4d; margin-top:20px;">Atsijungti</button>
         <button id="closeSettings">Grįžti</button>
