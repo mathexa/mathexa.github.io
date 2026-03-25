@@ -2,7 +2,7 @@
 <html lang="lt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mathexa 2026</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -38,7 +38,7 @@
             <input id="password2" type="password" placeholder="Slaptažodis">
             <input id="password3" type="password" placeholder="Pakartokite slaptažodį">
         </div>
-        <div id="signupStatus" class="status-msg"></div>
+        <div id="signupStatus" class="status-msg">Bent 8 simboliai</div>
         <button id="signupBtn">Sukurti</button>
         <button onclick="back()">Atgal</button>
     </div>
@@ -58,8 +58,8 @@
         <h2>Nustatymai</h2>
         <div id="supportIdView">ID: Kraunama...</div>
         
-        <div style="text-align: center; margin: 15px 0;">
-            <div style="font-size: 11px; opacity: 0.6; letter-spacing: 1px;">LIKUSIOS PERŽIŪROS</div>
+        <div class="clicks-container">
+            <div class="clicks-label">LIKUSIOS PERŽIŪROS</div>
             <h3 id="clicksInfo">--</h3>
         </div>
 
@@ -68,6 +68,7 @@
             <button id="btnRedeem">Aktyvuoti</button>
             <div id="subStatus"></div>
         </div>
+        
         <label class="check-container"><input type="checkbox" id="stayLoginSettings"> Likti prisijungus</label>
         <button id="logoutBtn" style="background:#ff4d4d; margin-top:20px;">Atsijungti</button>
         <button id="closeSettings">Grįžti</button>
