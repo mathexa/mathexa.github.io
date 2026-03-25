@@ -1,21 +1,17 @@
-const API = "https://script.google.com/macros/s/AKfycbye2gT0gCj3DeCplIDAFB-JZE0DYDUIE3fejyYtHwApo6Us7jf_1LqRhhu5JyeHOyd8Rg/exec";
-let VIDEOS_DB = [];
+const API = "https://script.google.com/macros/s/AKfycbw7eCh8QNIBc1p_mKwb4GZTwiLdgyDJJyUa6i3h6Wnel0mz_ybQb3IQX2lbDBHrpkp7EQ/exec";
 
 const isIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
-document.addEventListener("DOMContentLoaded", () => {
-    loadPrefixes();
-    bindEvents();
-    checkSession();
-});
-
-function loadPrefixes() {
-    const pref = document.getElementById("prefix");
-    const codes = ["+370","+371","+372","+44","+49","+33"];
-    codes.forEach(c => { const o = document.createElement("option"); o.value = c; o.innerText = c; pref.appendChild(o); });
+function formatTime(s) {
+    const min = Math.floor(s / 60);
+    const sec = Math.floor(s % 60);
+    return `${min}:${sec.toString().padStart(2, '0')}`;
 }
 
-function bindEvents() {
+document.addEventListener("DOMContentLoaded", () => {
+    const pref = document.getElementById("prefix");
+    ["+370","+371","+372","+44","+49"].forEach(c => { const o = document.createElement("option"); o.value = c; o.innerText = c; pref.appendChild(o); });
+    
     document.getElementById("btnLogin").onclick = () => show("login");
     document.getElementById("btnSignup").onclick = () => show("signup");
     document.getElementById("loginBtn").onclick = login;
@@ -25,23 +21,19 @@ function bindEvents() {
     document.getElementById("closeSettings").onclick = () => show("app");
     document.getElementById("logoutBtn").onclick = () => { localStorage.clear(); location.reload(); };
 
-    // Real-time Password Feedback
-    const p2 = document.getElementById("password2");
-    const p3 = document.getElementById("password3");
-    const fb = document.getElementById("signupStatus");
-
-    const validate = () => {
+    const p2 = document.getElementById("password2"), p3 = document.getElementById("password3"), fb = document.getElementById("signupStatus");
+    const valPass = () => {
         if (p2.value.length < 8) { fb.innerText = "Bent 8 simboliai"; fb.style.color = "#ff8080"; }
-        else if (p2.value !== p3.value && p3.value !== "") { fb.innerText = "Slaptažodžiai nesutampa"; fb.style.color = "#ff8080"; }
-        else if (p2.value === p3.value && p2.value !== "") { fb.innerText = "Sutampa ir tinka"; fb.style.color = "#80ff80"; }
+        else if (p3.value && p2.value !== p3.value) { fb.innerText = "Slaptažodžiai nesutampa"; fb.style.color = "#ff8080"; }
+        else if (p2.value === p3.value) { fb.innerText = "Sutampa ir tinka"; fb.style.color = "#80ff80"; }
     };
-    p2.oninput = validate;
-    p3.oninput = validate;
-}
+    p2.oninput = valPass; p3.oninput = valPass;
+
+    checkSession();
+});
 
 async function login() {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+    const email = document.getElementById("email").value, password = document.getElementById("password").value;
     if(!email || !password) return;
     document.getElementById("loginStatus").innerText = "Jungiamasi...";
     const res = await fetch(API, { method:"POST", body: JSON.stringify({ action:"login", email, password })});
@@ -54,8 +46,7 @@ async function login() {
 }
 
 async function signup() {
-    const p2 = document.getElementById("password2").value;
-    const p3 = document.getElementById("password3").value;
+    const p2 = document.getElementById("password2").value, p3 = document.getElementById("password3").value;
     if(p2.length < 8 || p2 !== p3) return;
     const data = { action: "signup", full_name: document.getElementById("name").value, email: document.getElementById("email2").value, password: p2, phone: document.getElementById("prefix").value + document.getElementById("phone").value, role: document.getElementById("role").value };
     const res = await fetch(API, { method:"POST", body: JSON.stringify(data)});
@@ -64,22 +55,20 @@ async function signup() {
 }
 
 async function redeem() {
-    const code = document.getElementById("subCode").value;
-    const s = JSON.parse(localStorage.getItem('mathexa_session'));
+    const code = document.getElementById("subCode").value, s = JSON.parse(localStorage.getItem('mathexa_session'));
     document.getElementById("subStatus").innerText = "Tikrinama...";
     const res = await fetch(API, { method:"POST", body: JSON.stringify({ action:"redeemCode", token: s.token, code })});
     const data = await res.json();
     if(data.success) {
         document.getElementById("subStatus").innerText = "Aktyvuota iki " + data.expiry;
-        document.getElementById("subStatus").style.color = "#80ff80";
         updateUI(999, data.expiry, null);
-    } else { document.getElementById("subStatus").innerText = data.error; document.getElementById("subStatus").style.color = "#ff8080"; }
+    } else document.getElementById("subStatus").innerText = data.error;
 }
 
 function updateUI(c, e, id) {
     const isP = e && new Date(e) > new Date();
-    const val = isP ? "PREMIUM" : "Liko: " + c;
-    document.getElementById("headerClicks").innerText = val;
+    const txt = isP ? "PREMIUM" : "Liko: " + c;
+    document.getElementById("headerClicks").innerText = txt;
     document.getElementById("clicksInfo").innerText = isP ? "PREMIUM" : c;
     if(id) document.getElementById("supportIdView").innerText = "ID: " + id;
 }
@@ -87,16 +76,16 @@ function updateUI(c, e, id) {
 async function showApp() {
     show("app");
     const res = await fetch('videos.json');
-    VIDEOS_DB = await res.json();
-    const grid = document.getElementById("videos");
+    const VIDEOS_DB = await res.json();
+    const grid = document.getElementById("videos"), fragment = document.createDocumentFragment();
     grid.innerHTML = "";
+    
     VIDEOS_DB.forEach(v => {
         const div = document.createElement("div");
         div.className = "video-card";
-        div.innerHTML = `<div class="v-meta">${v.platform} • ${v.language || 'LT'}</div><h3>${v.title}</h3><div class="v-tag">${v.category}</div>`;
+        div.innerHTML = `<div class="v-meta">${v.platform} • ${v.category}</div><h3>${v.title}</h3><div class="v-footer"><span class="v-tag">Video</span><span class="v-dur">⏱ ${formatTime(v.length)}</span></div>`;
         div.onclick = async () => {
-            const h = div.innerHTML;
-            div.innerHTML = "<h3>Prašome palaukti...</h3><p>Jungiamasi prie serverio</p>";
+            const h = div.innerHTML; div.innerHTML = "<h3>Prašome palaukti...</h3>";
             const s = JSON.parse(localStorage.getItem('mathexa_session'));
             const r = await fetch(API, { method:"POST", body: JSON.stringify({ action:"watch", token: s.token })});
             const d = await r.json();
@@ -106,8 +95,9 @@ async function showApp() {
                 if(isIOS()) window.location.href = v.url; else window.open(v.url, "_blank");
             } else alert(d.error);
         };
-        grid.appendChild(div);
+        fragment.appendChild(div);
     });
+    grid.appendChild(fragment);
 }
 
 function show(id) {
