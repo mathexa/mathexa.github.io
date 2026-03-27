@@ -7,6 +7,17 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div id="vImpNotif" class="notif-overlay hidden">
+        <div class="notif-box">
+            <button class="notif-close" onclick="closeNotif('vImpNotif')">✖</button>
+            <p id="vImpText"></p>
+        </div>
+    </div>
+    <div id="nImpNotif" class="notif-banner hidden">
+        <button class="notif-close-small" onclick="closeNotif('nImpNotif')">✖</button>
+        <p id="nImpText"></p>
+    </div>
+
     <div id="landing" class="center">
         <h1>Mathexa</h1>
         <button id="btnLogin">Prisijungti</button>
@@ -38,6 +49,9 @@
             <input id="password2" type="password" placeholder="Slaptažodis">
             <input id="password3" type="password" placeholder="Pakartokite slaptažodį">
         </div>
+        <div class="legal-text">
+            Kurdami paskyrą sutinkate su mūsų <a href="policy.txt" target="_blank">duomenų valdymo politika</a>, <a href="policy.txt" target="_blank">privatumo politika</a> ir <a href="policy.txt" target="_blank">naudojimo sąlygomis</a>.
+        </div>
         <div id="signupStatus" class="status-msg">Minimalus ilgis 8 simb.</div>
         <button id="signupBtn">Sukurti</button>
         <button onclick="back()">Atgal</button>
@@ -52,10 +66,15 @@
             </div>
         </div>
         
-        <div style="padding: 15px 25px 0 25px; display: flex; justify-content: center;">
+        <div style="padding: 15px 25px 0 25px; display: flex; justify-content: center; gap: 10px;">
             <input id="searchInput" placeholder="Ieškoti pamokos arba temos..." 
-                   style="width: 100%; max-width: 600px; background: rgba(255,255,255,0.05); 
+                   style="width: 100%; max-width: 500px; background: rgba(255,255,255,0.05); 
                           border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 12px;">
+            <select id="langFilter" style="width: 80px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 12px; outline: none;">
+                <option value="all" style="color: black;">Visi</option>
+                <option value="lt" style="color: black;">LT</option>
+                <option value="en" style="color: black;">EN</option>
+            </select>
         </div>
 
         <div id="videos" class="video-grid"></div>
@@ -73,7 +92,9 @@
             <button id="btnRedeem">Aktyvuoti</button>
             <div id="subStatus" class="status-msg"></div>
         </div>
-        <button id="logoutBtn" style="background:#ff4d4d; margin-top:20px;">Atsijungti</button>
+        
+        <button id="bugReportBtn" style="background:#ff9900; margin-top:20px;" onclick="window.open('https://forms.gle/sbs9DZoE7dyKpPhb7', '_blank')">Pranešti apie klaidą</button>
+        <button id="logoutBtn" style="background:#ff4d4d; margin-top:10px;">Atsijungti</button>
         <button id="closeSettings">Grįžti</button>
     </div>
 
