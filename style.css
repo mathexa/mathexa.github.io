@@ -21,3 +21,16 @@ button:hover { opacity: 0.85; transform: scale(1.02); }
 .v-dur { font-size: 11px; opacity: 0.7; }
 .status-msg { font-size: 12px; text-align: center; width: 230px; min-height: 18px; }
 .sub-area { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; gap: 10px; }
+
+/* Notifications & Legal Text */
+.notif-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 9999; display: flex; justify-content: center; align-items: center; }
+.notif-box { background: #1e3c72; padding: 30px; border-radius: 15px; border: 2px solid #4da3ff; width: 80%; max-width: 400px; text-align: center; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+.notif-close { position: absolute; top: 10px; right: 10px; background: transparent; border: none; color: white; width: auto; padding: 5px 10px; font-size: 18px; }
+.notif-close:hover { transform: scale(1.1); color: #ff4d4d; }
+
+.notif-banner { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(30, 60, 114, 0.95); padding: 15px 40px 15px 20px; border-radius: 10px; border: 1px solid #4da3ff; z-index: 9998; box-shadow: 0 5px 15px rgba(0,0,0,0.3); width: 80%; max-width: 400px; text-align: center; }
+.notif-close-small { position: absolute; top: 5px; right: 5px; background: transparent; border: none; color: white; width: auto; padding: 2px 8px; font-size: 14px; }
+
+.legal-text { font-size: 11px; text-align: center; width: 230px; opacity: 0.9; margin: -5px 0 5px 0; line-height: 1.4; }
+.legal-text a { color: #80ff80; text-decoration: none; font-weight: bold; }
+.legal-text a:hover { text-decoration: underline; }
