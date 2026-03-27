@@ -1,6 +1,8 @@
-const API = "https://script.google.com/macros/s/AKfycbxFdfhpSSGl5T5nsv8-tjkzGHHy01d72lNudier_e6VXKlTH5-47HNBPxzDzenWGmBWXw/exec";
+const API = "https://script.google.com/macros/s/AKfycbw7q5J9G9k3HLTspf8E7orT84PG_Gzm8uixBRomSrNVLBZZxacXCscLxdAUjjy6f7EoSA/exec";
 
 const isIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+let notificationsDB = [];
 
 function formatTime(s) {
     const min = Math.floor(s / 60);
@@ -11,10 +13,7 @@ function formatTime(s) {
 document.addEventListener("DOMContentLoaded", () => {
     const pref = document.getElementById("prefix");
     ["+370","+371","+372","+44","+49"].forEach(c => { 
-        const o = document.createElement("option"); 
-        o.value = c; 
-        o.innerText = c; 
-        pref.appendChild(o); 
+        const o = document.createElement("option"); o.value = c; o.innerText = c; pref.appendChild(o); 
     });
     
     document.getElementById("btnLogin").onclick = () => show("login");
@@ -34,8 +33,44 @@ document.addEventListener("DOMContentLoaded", () => {
     };
     p2.oninput = valPass; p3.oninput = valPass;
 
+    fetchNotifications();
     checkSession();
 });
+
+async function fetchNotifications() {
+    try {
+        const res = await fetch(API, { method:"POST", body: JSON.stringify({ action:"getNotifications" }) });
+        const data = await res.json();
+        if(data.notifications) notificationsDB = data.notifications;
+    } catch(e) {}
+}
+
+function displayNotif(loc) {
+    document.getElementById('vImpNotif').classList.add('hidden');
+    document.getElementById('nImpNotif').classList.add('hidden');
+    
+    const notif = notificationsDB.find(n => n.location === loc);
+    if(!notif) return;
+
+    if(notif.importance === "v.imp") {
+        document.getElementById('vImpText').innerText = notif.message;
+        document.getElementById('vImpNotif').classList.remove('hidden');
+    } else if(notif.importance === "n.imp") {
+        document.getElementById('nImpText').innerText = notif.message;
+        document.getElementById('nImpNotif').classList.remove('hidden');
+    }
+}
+
+function show(id) {
+    ["landing","login","signup","app","settings"].forEach(div => document.getElementById(div).classList.add("hidden"));
+    document.getElementById(id).classList.remove("hidden");
+    
+    const locMap = { "login": "log.in", "signup": "sign.up", "app": "m.s", "settings": "s" };
+    if(locMap[id]) displayNotif(locMap[id]);
+}
+
+function closeNotif(id) { document.getElementById(id).classList.add('hidden'); }
+function back() { show("landing"); }
 
 async function login() {
     const email = document.getElementById("email").value, password = document.getElementById("password").value;
@@ -104,12 +139,12 @@ async function showApp() {
     show("app");
     const grid = document.getElementById("videos");
     const searchInput = document.getElementById("searchInput");
+    const langFilter = document.getElementById("langFilter");
     
     try {
         const res = await fetch('videos.json');
         const VIDEOS_DB = await res.json();
 
-        // Helper function to draw cards
         const render = (list) => {
             grid.innerHTML = "";
             const fragment = document.createDocumentFragment();
@@ -134,30 +169,25 @@ async function showApp() {
             grid.appendChild(fragment);
         };
 
-        // Initial render of all videos
         render(VIDEOS_DB);
 
-        // Filter event
-        searchInput.oninput = () => {
+        const filterLogic = () => {
             const query = searchInput.value.toLowerCase();
+            const lang = langFilter.value;
             const filtered = VIDEOS_DB.filter(v => 
-                v.title.toLowerCase().includes(query) || 
-                v.category.toLowerCase().includes(query)
+                (v.title.toLowerCase().includes(query) || v.category.toLowerCase().includes(query)) &&
+                (lang === "all" || v.language === lang)
             );
             render(filtered);
         };
+
+        searchInput.oninput = filterLogic;
+        langFilter.onchange = filterLogic;
 
     } catch (err) {
         grid.innerHTML = "<p>Nepavyko užkrauti video sąrašo.</p>";
     }
 }
-
-function show(id) {
-    ["landing","login","signup","app","settings"].forEach(div => document.getElementById(div).classList.add("hidden"));
-    document.getElementById(id).classList.remove("hidden");
-}
-
-function back() { show("landing"); }
 
 async function checkSession() {
     let s = JSON.parse(localStorage.getItem('mathexa_session'));
