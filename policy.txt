@@ -1,5 +1,60 @@
-PRIVACY POLICY
-DATA MANAGEMENT POLICY
-TERMS OF USE
+1. PRIVATUMO POLITIKA
 
-[hi]
+Ši privatumo politika apibrėžia, kokie asmens duomenys yra renkami ir kaip jie yra naudojami šioje svetainėje.
+
+Svetainė renka šiuos duomenis: vardą, el. pašto adresą, slaptažodį (saugoma užšifruota forma), vartotojo identifikacinį numerį (support ID), paskutinio prisijungimo laiką, nesėkmingų prisijungimų skaičių, paskyros būseną, panaudotą aktyvavimo kodą, likusių paspaudimų skaičių, paskyros sukūrimo datą, prenumeratos galiojimo laiką ir vartotojo rolę.
+
+Duomenys renkami siekiant:
+
+užtikrinti vartotojų autentifikaciją,
+valdyti paskyras,
+užtikrinti sistemos saugumą,
+teikti paslaugas (vaizdo turinio prieigą),
+administruoti prenumeratas.
+
+Duomenys saugomi naudojant trečiųjų šalių paslaugas, tokias kaip Google (Google Sheets) ir svetainės talpinimo platformą GitHub (GitHub Pages). Todėl taip pat taikomos šių paslaugų teikėjų privatumo politikos.
+
+Duomenys saugomi tol, kol vartotojo paskyra yra aktyvi arba tiek, kiek būtina paslaugų teikimui.
+
+Vartotojai turi teisę:
+
+susipažinti su savo duomenimis,
+reikalauti juos ištaisyti ar ištrinti,
+apriboti duomenų tvarkymą.
+2. DUOMENŲ TVARKYMO POLITIKA
+
+Duomenų tvarkymo politika nustato, kaip surinkti duomenys yra saugomi, apsaugomi ir valdomi.
+
+Visi duomenys yra saugomi privačioje duomenų saugykloje (Google Sheets), prie kurios prieiga yra ribojama ir suteikiama tik autorizuotiems asmenims.
+
+Taikomos šios saugumo priemonės:
+
+slaptažodžių šifravimas,
+prieigos kontrolė,
+prisijungimų stebėjimas (įskaitant nesėkmingus bandymus),
+paskyros būsenos valdymas.
+
+Duomenys nėra perduodami tretiesiems asmenims, išskyrus atvejus, kai tai būtina techniniam paslaugos veikimui (pvz., naudojant Google ar GitHub infrastruktūrą).
+
+Duomenys gali būti saugomi tol, kol paskyra yra aktyvi, o pasibaigus jos galiojimui – pašalinami per pagrįstą laikotarpį.
+
+3. NAUDOJIMO SĄLYGOS
+
+Naudodamiesi šia svetaine, vartotojai sutinka su šiomis sąlygomis.
+
+Svetainė skirta mokiniams ir mokytojams, taip pat gali būti prieinama viešai, tačiau naudojama edukaciniais tikslais, įskaitant veiklą su Junior Achievement organizacija.
+
+Vartotojas įsipareigoja:
+
+pateikti teisingą informaciją registracijos metu,
+saugoti savo prisijungimo duomenis,
+nenaudoti svetainės neteisėtiems veiksmams,
+nebandyti apeiti sistemos apribojimų (pvz., paspaudimų limitų ar prenumeratos ribojimų).
+
+Administracija pasilieka teisę:
+
+sustabdyti arba panaikinti paskyras,
+apriboti prieigą prie sistemos,
+keisti funkcionalumą be išankstinio įspėjimo.
+
+Svetainė pateikiama „tokia, kokia yra“, ir jos kūrėjai neprisiima atsakomybės už galimus veikimo sutrikimus ar duomenų praradimą.
