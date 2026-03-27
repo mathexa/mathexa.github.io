@@ -1,4 +1,4 @@
-const API = "https://script.google.com/macros/s/AKfycbw7q5J9G9k3HLTspf8E7orT84PG_Gzm8uixBRomSrNVLBZZxacXCscLxdAUjjy6f7EoSA/exec";
+const API = "https://script.google.com/macros/s/AKfycbyoy2rodLYK_SKIP92ON32rRZl3ignaZBbYVbbo0El2J0wyVPSjXIwj3IOfg87VTPiS8g/exec";
 
 const isIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
@@ -11,11 +11,6 @@ function formatTime(s) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    const pref = document.getElementById("prefix");
-    ["+370","+371","+372","+44","+49"].forEach(c => { 
-        const o = document.createElement("option"); o.value = c; o.innerText = c; pref.appendChild(o); 
-    });
-    
     document.getElementById("btnLogin").onclick = () => show("login");
     document.getElementById("btnSignup").onclick = () => show("signup");
     document.getElementById("loginBtn").onclick = login;
@@ -31,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
         else if (p3.value && p2.value !== p3.value) { fb.innerText = "Slaptažodžiai nesutampa"; fb.style.color = "#ff8080"; }
         else if (p2.value === p3.value) { fb.innerText = "Sutampa ir tinka"; fb.style.color = "#80ff80"; }
     };
-    p2.oninput = valPass; p3.oninput = valPass;
+    if(p2) { p2.oninput = valPass; p3.oninput = valPass; }
 
     fetchNotifications();
     checkSession();
@@ -46,11 +41,16 @@ async function fetchNotifications() {
 }
 
 function displayNotif(loc) {
+    // Hidden by default
     document.getElementById('vImpNotif').classList.add('hidden');
     document.getElementById('nImpNotif').classList.add('hidden');
     
     const notif = notificationsDB.find(n => n.location === loc);
-    if(!notif) return;
+    if(!notif || !notif.message) return;
+
+    // Show-once logic: Check if this specific message was already seen
+    const seenList = JSON.parse(localStorage.getItem('seen_notifs') || "[]");
+    if (seenList.includes(notif.message)) return;
 
     if(notif.importance === "v.imp") {
         document.getElementById('vImpText').innerText = notif.message;
@@ -61,15 +61,29 @@ function displayNotif(loc) {
     }
 }
 
+function closeNotif(id) {
+    // When closed, add to seen list so it doesn't show again
+    const textElementId = id === 'vImpNotif' ? 'vImpText' : 'nImpText';
+    const msg = document.getElementById(textElementId).innerText;
+    const seenList = JSON.parse(localStorage.getItem('seen_notifs') || "[]");
+    if (!seenList.includes(msg)) {
+        seenList.push(msg);
+        localStorage.setItem('seen_notifs', JSON.stringify(seenList));
+    }
+    document.getElementById(id).classList.add('hidden');
+}
+
 function show(id) {
-    ["landing","login","signup","app","settings"].forEach(div => document.getElementById(div).classList.add("hidden"));
+    ["landing","login","signup","app","settings"].forEach(div => {
+        const el = document.getElementById(div);
+        if(el) el.classList.add("hidden");
+    });
     document.getElementById(id).classList.remove("hidden");
     
     const locMap = { "login": "log.in", "signup": "sign.up", "app": "m.s", "settings": "s" };
     if(locMap[id]) displayNotif(locMap[id]);
 }
 
-function closeNotif(id) { document.getElementById(id).classList.add('hidden'); }
 function back() { show("landing"); }
 
 async function login() {
@@ -84,7 +98,7 @@ async function login() {
             updateUI(data.clicks_remaining, data.expiry, data.support_id);
             showApp();
         } else document.getElementById("loginStatus").innerText = data.error;
-    } catch(e) { document.getElementById("loginStatus").innerText = "Ryšio klaida. Rašykite: mathexa.dev@gmail.com"; }
+    } catch(e) { document.getElementById("loginStatus").innerText = "Ryšio klaida."; }
 }
 
 async function signup() {
@@ -95,7 +109,6 @@ async function signup() {
         full_name: document.getElementById("name").value, 
         email: document.getElementById("email2").value, 
         password: p2, 
-        phone: document.getElementById("prefix").value + document.getElementById("phone").value, 
         role: document.getElementById("role").value 
     };
     const res = await fetch(API, { method:"POST", body: JSON.stringify(data)});
@@ -109,7 +122,6 @@ async function redeem() {
     const status = document.getElementById("subStatus");
     if(!code || !s) return;
     status.innerText = "Tikrinama...";
-    status.style.color = "white";
     try {
         const res = await fetch(API, { method:"POST", body: JSON.stringify({ action:"redeemCode", token: s.token, code })});
         const data = await res.json();
@@ -121,10 +133,7 @@ async function redeem() {
             status.innerText = data.error;
             status.style.color = "#ff8080";
         }
-    } catch(err) {
-        status.innerText = "Ryšio klaida. Rašykite: mathexa.dev@gmail.com";
-        status.style.color = "#ff8080";
-    }
+    } catch(err) { status.innerText = "Ryšio klaida."; }
 }
 
 function updateUI(c, e, id) {
@@ -147,46 +156,33 @@ async function showApp() {
 
         const render = (list) => {
             grid.innerHTML = "";
-            const fragment = document.createDocumentFragment();
             list.forEach(v => {
                 const div = document.createElement("div");
                 div.className = "video-card";
                 div.innerHTML = `<div class="v-meta">${v.platform} • ${v.category}</div><h3>${v.title}</h3><div class="v-footer"><span class="v-tag">Video</span><span class="v-dur">⏱ ${formatTime(v.length)}</span></div>`;
-                
                 div.onclick = async () => {
-                    const h = div.innerHTML; div.innerHTML = "<h3>Kraunama...</h3>";
                     const s = JSON.parse(localStorage.getItem('mathexa_session'));
                     const r = await fetch(API, { method:"POST", body: JSON.stringify({ action:"watch", token: s.token })});
                     const d = await r.json();
-                    div.innerHTML = h;
                     if(d.allowed) {
                         updateUI(d.remaining, null, null);
                         if(isIOS()) window.location.href = v.url; else window.open(v.url, "_blank");
                     } else alert(d.error);
                 };
-                fragment.appendChild(div);
+                grid.appendChild(div);
             });
-            grid.appendChild(fragment);
         };
 
         render(VIDEOS_DB);
-
         const filterLogic = () => {
             const query = searchInput.value.toLowerCase();
             const lang = langFilter.value;
-            const filtered = VIDEOS_DB.filter(v => 
-                (v.title.toLowerCase().includes(query) || v.category.toLowerCase().includes(query)) &&
-                (lang === "all" || v.language === lang)
-            );
+            const filtered = VIDEOS_DB.filter(v => (v.title.toLowerCase().includes(query) || v.category.toLowerCase().includes(query)) && (lang === "all" || v.language === lang));
             render(filtered);
         };
-
         searchInput.oninput = filterLogic;
         langFilter.onchange = filterLogic;
-
-    } catch (err) {
-        grid.innerHTML = "<p>Nepavyko užkrauti video sąrašo.</p>";
-    }
+    } catch (err) { grid.innerHTML = "<p>Klaida kraunant video.</p>"; }
 }
 
 async function checkSession() {
@@ -195,9 +191,6 @@ async function checkSession() {
     try {
         const res = await fetch(API, { method:"POST", body: JSON.stringify({ action:"validateToken", token: s.token }) });
         const data = await res.json();
-        if(data.success) { 
-            updateUI(data.clicks_remaining, data.expiry, data.support_id); 
-            showApp(); 
-        }
+        if(data.success) { updateUI(data.clicks_remaining, data.expiry, data.support_id); showApp(); }
     } catch(e) { localStorage.clear(); }
 }
