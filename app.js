@@ -83,7 +83,7 @@ async function login() {
 async function signup() {
     const p2 = document.getElementById("password2").value, p3 = document.getElementById("password3").value;
     if(p2.length < 8 || p2 !== p3) return;
-    const data = { action: "signup", full_name: document.getElementById("name").value, email: document.getElementById("email2").value, password: p2, role: document.getElementById("role").value };
+    const data = { action: "signup", full_name: document.getElementById("name").value, email: document.getElementById("email2").value, password: p2, role: document.getElementById("role").value };
     const res = await fetch(API, { method:"POST", body: JSON.stringify(data)});
     const resData = await res.json();
     if(resData.success) { alert("Sukurta!"); show("login"); } else alert(resData.error);
@@ -99,12 +99,10 @@ async function redeem() {
         const res = await fetch(API, { method:"POST", body: JSON.stringify({ action:"redeemCode", token: s.token, code })});
         const data = await res.json();
         if(data.success) {
-            status.innerText = "Aktyvuota iki " + data.expiry;
-            status.style.color = "#80ff80";
-            location.reload(); // Refresh to update clicks logic
+            status.innerText = "Aktyvuota!";
+            setTimeout(() => location.reload(), 1000);
         } else {
             status.innerText = data.error;
-            status.style.color = "#ff8080";
         }
     } catch(err) { status.innerText = "Klaida."; }
 }
@@ -123,14 +121,16 @@ async function showApp() {
                 div.innerHTML = `<div class="v-meta">${v.platform} • ${v.category}</div><h3>${v.title}</h3><div class="v-footer"><span class="v-tag">Video</span></div>`;
                 div.onclick = async () => {
                     document.getElementById("videoOverlay").classList.remove("hidden");
-                    const s = JSON.parse(localStorage.getItem('mathexa_session'));
-                    const r = await fetch(API, { method:"POST", body: JSON.stringify({ action:"watch", token: s.token })});
-                    const d = await r.json();
+                    try {
+                        const s = JSON.parse(localStorage.getItem('mathexa_session'));
+                        const r = await fetch(API, { method:"POST", body: JSON.stringify({ action:"watch", token: s.token })});
+                        const d = await r.json();
+                        if(d.allowed) {
+                            updateUI(d.remaining, null, null);
+                            if(isIOS()) window.location.href = v.url; else window.open(v.url, "_blank");
+                        } else alert(d.error);
+                    } catch(e) { alert("Ryšio klaida."); }
                     document.getElementById("videoOverlay").classList.add("hidden");
-                    if(d.allowed) {
-                        updateUI(d.remaining, null, null);
-                        if(isIOS()) window.location.href = v.url; else window.open(v.url, "_blank");
-                    } else alert(d.error);
                 };
                 grid.appendChild(div);
             });
@@ -146,34 +146,45 @@ async function checkSession() {
 
     if(!stay && !s) return;
     
+    // Auto-login path
     if(stay && !s && sid) {
-        document.getElementById("loadingBanner").classList.remove("hidden");
+        const banner = document.getElementById("loadingBanner");
+        banner.classList.remove("hidden");
         try {
             const res = await fetch(API, { method:"POST", body: JSON.stringify({ action:"login", support_id: sid })});
             const data = await res.json();
-            document.getElementById("loadingBanner").classList.add("hidden");
             if(data.success) {
                 localStorage.setItem('mathexa_session', JSON.stringify({ token: data.token }));
                 updateUI(data.clicks_remaining, data.expiry, data.support_id);
                 showApp();
+            } else {
+                // If ID is invalid or user banned, clear it so they can log in manually
+                localStorage.removeItem('mathexa_support');
+                show("landing");
             }
-        } catch(e) { document.getElementById("loadingBanner").classList.add("hidden"); }
+        } catch(e) {
+            console.error("Auto-login failed", e);
+            show("landing");
+        } finally {
+            banner.classList.add("hidden");
+        }
         return;
     }
 
-    if(!s) return;
-
-    if(Math.random() < 0.1) {
-        try {
-            const res = await fetch(API, { method:"POST", body: JSON.stringify({ action:"validateToken", token: s.token }) });
-            const data = await res.json();
-            if(data.success && data.banned !== "yes") { 
-                updateUI(data.clicks_remaining, data.expiry, data.support_id); 
-                showApp(); 
-            } else { localStorage.clear(); location.reload(); }
-        } catch(e) {}
-    } else {
-        showApp();
+    // Existing session path
+    if(s) {
+        if(Math.random() < 0.1) {
+            try {
+                const res = await fetch(API, { method:"POST", body: JSON.stringify({ action:"validateToken", token: s.token }) });
+                const data = await res.json();
+                if(data.success && data.banned !== "yes") { 
+                    updateUI(data.clicks_remaining, data.expiry, data.support_id); 
+                    showApp(); 
+                } else { localStorage.clear(); location.reload(); }
+            } catch(e) { showApp(); } // If check fails, let them in anyway to avoid lockouts
+        } else {
+            showApp();
+        }
     }
 }
 
