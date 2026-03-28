@@ -1,18 +1,35 @@
-/* --- Core Reset & Theme --- */
+/* =========================================
+   MATHEXA 2026 - FULL UNIFIED STYLESHEET
+   ========================================= */
+
+/* --- Root & Reset --- */
 * {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
     -webkit-tap-highlight-color: transparent;
 }
 
+:root {
+    --primary: #4da3ff;
+    --bg-dark: #0a1f44;
+    --bg-light: #1e3c72;
+    --glass: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --error: #ff4d4d;
+    --success: #80ff80;
+}
+
 body { 
-    margin: 0; 
     font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-    background: linear-gradient(135deg, #0a1f44, #1e3c72); 
+    background: linear-gradient(135deg, var(--bg-dark), var(--bg-light)); 
     color: white; 
     min-height: 100vh; 
     overflow-x: hidden; 
+    line-height: 1.6;
 }
 
+/* --- Layout Containers --- */
 .center { 
     display: flex; 
     flex-direction: column; 
@@ -21,39 +38,51 @@ body {
     min-height: 100vh; 
     gap: 15px; 
     padding: 20px; 
+    text-align: center;
 }
 
-.hidden { display: none !important; }
+.hidden { 
+    display: none !important; 
+}
 
-/* --- Forms & Inputs --- */
+/* --- Typography --- */
+h1 { font-size: 2.5rem; margin-bottom: 10px; letter-spacing: 2px; }
+h2 { font-size: 1.8rem; margin-bottom: 10px; }
+h3 { font-size: 1.1rem; margin: 5px 0; }
+
+/* --- Form Elements --- */
 input, select, button { 
-    padding: 12px; 
-    border-radius: 10px; 
+    padding: 14px; 
+    border-radius: 12px; 
     border: none; 
     width: 230px; 
     font-size: 14px; 
     outline: none; 
+    transition: all 0.2s ease;
 }
 
 input, select {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
     color: white;
 }
 
-select option { color: black; }
+input::placeholder { color: rgba(255, 255, 255, 0.5); }
+
+select option { color: #333; }
 
 button { 
-    background: #4da3ff; 
+    background: var(--primary); 
     color: white; 
     cursor: pointer; 
     font-weight: bold; 
-    transition: all 0.2s ease; 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 button:hover { 
     opacity: 0.9; 
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(77, 163, 255, 0.3);
 }
 
 button:active { transform: translateY(0); }
@@ -61,7 +90,7 @@ button:active { transform: translateY(0); }
 .password-section { 
     display: flex; 
     flex-direction: column; 
-    gap: 10px; 
+    gap: 12px; 
     width: 230px; 
 }
 
@@ -69,165 +98,246 @@ button:active { transform: translateY(0); }
     font-size: 12px; 
     text-align: center; 
     width: 230px; 
-    min-height: 15px;
-    color: #ff8080;
+    min-height: 18px;
+    color: var(--error);
 }
 
 .legal-text { 
     font-size: 11px; 
     text-align: center; 
     width: 230px; 
-    opacity: 0.7; 
-    line-height: 1.4;
+    opacity: 0.8; 
+    margin-top: -5px;
 }
 
-.legal-text a { color: #4da3ff; text-decoration: none; }
+.legal-text a { color: var(--primary); text-decoration: none; font-weight: bold; }
 
-/* --- App Layout --- */
+/* --- Top Navigation Bar --- */
 .topbar { 
     display: flex; 
     justify-content: space-between; 
     align-items: center; 
-    padding: 15px 20px; 
-    background: rgba(0,0,0,0.3); 
-    backdrop-filter: blur(10px); 
+    padding: 15px 25px; 
+    background: rgba(0, 0, 0, 0.4); 
+    backdrop-filter: blur(12px); 
+    -webkit-backdrop-filter: blur(12px);
     position: sticky; 
     top: 0; 
     z-index: 1000; 
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.logo { font-weight: bold; font-size: 1.2rem; letter-spacing: 1px; }
+.logo { font-weight: 800; font-size: 20px; color: white; text-transform: uppercase; }
 
 .actions { display: flex; align-items: center; gap: 12px; }
 
 #headerClicks { 
-    background: rgba(77, 163, 255, 0.15); 
-    padding: 6px 12px; 
-    border-radius: 20px; 
-    font-weight: bold; 
+    background: rgba(77, 163, 255, 0.2); 
+    padding: 8px 16px; 
+    border-radius: 50px; 
+    font-weight: 700; 
     font-size: 13px; 
-    border: 1px solid rgba(77, 163, 255, 0.3); 
-    color: #4da3ff; 
+    border: 1px solid rgba(77, 163, 255, 0.4); 
+    color: var(--primary); 
 }
 
-#settingsBtn { width: auto; padding: 8px 12px; background: rgba(255,255,255,0.1); }
+#settingsBtn { 
+    width: 40px; 
+    height: 40px; 
+    padding: 0; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    background: var(--glass); 
+    border-radius: 50%;
+}
 
-/* --- Video Grid --- */
+/* --- Main App Content --- */
+#searchInput {
+    width: 100%;
+    max-width: 600px;
+    margin: 20px auto;
+    display: block;
+    background: rgba(255,255,255,0.08);
+}
+
 .video-grid { 
     display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
-    gap: 20px; 
-    padding: 20px; 
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+    gap: 25px; 
+    padding: 25px; 
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
 .video-card { 
-    background: rgba(255,255,255,0.05); 
-    border-radius: 15px; 
-    padding: 20px; 
+    background: rgba(255, 255, 255, 0.06); 
+    border-radius: 18px; 
+    padding: 24px; 
     cursor: pointer; 
-    border: 1px solid rgba(255,255,255,0.1); 
-    transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
+    border: 1px solid rgba(255, 255, 255, 0.1); 
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .video-card:hover { 
-    background: rgba(255,255,255,0.1); 
-    border-color: #4da3ff; 
-    transform: scale(1.02);
+    transform: translateY(-8px); 
+    background: rgba(255, 255, 255, 0.12); 
+    border-color: var(--primary); 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
-.v-meta { font-size: 10px; opacity: 0.5; text-transform: uppercase; margin-bottom: 5px; }
-.v-tag { background: rgba(77, 163, 255, 0.2); color: #4da3ff; padding: 3px 8px; border-radius: 5px; font-size: 10px; }
+.v-meta { font-size: 10px; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+.v-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
+.v-tag { background: rgba(77, 163, 255, 0.25); color: var(--primary); padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; }
 
-/* --- Settings & Support ID --- */
+/* --- Settings View --- */
 #supportIdView { 
-    background: rgba(0,0,0,0.2); 
-    padding: 12px; 
-    border-radius: 10px; 
-    border: 1px dashed #4da3ff; 
+    background: rgba(0, 0, 0, 0.4); 
+    padding: 15px; 
+    border-radius: 12px; 
+    border: 1px dashed var(--primary); 
     font-family: 'Courier New', monospace; 
-    color: #4da3ff; 
+    color: var(--primary); 
     text-align: center; 
-    width: 230px; 
+    width: 250px; 
+    font-size: 14px;
     margin-bottom: 10px;
 }
 
-.clicks-box { text-align: center; margin: 10px 0; }
+.clicks-box { text-align: center; margin: 20px 0; }
+.clicks-label { font-size: 10px; opacity: 0.6; letter-spacing: 2px; margin-bottom: 5px; }
+
 #clicksInfo { 
-    font-size: 56px; 
+    font-size: 64px; 
     margin: 5px 0; 
+    font-weight: 800;
     color: #fff; 
-    text-shadow: 0 0 15px rgba(77, 163, 255, 0.5); 
+    text-shadow: 0 0 25px rgba(77, 163, 255, 0.6); 
 }
+
+#expiryInfo { font-size: 12px; opacity: 0.7; margin-bottom: 15px; }
 
 .toggle-area {
     margin: 10px 0;
-    font-size: 14px;
-    background: rgba(255,255,255,0.05);
-    padding: 12px;
-    border-radius: 10px;
-    width: 230px;
+    background: var(--glass);
+    padding: 15px;
+    border-radius: 12px;
+    width: 250px;
     display: flex;
     align-items: center;
 }
 
-.toggle-area label { cursor: pointer; display: flex; align-items: center; gap: 10px; width: 100%; }
-.toggle-area input { width: 18px !important; height: 18px !important; margin: 0; cursor: pointer; }
+.toggle-area label { 
+    cursor: pointer; 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+    width: 100%;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.toggle-area input[type="checkbox"] { 
+    width: 20px !important; 
+    height: 20px !important; 
+    cursor: pointer; 
+}
 
 .sub-area { 
-    background: rgba(255,255,255,0.03); 
-    padding: 15px; 
-    border-radius: 12px; 
+    background: rgba(0, 0, 0, 0.2); 
+    padding: 20px; 
+    border-radius: 15px; 
+    border: 1px solid rgba(255,255,255,0.05);
     display: flex; 
     flex-direction: column; 
-    gap: 10px; 
+    gap: 12px; 
     margin-top: 10px;
 }
 
-/* --- Notifications & Overlays --- */
+/* --- Overlays & Notifications --- */
 .auth-banner {
     position: fixed; top: 0; left: 0; width: 100%; 
-    background: #4da3ff; color: white; text-align: center; 
-    padding: 10px; font-weight: bold; z-index: 10001;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    background: var(--primary); color: white; text-align: center; 
+    padding: 12px; font-weight: bold; z-index: 10001;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    font-size: 14px;
 }
 
 .notif-overlay { 
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
-    background: rgba(0,0,0,0.8); z-index: 9999; 
+    background: rgba(0, 0, 0, 0.85); z-index: 9999; 
     display: flex; justify-content: center; align-items: center; 
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 
 .notif-box { 
-    background: #1e3c72; padding: 25px; border-radius: 20px; 
-    border: 2px solid #4da3ff; width: 85%; max-width: 380px; 
-    text-align: center; position: relative;
+    background: var(--bg-light); 
+    padding: 35px 25px; 
+    border-radius: 24px; 
+    border: 2px solid var(--primary); 
+    width: 90%; 
+    max-width: 400px; 
+    text-align: center; 
+    position: relative;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
 }
 
-/* Responsive Font Logic (Up to 200 chars) */
 .notif-box p { 
-    font-size: clamp(14px, 4.2vw, 17px); 
+    font-size: clamp(14px, 4.5vw, 18px); 
     line-height: 1.6; 
     margin: 15px 0;
-    max-height: 60vh;
+    max-height: 50vh;
     overflow-y: auto;
+    padding-right: 10px;
 }
 
 .notif-close { 
-    position: absolute; top: 10px; right: 10px; 
-    background: transparent; color: white; font-size: 20px; 
-    width: auto; padding: 5px; 
+    position: absolute; top: 15px; right: 15px; 
+    background: transparent; color: white; font-size: 22px; 
+    width: auto; padding: 5px; opacity: 0.7;
 }
+
+.notif-close:hover { opacity: 1; }
 
 .notif-banner { 
-    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
-    background: #1e3c72; padding: 15px 40px 15px 20px; border-radius: 12px; 
-    border: 1px solid #4da3ff; z-index: 9998; width: 90%; max-width: 400px;
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
+    background: rgba(30, 60, 114, 0.95); 
+    padding: 18px 50px 18px 25px; 
+    border-radius: 15px; 
+    border: 1px solid var(--primary); 
+    z-index: 9998; 
+    width: 90%; 
+    max-width: 420px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
 }
 
-.notif-banner p { margin: 0; font-size: 14px; text-align: center; }
-.notif-close-small { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: transparent; width: auto; color: white; }
+.notif-banner p { margin: 0; font-size: 14px; text-align: center; font-weight: 500; }
 
-/* Custom Scrollbar for Notif box */
+.notif-close-small { 
+    position: absolute; right: 15px; top: 50%; 
+    transform: translateY(-50%); 
+    background: transparent; width: auto; color: white; 
+    font-size: 18px; opacity: 0.6;
+}
+
+/* --- Scrollbars --- */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-dark); }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
 .notif-box p::-webkit-scrollbar { width: 4px; }
-.notif-box p::-webkit-scrollbar-thumb { background: #4da3ff; border-radius: 10px; }
+.notif-box p::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+
+/* --- Mobile Adjustments --- */
+@media (max-width: 480px) {
+    .video-grid { padding: 15px; gap: 15px; }
+    .topbar { padding: 12px 15px; }
+    .logo { font-size: 16px; }
+    #headerClicks { padding: 6px 12px; font-size: 12px; }
+    button, input, select { width: 100%; max-width: 280px; }
+}
