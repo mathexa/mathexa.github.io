@@ -1,34 +1,301 @@
-body { margin: 0; font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #0a1f44, #1e3c72); color: white; min-height: 100vh; overflow-x: hidden; }
-.center { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; gap: 15px; padding: 20px; box-sizing: border-box; }
+/* --- Global Styles --- */
+body { 
+    margin: 0; 
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+    background: linear-gradient(135deg, #0a1f44, #1e3c72); 
+    color: white; 
+    min-height: 100vh; 
+    overflow-x: hidden; 
+}
+
+.center { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    min-height: 100vh; 
+    gap: 15px; 
+    padding: 20px; 
+    box-sizing: border-box; 
+}
+
 .hidden { display: none !important; }
-input, select, button { padding: 12px; border-radius: 10px; border: none; width: 230px; box-sizing: border-box; font-size: 14px; outline: none; }
-button { background: #4da3ff; color: white; cursor: pointer; font-weight: bold; transition: 0.2s; }
-button:hover { opacity: 0.85; transform: scale(1.02); }
-.password-section { display: flex; flex-direction: column; gap: 12px; width: 230px; margin: 5px 0; }
-#headerClicks { background: rgba(77, 163, 255, 0.2); padding: 8px 15px; border-radius: 12px; font-weight: bold; font-size: 14px; border: 1px solid rgba(77, 163, 255, 0.3); color: #4da3ff; }
-.clicks-box { text-align: center; margin: 15px 0; }
-.clicks-label { font-size: 10px; opacity: 0.6; letter-spacing: 1.5px; }
-#clicksInfo { font-size: 42px; margin: 5px 0; color: #fff; text-shadow: 0 0 20px rgba(77, 163, 255, 0.6); }
-#supportIdView { background: rgba(0,0,0,0.3); padding: 12px; border-radius: 10px; border: 1px dashed #4da3ff; font-family: monospace; color: #4da3ff; text-align: center; width: 230px; }
-.topbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); position: sticky; top: 0; z-index: 100; }
-.video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; padding: 25px; }
-.video-card { background: rgba(255,255,255,0.08); border-radius: 15px; padding: 20px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; }
-.video-card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.15); border-color: #4da3ff; }
+
+/* --- Form Elements --- */
+input, select, button { 
+    padding: 12px; 
+    border-radius: 10px; 
+    border: none; 
+    width: 230px; 
+    box-sizing: border-box; 
+    font-size: 14px; 
+    outline: none; 
+}
+
+input, select {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+select option { color: black; }
+
+button { 
+    background: #4da3ff; 
+    color: white; 
+    cursor: pointer; 
+    font-weight: bold; 
+    transition: 0.2s; 
+}
+
+button:hover { 
+    opacity: 0.85; 
+    transform: scale(1.02); 
+}
+
+.password-section { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 12px; 
+    width: 230px; 
+    margin: 5px 0; 
+}
+
+.status-msg { 
+    font-size: 12px; 
+    text-align: center; 
+    width: 230px; 
+    min-height: 18px; 
+}
+
+/* --- App UI Components --- */
+.topbar { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 15px 20px; 
+    background: rgba(0,0,0,0.4); 
+    backdrop-filter: blur(8px); 
+    position: sticky; 
+    top: 0; 
+    z-index: 100; 
+}
+
+.logo { font-weight: bold; font-size: 18px; letter-spacing: 1px; }
+
+.actions { display: flex; align-items: center; gap: 10px; }
+
+#headerClicks { 
+    background: rgba(77, 163, 255, 0.2); 
+    padding: 8px 15px; 
+    border-radius: 12px; 
+    font-weight: bold; 
+    font-size: 14px; 
+    border: 1px solid rgba(77, 163, 255, 0.3); 
+    color: #4da3ff; 
+}
+
+#settingsBtn { width: auto; padding: 8px 12px; background: rgba(255,255,255,0.1); }
+
+/* --- Search & Grid --- */
+#searchInput {
+    width: 100%; 
+    max-width: 500px; 
+    background: rgba(255,255,255,0.05); 
+    border: 1px solid rgba(255,255,255,0.1); 
+    border-radius: 12px;
+}
+
+.video-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+    gap: 20px; 
+    padding: 25px; 
+}
+
+.video-card { 
+    background: rgba(255,255,255,0.08); 
+    border-radius: 15px; 
+    padding: 20px; 
+    cursor: pointer; 
+    border: 1px solid rgba(255,255,255,0.1); 
+    transition: 0.3s; 
+}
+
+.video-card:hover { 
+    transform: translateY(-5px); 
+    background: rgba(255,255,255,0.15); 
+    border-color: #4da3ff; 
+}
+
 .v-meta { font-size: 10px; opacity: 0.5; text-transform: uppercase; margin-bottom: 8px; }
 .v-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
 .v-tag { background: rgba(77, 163, 255, 0.2); color: #4da3ff; padding: 4px 10px; border-radius: 20px; font-size: 11px; }
-.v-dur { font-size: 11px; opacity: 0.7; }
-.status-msg { font-size: 12px; text-align: center; width: 230px; min-height: 18px; }
-.sub-area { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; gap: 10px; }
 
-/* Notification UI */
-.notif-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 9999; display: flex; justify-content: center; align-items: center; }
-.notif-box { background: #1e3c72; padding: 30px; border-radius: 15px; border: 2px solid #4da3ff; width: 80%; max-width: 400px; text-align: center; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
-.notif-close { position: absolute; top: 10px; right: 10px; background: transparent; border: none; color: white; width: auto; padding: 5px 10px; font-size: 18px; cursor: pointer; }
-.notif-banner { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(30, 60, 114, 0.95); padding: 15px 40px 15px 20px; border-radius: 10px; border: 1px solid #4da3ff; z-index: 9998; box-shadow: 0 5px 15px rgba(0,0,0,0.3); width: 80%; max-width: 400px; text-align: center; }
-.notif-close-small { position: absolute; top: 5px; right: 5px; background: transparent; border: none; color: white; width: auto; padding: 2px 8px; font-size: 14px; cursor: pointer; }
+/* --- Settings & Support ID --- */
+.clicks-box { text-align: center; margin: 15px 0; }
+.clicks-label { font-size: 10px; opacity: 0.6; letter-spacing: 1.5px; }
+#clicksInfo { 
+    font-size: 48px; 
+    margin: 5px 0; 
+    color: #fff; 
+    text-shadow: 0 0 20px rgba(77, 163, 255, 0.6); 
+}
 
-/* Legal Text */
-.legal-text { font-size: 11px; text-align: center; width: 230px; opacity: 0.9; margin: -5px 0 5px 0; line-height: 1.4; }
-.legal-text a { color: #80ff80; text-decoration: none; font-weight: bold; }
+#supportIdView { 
+    background: rgba(0,0,0,0.3); 
+    padding: 12px; 
+    border-radius: 10px; 
+    border: 1px dashed #4da3ff; 
+    font-family: 'Courier New', monospace; 
+    color: #4da3ff; 
+    text-align: center; 
+    width: 230px; 
+    box-sizing: border-box;
+}
+
+.toggle-area {
+    margin: 10px 0;
+    font-size: 14px;
+    background: rgba(255,255,255,0.05);
+    padding: 12px;
+    border-radius: 10px;
+    width: 230px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+}
+
+.toggle-area label { 
+    cursor: pointer; 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    width: 100%;
+}
+
+.toggle-area input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+
+.sub-area { 
+    background: rgba(255,255,255,0.05); 
+    padding: 15px; 
+    border-radius: 15px; 
+    border: 1px solid rgba(255,255,255,0.1); 
+    display: flex; 
+    flex-direction: column; 
+    gap: 10px; 
+}
+
+/* --- Notifications & Banners --- */
+.auth-banner {
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    background: #4da3ff; 
+    color: white; 
+    text-align: center; 
+    padding: 10px; 
+    font-weight: bold; 
+    z-index: 10001;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+.notif-overlay { 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100vw; 
+    height: 100vh; 
+    background: rgba(0,0,0,0.85); 
+    z-index: 9999; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    backdrop-filter: blur(4px);
+}
+
+.notif-box { 
+    background: #1e3c72; 
+    padding: 30px; 
+    border-radius: 15px; 
+    border: 2px solid #4da3ff; 
+    width: 85%; 
+    max-width: 400px; 
+    text-align: center; 
+    position: relative; 
+    box-shadow: 0 0 40px rgba(0,0,0,0.6); 
+}
+
+/* Responsive Notification Text */
+.notif-box p {
+    font-size: clamp(14px, 4.5vw, 18px); 
+    line-height: 1.5;
+    word-wrap: break-word;
+    max-height: 250px;
+    overflow-y: auto;
+    margin: 15px 0;
+    padding-right: 5px;
+}
+
+.notif-close { 
+    position: absolute; 
+    top: 10px; 
+    right: 10px; 
+    background: transparent; 
+    border: none; 
+    color: white; 
+    width: auto; 
+    padding: 5px 10px; 
+    font-size: 20px; 
+    cursor: pointer; 
+}
+
+.notif-banner { 
+    position: fixed; 
+    bottom: 25px; 
+    left: 50%; 
+    transform: translateX(-50%); 
+    background: rgba(30, 60, 114, 0.98); 
+    padding: 15px 45px 15px 20px; 
+    border-radius: 12px; 
+    border: 1px solid #4da3ff; 
+    z-index: 9998; 
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4); 
+    width: 85%; 
+    max-width: 400px; 
+    text-align: center; 
+}
+
+.notif-banner p { margin: 0; font-size: 14px; }
+
+.notif-close-small { 
+    position: absolute; 
+    top: 50%; 
+    right: 10px; 
+    transform: translateY(-50%);
+    background: transparent; 
+    border: none; 
+    color: white; 
+    width: auto; 
+    padding: 5px; 
+    font-size: 16px; 
+    cursor: pointer; 
+}
+
+/* --- Legal Text --- */
+.legal-text { 
+    font-size: 11px; 
+    text-align: center; 
+    width: 230px; 
+    opacity: 0.8; 
+    margin: -5px 0 5px 0; 
+    line-height: 1.4; 
+}
+
+.legal-text a { color: #4da3ff; text-decoration: none; font-weight: bold; }
 .legal-text a:hover { text-decoration: underline; }
+
+/* --- Custom Scrollbar for Notif Box --- */
+.notif-box p::-webkit-scrollbar { width: 4px; }
+.notif-box p::-webkit-scrollbar-thumb { background: #4da3ff; border-radius: 10px; }
