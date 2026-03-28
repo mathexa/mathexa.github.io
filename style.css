@@ -1,4 +1,9 @@
-/* --- Global Styles --- */
+/* --- Core Reset & Theme --- */
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
 body { 
     margin: 0; 
     font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
@@ -16,18 +21,16 @@ body {
     min-height: 100vh; 
     gap: 15px; 
     padding: 20px; 
-    box-sizing: border-box; 
 }
 
 .hidden { display: none !important; }
 
-/* --- Form Elements --- */
+/* --- Forms & Inputs --- */
 input, select, button { 
     padding: 12px; 
     border-radius: 10px; 
     border: none; 
     width: 230px; 
-    box-sizing: border-box; 
     font-size: 14px; 
     outline: none; 
 }
@@ -45,105 +48,99 @@ button {
     color: white; 
     cursor: pointer; 
     font-weight: bold; 
-    transition: 0.2s; 
+    transition: all 0.2s ease; 
 }
 
 button:hover { 
-    opacity: 0.85; 
-    transform: scale(1.02); 
+    opacity: 0.9; 
+    transform: translateY(-1px);
 }
+
+button:active { transform: translateY(0); }
 
 .password-section { 
     display: flex; 
     flex-direction: column; 
-    gap: 12px; 
+    gap: 10px; 
     width: 230px; 
-    margin: 5px 0; 
 }
 
 .status-msg { 
     font-size: 12px; 
     text-align: center; 
     width: 230px; 
-    min-height: 18px; 
+    min-height: 15px;
+    color: #ff8080;
 }
 
-/* --- App UI Components --- */
+.legal-text { 
+    font-size: 11px; 
+    text-align: center; 
+    width: 230px; 
+    opacity: 0.7; 
+    line-height: 1.4;
+}
+
+.legal-text a { color: #4da3ff; text-decoration: none; }
+
+/* --- App Layout --- */
 .topbar { 
     display: flex; 
     justify-content: space-between; 
     align-items: center; 
     padding: 15px 20px; 
-    background: rgba(0,0,0,0.4); 
-    backdrop-filter: blur(8px); 
+    background: rgba(0,0,0,0.3); 
+    backdrop-filter: blur(10px); 
     position: sticky; 
     top: 0; 
-    z-index: 100; 
+    z-index: 1000; 
 }
 
-.logo { font-weight: bold; font-size: 18px; letter-spacing: 1px; }
+.logo { font-weight: bold; font-size: 1.2rem; letter-spacing: 1px; }
 
-.actions { display: flex; align-items: center; gap: 10px; }
+.actions { display: flex; align-items: center; gap: 12px; }
 
 #headerClicks { 
-    background: rgba(77, 163, 255, 0.2); 
-    padding: 8px 15px; 
-    border-radius: 12px; 
+    background: rgba(77, 163, 255, 0.15); 
+    padding: 6px 12px; 
+    border-radius: 20px; 
     font-weight: bold; 
-    font-size: 14px; 
+    font-size: 13px; 
     border: 1px solid rgba(77, 163, 255, 0.3); 
     color: #4da3ff; 
 }
 
 #settingsBtn { width: auto; padding: 8px 12px; background: rgba(255,255,255,0.1); }
 
-/* --- Search & Grid --- */
-#searchInput {
-    width: 100%; 
-    max-width: 500px; 
-    background: rgba(255,255,255,0.05); 
-    border: 1px solid rgba(255,255,255,0.1); 
-    border-radius: 12px;
-}
-
+/* --- Video Grid --- */
 .video-grid { 
     display: grid; 
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
     gap: 20px; 
-    padding: 25px; 
+    padding: 20px; 
 }
 
 .video-card { 
-    background: rgba(255,255,255,0.08); 
+    background: rgba(255,255,255,0.05); 
     border-radius: 15px; 
     padding: 20px; 
     cursor: pointer; 
     border: 1px solid rgba(255,255,255,0.1); 
-    transition: 0.3s; 
+    transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
 }
 
 .video-card:hover { 
-    transform: translateY(-5px); 
-    background: rgba(255,255,255,0.15); 
+    background: rgba(255,255,255,0.1); 
     border-color: #4da3ff; 
+    transform: scale(1.02);
 }
 
-.v-meta { font-size: 10px; opacity: 0.5; text-transform: uppercase; margin-bottom: 8px; }
-.v-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
-.v-tag { background: rgba(77, 163, 255, 0.2); color: #4da3ff; padding: 4px 10px; border-radius: 20px; font-size: 11px; }
+.v-meta { font-size: 10px; opacity: 0.5; text-transform: uppercase; margin-bottom: 5px; }
+.v-tag { background: rgba(77, 163, 255, 0.2); color: #4da3ff; padding: 3px 8px; border-radius: 5px; font-size: 10px; }
 
 /* --- Settings & Support ID --- */
-.clicks-box { text-align: center; margin: 15px 0; }
-.clicks-label { font-size: 10px; opacity: 0.6; letter-spacing: 1.5px; }
-#clicksInfo { 
-    font-size: 48px; 
-    margin: 5px 0; 
-    color: #fff; 
-    text-shadow: 0 0 20px rgba(77, 163, 255, 0.6); 
-}
-
 #supportIdView { 
-    background: rgba(0,0,0,0.3); 
+    background: rgba(0,0,0,0.2); 
     padding: 12px; 
     border-radius: 10px; 
     border: 1px dashed #4da3ff; 
@@ -151,7 +148,15 @@ button:hover {
     color: #4da3ff; 
     text-align: center; 
     width: 230px; 
-    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+
+.clicks-box { text-align: center; margin: 10px 0; }
+#clicksInfo { 
+    font-size: 56px; 
+    margin: 5px 0; 
+    color: #fff; 
+    text-shadow: 0 0 15px rgba(77, 163, 255, 0.5); 
 }
 
 .toggle-area {
@@ -161,141 +166,68 @@ button:hover {
     padding: 12px;
     border-radius: 10px;
     width: 230px;
-    box-sizing: border-box;
     display: flex;
     align-items: center;
 }
 
-.toggle-area label { 
-    cursor: pointer; 
-    display: flex; 
-    align-items: center; 
-    gap: 10px; 
-    width: 100%;
-}
-
-.toggle-area input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+.toggle-area label { cursor: pointer; display: flex; align-items: center; gap: 10px; width: 100%; }
+.toggle-area input { width: 18px !important; height: 18px !important; margin: 0; cursor: pointer; }
 
 .sub-area { 
-    background: rgba(255,255,255,0.05); 
+    background: rgba(255,255,255,0.03); 
     padding: 15px; 
-    border-radius: 15px; 
-    border: 1px solid rgba(255,255,255,0.1); 
+    border-radius: 12px; 
     display: flex; 
     flex-direction: column; 
     gap: 10px; 
+    margin-top: 10px;
 }
 
-/* --- Notifications & Banners --- */
+/* --- Notifications & Overlays --- */
 .auth-banner {
-    position: fixed; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    background: #4da3ff; 
-    color: white; 
-    text-align: center; 
-    padding: 10px; 
-    font-weight: bold; 
-    z-index: 10001;
+    position: fixed; top: 0; left: 0; width: 100%; 
+    background: #4da3ff; color: white; text-align: center; 
+    padding: 10px; font-weight: bold; z-index: 10001;
     box-shadow: 0 2px 10px rgba(0,0,0,0.3);
 }
 
 .notif-overlay { 
-    position: fixed; 
-    top: 0; 
-    left: 0; 
-    width: 100vw; 
-    height: 100vh; 
-    background: rgba(0,0,0,0.85); 
-    z-index: 9999; 
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-    backdrop-filter: blur(4px);
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+    background: rgba(0,0,0,0.8); z-index: 9999; 
+    display: flex; justify-content: center; align-items: center; 
+    backdrop-filter: blur(5px);
 }
 
 .notif-box { 
-    background: #1e3c72; 
-    padding: 30px; 
-    border-radius: 15px; 
-    border: 2px solid #4da3ff; 
-    width: 85%; 
-    max-width: 400px; 
-    text-align: center; 
-    position: relative; 
-    box-shadow: 0 0 40px rgba(0,0,0,0.6); 
+    background: #1e3c72; padding: 25px; border-radius: 20px; 
+    border: 2px solid #4da3ff; width: 85%; max-width: 380px; 
+    text-align: center; position: relative;
 }
 
-/* Responsive Notification Text */
-.notif-box p {
-    font-size: clamp(14px, 4.5vw, 18px); 
-    line-height: 1.5;
-    word-wrap: break-word;
-    max-height: 250px;
-    overflow-y: auto;
+/* Responsive Font Logic (Up to 200 chars) */
+.notif-box p { 
+    font-size: clamp(14px, 4.2vw, 17px); 
+    line-height: 1.6; 
     margin: 15px 0;
-    padding-right: 5px;
+    max-height: 60vh;
+    overflow-y: auto;
 }
 
 .notif-close { 
-    position: absolute; 
-    top: 10px; 
-    right: 10px; 
-    background: transparent; 
-    border: none; 
-    color: white; 
-    width: auto; 
-    padding: 5px 10px; 
-    font-size: 20px; 
-    cursor: pointer; 
+    position: absolute; top: 10px; right: 10px; 
+    background: transparent; color: white; font-size: 20px; 
+    width: auto; padding: 5px; 
 }
 
 .notif-banner { 
-    position: fixed; 
-    bottom: 25px; 
-    left: 50%; 
-    transform: translateX(-50%); 
-    background: rgba(30, 60, 114, 0.98); 
-    padding: 15px 45px 15px 20px; 
-    border-radius: 12px; 
-    border: 1px solid #4da3ff; 
-    z-index: 9998; 
-    box-shadow: 0 8px 25px rgba(0,0,0,0.4); 
-    width: 85%; 
-    max-width: 400px; 
-    text-align: center; 
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
+    background: #1e3c72; padding: 15px 40px 15px 20px; border-radius: 12px; 
+    border: 1px solid #4da3ff; z-index: 9998; width: 90%; max-width: 400px;
 }
 
-.notif-banner p { margin: 0; font-size: 14px; }
+.notif-banner p { margin: 0; font-size: 14px; text-align: center; }
+.notif-close-small { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: transparent; width: auto; color: white; }
 
-.notif-close-small { 
-    position: absolute; 
-    top: 50%; 
-    right: 10px; 
-    transform: translateY(-50%);
-    background: transparent; 
-    border: none; 
-    color: white; 
-    width: auto; 
-    padding: 5px; 
-    font-size: 16px; 
-    cursor: pointer; 
-}
-
-/* --- Legal Text --- */
-.legal-text { 
-    font-size: 11px; 
-    text-align: center; 
-    width: 230px; 
-    opacity: 0.8; 
-    margin: -5px 0 5px 0; 
-    line-height: 1.4; 
-}
-
-.legal-text a { color: #4da3ff; text-decoration: none; font-weight: bold; }
-.legal-text a:hover { text-decoration: underline; }
-
-/* --- Custom Scrollbar for Notif Box --- */
+/* Custom Scrollbar for Notif box */
 .notif-box p::-webkit-scrollbar { width: 4px; }
 .notif-box p::-webkit-scrollbar-thumb { background: #4da3ff; border-radius: 10px; }
