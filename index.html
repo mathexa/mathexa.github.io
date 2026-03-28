@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div id="loadingBanner" class="auth-banner hidden">Jungiamasi prie paskyros...</div>
+
     <div id="vImpNotif" class="notif-overlay hidden">
         <div class="notif-box">
             <button class="notif-close" onclick="closeNotif('vImpNotif')">✖</button>
@@ -37,7 +39,6 @@
         <h2>Nauja paskyra</h2>
         <input id="name" placeholder="Vardas Pavardė">
         <input id="email2" type="email" placeholder="El. paštas">
-        
         <select id="role">
             <option value="student">Studentas</option>
             <option value="teacher">Mokytojas</option>
@@ -47,7 +48,7 @@
             <input id="password3" type="password" placeholder="Pakartokite slaptažodį">
         </div>
         <div class="legal-text">
-            Kurdami paskyrą sutinkate su mūsų <a href="policy.txt" target="_blank">duomenų valdymo politika</a>, <a href="policy.txt" target="_blank">privatumo politika</a> ir <a href="policy.txt" target="_blank">naudojimo sąlygomis</a>.
+            Kurdami paskyrą sutinkate su <a href="policy.txt" target="_blank">taisyklėmis</a>.
         </div>
         <div id="signupStatus" class="status-msg">Minimalus ilgis 8 simb.</div>
         <button id="signupBtn">Sukurti</button>
@@ -62,18 +63,14 @@
                 <button id="settingsBtn">⚙</button>
             </div>
         </div>
-        
         <div style="padding: 15px 25px 0 25px; display: flex; justify-content: center; gap: 10px;">
-            <input id="searchInput" placeholder="Ieškoti pamokos arba temos..." 
-                   style="width: 100%; max-width: 500px; background: rgba(255,255,255,0.05); 
-                          border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 12px;">
-            <select id="langFilter" style="width: 80px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 12px; outline: none;">
-                <option value="all" style="color: black;">Visi</option>
-                <option value="lt" style="color: black;">LT</option>
-                <option value="en" style="color: black;">EN</option>
+            <input id="searchInput" placeholder="Ieškoti pamokos...">
+            <select id="langFilter" style="width: 80px;">
+                <option value="all">Visi</option>
+                <option value="lt">LT</option>
+                <option value="en">EN</option>
             </select>
         </div>
-
         <div id="videos" class="video-grid"></div>
     </div>
 
@@ -83,16 +80,27 @@
         <div class="clicks-box">
             <div class="clicks-label">LIKUSIOS PERŽIŪROS</div>
             <h3 id="clicksInfo">--</h3>
+            <div id="expiryInfo" style="font-size: 11px; opacity: 0.7; margin-top: -10px;"></div>
         </div>
+
+        <div class="toggle-area">
+            <label><input type="checkbox" id="stayLogged"> Likti prisijungus</label>
+        </div>
+
         <div class="sub-area">
             <input id="subCode" placeholder="Prenumeratos kodas">
             <button id="btnRedeem">Aktyvuoti</button>
             <div id="subStatus" class="status-msg"></div>
         </div>
         
-        <button id="bugReportBtn" style="background:#ff9900; margin-top:20px;" onclick="window.open('https://forms.gle/qn1EeUGWqb1KqmVX9', '_blank')">Pranešti apie klaidą</button>
         <button id="logoutBtn" style="background:#ff4d4d; margin-top:10px;">Atsijungti</button>
         <button id="closeSettings">Grįžti</button>
+    </div>
+
+    <div id="videoOverlay" class="notif-overlay hidden">
+        <div class="notif-box">
+            <p>Susisiekiama su serveriu...<br><small>Video bus paleistas netrukus.</small></p>
+        </div>
     </div>
 
     <script src="app.js"></script>
