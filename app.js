@@ -80,6 +80,35 @@ async function login() {
     } catch(e) { document.getElementById("loginStatus").innerText = "Ryšio klaida."; }
 }
 
+async function signup() {
+    const p2 = document.getElementById("password2").value, p3 = document.getElementById("password3").value;
+    if(p2.length < 8 || p2 !== p3) return;
+    const data = { action: "signup", full_name: document.getElementById("name").value, email: document.getElementById("email2").value, password: p2, role: document.getElementById("role").value };
+    const res = await fetch(API, { method:"POST", body: JSON.stringify(data)});
+    const resData = await res.json();
+    if(resData.success) { alert("Sukurta!"); show("login"); } else alert(resData.error);
+}
+
+async function redeem() {
+    const code = document.getElementById("subCode").value;
+    const s = JSON.parse(localStorage.getItem('mathexa_session'));
+    const status = document.getElementById("subStatus");
+    if(!code || !s) return;
+    status.innerText = "Tikrinama...";
+    try {
+        const res = await fetch(API, { method:"POST", body: JSON.stringify({ action:"redeemCode", token: s.token, code })});
+        const data = await res.json();
+        if(data.success) {
+            status.innerText = "Aktyvuota iki " + data.expiry;
+            status.style.color = "#80ff80";
+            location.reload(); // Refresh to update clicks logic
+        } else {
+            status.innerText = data.error;
+            status.style.color = "#ff8080";
+        }
+    } catch(err) { status.innerText = "Klaida."; }
+}
+
 async function showApp() {
     show("app");
     const grid = document.getElementById("videos");
@@ -117,7 +146,6 @@ async function checkSession() {
 
     if(!stay && !s) return;
     
-    // Auto-login logic
     if(stay && !s && sid) {
         document.getElementById("loadingBanner").classList.remove("hidden");
         try {
@@ -135,7 +163,6 @@ async function checkSession() {
 
     if(!s) return;
 
-    // 1 in 10 chance to re-validate expiry/ban status
     if(Math.random() < 0.1) {
         try {
             const res = await fetch(API, { method:"POST", body: JSON.stringify({ action:"validateToken", token: s.token }) });
@@ -157,4 +184,10 @@ function show(id) {
     if(locMap[id]) displayNotif(locMap[id]);
 }
 function back() { show("landing"); }
-function closeNotif(id) { document.getElementById(id).classList.add('hidden'); }
+function closeNotif(id) { 
+    const textElementId = id === 'vImpNotif' ? 'vImpText' : 'nImpText';
+    const msg = document.getElementById(textElementId).innerText;
+    const seenList = JSON.parse(localStorage.getItem('seen_notifs') || "[]");
+    if (!seenList.includes(msg)) { seenList.push(msg); localStorage.setItem('seen_notifs', JSON.stringify(seenList)); }
+    document.getElementById(id).classList.add('hidden'); 
+}
