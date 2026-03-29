@@ -15,6 +15,7 @@
             <p id="vImpText"></p>
         </div>
     </div>
+    
     <div id="nImpNotif" class="notif-banner hidden">
         <button class="notif-close-small" onclick="closeNotif('nImpNotif')">✖</button>
         <p id="nImpText"></p>
@@ -22,37 +23,41 @@
 
     <div id="landing" class="center">
         <h1>Mathexa</h1>
-        <button id="btnLogin">Prisijungti</button>
-        <button id="btnSignup">Registruotis</button>
+        <div class="btn-group">
+            <button id="btnLogin">Prisijungti</button>
+            <button id="btnSignup" style="background: var(--glass); border: 1px solid var(--primary);">Registruotis</button>
+        </div>
     </div>
 
     <div id="login" class="center hidden">
         <h2>Prisijungti</h2>
-        <input id="email" type="email" placeholder="El. paštas">
-        <input id="password" type="password" placeholder="Slaptažodis">
+        <div class="input-wrap">
+            <input id="email" type="email" placeholder="El. paštas">
+            <input id="password" type="password" placeholder="Slaptažodis">
+        </div>
         <div id="loginStatus" class="status-msg"></div>
         <button id="loginBtn">Eiti</button>
-        <button onclick="back()">Atgal</button>
+        <button class="btn-flat" onclick="back()">Atgal</button>
     </div>
 
     <div id="signup" class="center hidden">
         <h2>Nauja paskyra</h2>
-        <input id="name" placeholder="Vardas Pavardė">
-        <input id="email2" type="email" placeholder="El. paštas">
-        <select id="role">
-            <option value="student">Studentas</option>
-            <option value="teacher">Mokytojas</option>
-        </select>
-        <div class="password-section">
+        <div class="input-wrap">
+            <input id="name" placeholder="Vardas Pavardė">
+            <input id="email2" type="email" placeholder="El. paštas">
+            <select id="role">
+                <option value="student">Studentas</option>
+                <option value="teacher">Mokytojas</option>
+            </select>
             <input id="password2" type="password" placeholder="Slaptažodis">
             <input id="password3" type="password" placeholder="Pakartokite slaptažodį">
         </div>
-        <div class="legal-text">
+        <div class="legal-box">
             Kurdami paskyrą sutinkate su <a href="policy.txt" target="_blank">taisyklėmis</a>.
         </div>
         <div id="signupStatus" class="status-msg">Minimalus ilgis 8 simb.</div>
         <button id="signupBtn">Sukurti</button>
-        <button onclick="back()">Atgal</button>
+        <button class="btn-flat" onclick="back()">Atgal</button>
     </div>
 
     <div id="app" class="hidden">
@@ -63,7 +68,7 @@
                 <button id="settingsBtn">⚙</button>
             </div>
         </div>
-        <div class="filter-bar">
+        <div class="search-area">
             <input id="searchInput" placeholder="Ieškoti pamokos...">
             <select id="langFilter">
                 <option value="all">Visi</option>
@@ -77,24 +82,25 @@
     <div id="settings" class="center hidden">
         <h2>Nustatymai</h2>
         <div id="supportIdView">ID: Kraunama...</div>
+        
         <div class="clicks-box">
             <div class="clicks-label">LIKUSIOS PERŽIŪROS</div>
-            <h3 id="clicksInfo">--</h3>
-            <div id="expiryInfo"></div>
+            <h1 id="clicksInfo">--</h1>
+            <div id="expiryInfo" class="exp-text"></div>
         </div>
 
-        <div class="toggle-area">
-            <label><input type="checkbox" id="stayLogged"> Likti prisijungus</label>
+        <div class="settings-card">
+            <label class="toggle"><input type="checkbox" id="stayLogged"> Likti prisijungus</label>
         </div>
 
-        <div class="sub-area">
-            <input id="subCode" placeholder="Kodas">
+        <div class="settings-card">
+            <input id="subCode" placeholder="Prenumeratos kodas">
             <button id="btnRedeem">Aktyvuoti</button>
             <div id="subStatus" class="status-msg"></div>
         </div>
         
-        <button id="logoutBtn" style="background:#ff4d4d; margin-top:10px;">Atsijungti</button>
-        <button id="closeSettings">Grįžti</button>
+        <button id="logoutBtn" class="btn-danger">Atsijungti</button>
+        <button id="closeSettings" class="btn-flat">Grįžti</button>
     </div>
 
     <script src="app.js"></script>
